@@ -22,4 +22,8 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Authentication.Persistence\Authentication.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

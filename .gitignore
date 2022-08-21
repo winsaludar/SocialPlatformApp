@@ -2,3 +2,9 @@
 /SocialPlatformApp/.vs/SocialPlatformApp/config
 /SocialPlatformApp/Authentication.API/bin/Debug/net6.0
 /SocialPlatformApp/Authentication.API/obj/Debug/net6.0
+/SocialPlatformApp/Authentication.API/obj
+/SocialPlatformApp/Authentication.Persistence/bin/Debug/net6.0
+/SocialPlatformApp/Authentication.Persistence/obj
+/SocialPlatformApp/Authtentication.Domain/bin/Debug/net6.0
+/SocialPlatformApp/Authtentication.Domain/obj
+/SocialPlatformApp/.vs/ProjectEvaluation
