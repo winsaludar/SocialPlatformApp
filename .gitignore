@@ -19,3 +19,7 @@
 /SocialPlatformApp/Authentication.Presentation/bin/Debug/net6.0
 /SocialPlatformApp/Authentication.Presentation/obj/Debug/net6.0/ref/Authentication.Presentation.dll
 /SocialPlatformApp/Authentication.Presentation/obj
+/SocialPlatformApp/Authentication.Services.Tests/obj/Debug/net6.0
+/SocialPlatformApp/.vs/SocialPlatformApp/FileContentIndex
+/SocialPlatformApp/Authentication.UnitTests/bin/Debug/net6.0
+/SocialPlatformApp/Authentication.UnitTests/obj

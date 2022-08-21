@@ -4,10 +4,11 @@ using Authentication.Domain.Exceptions;
 using Authentication.Domain.Repositories;
 using Authentication.Services.Abstraction;
 using Mapster;
+using System.Text.RegularExpressions;
 
 namespace Authentication.Services;
 
-internal class ApplicationUserService : IApplicationUserService
+public class ApplicationUserService : IApplicationUserService
 {
     private readonly IRepositoryManager _repositoryManager;
 
@@ -15,6 +16,9 @@ internal class ApplicationUserService : IApplicationUserService
 
     public async Task<ApplicationUserDto> GetByEmailAsync(string email)
     {
+        if (string.IsNullOrEmpty(email) || !IsEmailValid(email))
+            throw new InvalidEmailException(email);
+
         var user = await _repositoryManager.ApplicationUserRepository.GetByEmailAsync(email);
         if (user is null)
             throw new UserNotFoundException(email);
@@ -25,6 +29,9 @@ internal class ApplicationUserService : IApplicationUserService
 
     public async Task RegisterAsync(RegisterApplicationUserDto registerApplicationUserDto)
     {
+        if (string.IsNullOrEmpty(registerApplicationUserDto.Email) || !IsEmailValid(registerApplicationUserDto.Email))
+            throw new InvalidEmailException(registerApplicationUserDto.Email);
+
         var existingUser = await _repositoryManager.ApplicationUserRepository.GetByEmailAsync(registerApplicationUserDto.Email);
         if (existingUser is not null)
             throw new UserAlreadyExistException(registerApplicationUserDto.Email);
@@ -37,5 +44,10 @@ internal class ApplicationUserService : IApplicationUserService
         };
 
         await _repositoryManager.ApplicationUserRepository.RegisterAsync(newUser, registerApplicationUserDto.Password);
+    }
+
+    private static bool IsEmailValid(string email)
+    {
+        return Regex.IsMatch(email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
     }
 }
