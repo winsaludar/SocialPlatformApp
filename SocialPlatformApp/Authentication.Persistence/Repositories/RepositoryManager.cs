@@ -1,5 +1,5 @@
-﻿using Authentication.Persistence.Models;
-using Authtentication.Domain.Repositories;
+﻿using Authentication.Domain.Repositories;
+using Authentication.Persistence.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Authentication.Persistence.Repositories;

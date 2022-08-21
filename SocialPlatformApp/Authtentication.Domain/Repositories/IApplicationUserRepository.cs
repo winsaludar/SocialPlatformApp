@@ -1,6 +1,6 @@
-﻿using Authtentication.Domain.Entities;
+﻿using Authentication.Domain.Entities;
 
-namespace Authtentication.Domain.Repositories;
+namespace Authentication.Domain.Repositories;
 
 public interface IApplicationUserRepository
 {

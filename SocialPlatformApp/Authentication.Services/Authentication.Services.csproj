@@ -8,13 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="Mapster" Version="7.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.8" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Authentication.Contracts\Authentication.Contracts.csproj" />
+    <ProjectReference Include="..\Authentication.Services.Abstraction\Authentication.Services.Abstraction.csproj" />
     <ProjectReference Include="..\Authtentication.Domain\Authentication.Domain.csproj" />
   </ItemGroup>
 

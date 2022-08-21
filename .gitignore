@@ -8,3 +8,14 @@
 /SocialPlatformApp/Authtentication.Domain/bin/Debug/net6.0
 /SocialPlatformApp/Authtentication.Domain/obj
 /SocialPlatformApp/.vs/ProjectEvaluation
+/SocialPlatformApp/.vs/SocialPlatformApp/DesignTimeBuild
+/SocialPlatformApp/Authentication.Contracts/bin/Debug/net6.0
+/SocialPlatformApp/Authentication.Contracts/obj
+/SocialPlatformApp/Authentication.Services.Abstraction/bin/Debug/net6.0
+/SocialPlatformApp/Authentication.Services.Abstraction/obj
+/SocialPlatformApp/Authentication.Services/bin/Debug/net6.0
+/SocialPlatformApp/Authentication.Services/obj/Debug/net6.0/ref/Authentication.Services.dll
+/SocialPlatformApp/Authentication.Services/obj
+/SocialPlatformApp/Authentication.Presentation/bin/Debug/net6.0
+/SocialPlatformApp/Authentication.Presentation/obj/Debug/net6.0/ref/Authentication.Presentation.dll
+/SocialPlatformApp/Authentication.Presentation/obj

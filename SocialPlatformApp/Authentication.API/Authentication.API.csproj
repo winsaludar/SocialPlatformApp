@@ -19,11 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Authentication.Persistence\Authentication.Persistence.csproj" />
+    <ProjectReference Include="..\Authentication.Presentation\Authentication.Presentation.csproj" />
+    <ProjectReference Include="..\Authentication.Services\Authentication.Services.csproj" />
   </ItemGroup>
 
 </Project>

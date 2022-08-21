@@ -1,9 +1,9 @@
-﻿namespace Authentication.Domain.Entities;
+﻿namespace Authentication.Contracts;
 
-public class ApplicationUser
+public record RegisterApplicationUserDto
 {
-    public Guid Id { get; set; }
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public string Email { get; set; } = default!;
+    public string Password { get; set; } = default!;
 }

@@ -1,4 +1,4 @@
-﻿namespace Authtentication.Domain.Repositories;
+﻿namespace Authentication.Domain.Repositories;
 
 public interface IRepositoryManager
 {
