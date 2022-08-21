@@ -36,6 +36,10 @@ public class ApplicationUserService : IApplicationUserService
         if (existingUser is not null)
             throw new UserAlreadyExistException(registerApplicationUserDto.Email);
 
+        bool isPasswordValid = await _repositoryManager.ApplicationUserRepository.ValidateRegistrationPassword(registerApplicationUserDto.Password);
+        if (!isPasswordValid)
+            throw new InvalidPasswordException();
+
         ApplicationUser newUser = new()
         {
             FirstName = registerApplicationUserDto.FirstName,

@@ -31,4 +31,17 @@ internal sealed class ApplicationUserRepository : IApplicationUserRepository
 
         await _userManager.CreateAsync(newUser, password);
     }
+
+    public async Task<bool> ValidateRegistrationPassword(string password)
+    {
+        var passwordValidators = _userManager.PasswordValidators;
+        foreach (var validator in passwordValidators)
+        {
+            var result = await validator.ValidateAsync(_userManager, null!, password);
+            if (!result.Succeeded)
+                return false;
+        }
+
+        return true;
+    }
 }

@@ -13,8 +13,8 @@ public class AuthController : ControllerBase
 
     public AuthController(IServiceManager serviceManager) => _serviceManager = serviceManager;
 
-    [HttpPost]
-    public async Task<IActionResult> Register(RegisterApplicationUser user)
+    [HttpPost("register")]
+    public async Task<IActionResult> RegisterAsync([FromBody] RegisterApplicationUser user)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields.");

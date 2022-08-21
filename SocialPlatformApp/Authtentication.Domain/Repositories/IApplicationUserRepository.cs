@@ -6,4 +6,5 @@ public interface IApplicationUserRepository
 {
     Task<ApplicationUser?> GetByEmailAsync(string email);
     Task RegisterAsync(ApplicationUser applicationUser, string password);
+    Task<bool> ValidateRegistrationPassword(string password);
 }

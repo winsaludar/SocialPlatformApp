@@ -61,8 +61,8 @@ public class ApplicationUserServiceTests
     {
         RegisterApplicationUserDto newUser = new()
         {
-            FirstName = "Test",
-            LastName = "Test",
+            FirstName = "First",
+            LastName = "Last",
             Email = email,
             Password = "password"
         };
@@ -76,8 +76,8 @@ public class ApplicationUserServiceTests
         string email = "existinguser@email.com";
         RegisterApplicationUserDto newUser = new()
         {
-            FirstName = "Test",
-            LastName = "Test",
+            FirstName = "First",
+            LastName = "Last",
             Email = email,
             Password = "password"
         };
@@ -88,27 +88,45 @@ public class ApplicationUserServiceTests
     }
 
     [Fact]
-    public async Task RegisterAsync_EmailIsValidAndDoesNotExist_CreateUser()
+    public async Task RegisterAsync_InvalidPassword_ThrowsInvalidPasswordException()
+    {
+        RegisterApplicationUserDto newUser = new()
+        {
+            FirstName = "First",
+            LastName = "Last",
+            Email = "test@example.com",
+            Password = ""
+        };
+
+        _mockRepo.Setup(x => x.ApplicationUserRepository.ValidateRegistrationPassword(newUser.Password))
+            .ReturnsAsync(false);
+
+        await Assert.ThrowsAsync<InvalidPasswordException>(() => _applicationUserService.RegisterAsync(newUser));
+    }
+
+    [Fact]
+    public async Task RegisterAsync_EmailAndPasswordAreBothValid_CreateUser()
     {
         ApplicationUser? createdUser = null;
-        _mockRepo.Setup(x => x.ApplicationUserRepository.RegisterAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
-            .Callback<ApplicationUser, string>((x, y) => createdUser = x);
-
         string email = "nonexistinguser@email.com";
+        string password = "P@$$w0rd1";
+        _mockRepo.Setup(x => x.ApplicationUserRepository.GetByEmailAsync(email))
+            .ReturnsAsync((ApplicationUser)null!);
+        _mockRepo.Setup(x => x.ApplicationUserRepository.ValidateRegistrationPassword(password))
+            .ReturnsAsync(true);
+        _mockRepo.Setup(x => x.ApplicationUserRepository.RegisterAsync(It.IsAny<ApplicationUser>(), password))
+            .Callback<ApplicationUser, string>((x, y) => createdUser = x);
         RegisterApplicationUserDto newUser = new()
         {
             FirstName = "Test",
             LastName = "Test",
             Email = email,
-            Password = "password"
+            Password = password
         };
-        _mockRepo.Setup(x => x.ApplicationUserRepository.GetByEmailAsync(email))
-            .ReturnsAsync((ApplicationUser)null!);
-
 
         await _applicationUserService.RegisterAsync(newUser);
 
-        _mockRepo.Verify(x => x.ApplicationUserRepository.RegisterAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()), Times.Once);
+        _mockRepo.Verify(x => x.ApplicationUserRepository.RegisterAsync(It.IsAny<ApplicationUser>(), password), Times.Once);
         Assert.Equal(createdUser?.FirstName, newUser.FirstName);
         Assert.Equal(createdUser?.LastName, newUser.LastName);
         Assert.Equal(createdUser?.Email, newUser.Email);
