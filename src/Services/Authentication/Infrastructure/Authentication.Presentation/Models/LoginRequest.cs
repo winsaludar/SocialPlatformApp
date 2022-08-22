@@ -2,7 +2,7 @@
 
 namespace Authentication.Presentation.Models;
 
-public class LoginApplicationUser
+public class LoginRequest
 {
     [Required]
     [EmailAddress]

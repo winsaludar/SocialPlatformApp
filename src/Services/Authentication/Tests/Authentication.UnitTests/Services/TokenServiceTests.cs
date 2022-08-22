@@ -40,7 +40,7 @@ public class TokenServiceTests
     [InlineData("test@emailcom")]
     public async Task GenerateJwtAsync_InvalidEmail_ThrowsInvalidEmailException(string email)
     {
-        ApplicationUser user = new() { Email = email };
+        UserDto user = new() { Email = email };
 
         await Assert.ThrowsAsync<InvalidEmailException>(() => _tokenService.GenerateJwtAsync(user));
     }
@@ -48,7 +48,7 @@ public class TokenServiceTests
     [Fact]
     public async Task GenerateJwtAsync_RefreshTokenIsNotNull_ReturnsNewTokenWithoutInsertingNewItemInTheDatabase()
     {
-        ApplicationUser user = new()
+        UserDto user = new()
         {
             Id = Guid.NewGuid(),
             Email = "test@example.com",
@@ -56,7 +56,7 @@ public class TokenServiceTests
             LastName = "Last"
         };
 
-        var result = await _tokenService.GenerateJwtAsync(user, new RefreshToken());
+        var result = await _tokenService.GenerateJwtAsync(user, new RefreshTokenDto());
 
         _mockRepo.Verify(x => x.RefreshTokenRepository.CreateAsync(It.IsAny<RefreshToken>()), Times.Never);
         Assert.IsType<TokenDto>(result);
@@ -65,7 +65,7 @@ public class TokenServiceTests
     [Fact]
     public async Task GenerateJwtAsync_RefreshTokenIsNull_ReturnsNewTokenAndInsertNewItemInTheDatabase()
     {
-        ApplicationUser user = new()
+        UserDto user = new()
         {
             Id = Guid.NewGuid(),
             Email = "test@example.com",
@@ -113,7 +113,7 @@ public class TokenServiceTests
     [Fact]
     public async Task RefreshJwtAsync_ExistingTokenIsValid_ReturnsNewToken()
     {
-        ApplicationUser user = new()
+        UserDto user = new()
         {
             Id = Guid.NewGuid(),
             Email = "test@example.com",
@@ -123,7 +123,13 @@ public class TokenServiceTests
         _mockRepo.Setup(x => x.RefreshTokenRepository.GetByOldRefreshTokenAsync(It.IsAny<string>()))
             .ReturnsAsync(new RefreshToken());
         _mockRepo.Setup(x => x.ApplicationUserRepository.GetByIdAsync(It.IsAny<string>()))
-            .ReturnsAsync(user);
+            .ReturnsAsync(new ApplicationUser
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            });
         var token = await _tokenService.GenerateJwtAsync(user);
 
         var result = await _tokenService.RefreshJwtAsync(token);

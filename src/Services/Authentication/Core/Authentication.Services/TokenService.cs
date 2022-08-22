@@ -3,6 +3,7 @@ using Authentication.Domain.Entities;
 using Authentication.Domain.Exceptions;
 using Authentication.Domain.Repositories;
 using Authentication.Services.Abstraction;
+using Mapster;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,11 +26,50 @@ public class TokenService : ITokenService
         _tokenValidationParameters = tokenValidationParameters;
     }
 
-    public async Task<TokenDto> GenerateJwtAsync(ApplicationUser user, RefreshToken? rToken = null)
+    public async Task<TokenDto> GenerateJwtAsync(UserDto userDto, RefreshTokenDto? refreshTokenDto = null)
     {
-        if (string.IsNullOrEmpty(user.Email) || !IsEmailValid(user.Email))
-            throw new InvalidEmailException(user.Email);
+        if (string.IsNullOrEmpty(userDto.Email) || !IsEmailValid(userDto.Email))
+            throw new InvalidEmailException(userDto.Email);
 
+        ApplicationUser user = userDto.Adapt<ApplicationUser>();
+        RefreshToken? token = refreshTokenDto?.Adapt<RefreshToken>();
+
+        return await GenerateAsync(user, token);
+    }
+
+    public async Task<TokenDto> RefreshJwtAsync(TokenDto oldToken)
+    {
+        JwtSecurityTokenHandler jwtTokenHandler = new();
+
+        var refreshTokenDb = await _repositoryManager.RefreshTokenRepository.GetByOldRefreshTokenAsync(oldToken.RefreshToken);
+        if (refreshTokenDb is null)
+            throw new InvalidRefreshTokenException();
+
+        var userDb = await _repositoryManager.ApplicationUserRepository.GetByIdAsync(refreshTokenDb.UserId);
+        if (userDb is null)
+            throw new InvalidRefreshTokenException();
+
+        // Handle expired token
+        try
+        {
+            var tokenCheckResult = jwtTokenHandler.ValidateToken(oldToken.Token, _tokenValidationParameters, out var validatedToken);
+            return await GenerateAsync(userDb, refreshTokenDb);
+        }
+        catch (SecurityTokenExpiredException)
+        {
+            if (refreshTokenDb?.DateExpire >= DateTime.UtcNow)
+                return await GenerateAsync(userDb, refreshTokenDb);
+            else
+                return await GenerateAsync(userDb);
+        }
+        catch (Exception)
+        {
+            throw new InvalidRefreshTokenException();
+        }
+    }
+
+    private async Task<TokenDto> GenerateAsync(ApplicationUser user, RefreshToken? rToken = null)
+    {
         // Configure claims that will be added in the token
         var authClaims = new List<Claim>()
         {
@@ -85,37 +125,6 @@ public class TokenService : ITokenService
             RefreshToken = refreshToken.Token,
             ExpiresAt = token.ValidTo
         };
-    }
-
-    public async Task<TokenDto> RefreshJwtAsync(TokenDto oldToken)
-    {
-        JwtSecurityTokenHandler jwtTokenHandler = new();
-
-        var refreshTokenDb = await _repositoryManager.RefreshTokenRepository.GetByOldRefreshTokenAsync(oldToken.RefreshToken);
-        if (refreshTokenDb is null)
-            throw new InvalidRefreshTokenException();
-
-        var userDb = await _repositoryManager.ApplicationUserRepository.GetByIdAsync(refreshTokenDb.UserId);
-        if (userDb is null)
-            throw new InvalidRefreshTokenException();
-
-        // Handle expired token
-        try
-        {
-            var tokenCheckResult = jwtTokenHandler.ValidateToken(oldToken.Token, _tokenValidationParameters, out var validatedToken);
-            return await GenerateJwtAsync(userDb, refreshTokenDb);
-        }
-        catch (SecurityTokenExpiredException)
-        {
-            if (refreshTokenDb?.DateExpire >= DateTime.UtcNow)
-                return await GenerateJwtAsync(userDb, refreshTokenDb);
-            else
-                return await GenerateJwtAsync(userDb);
-        }
-        catch (Exception)
-        {
-            throw new InvalidRefreshTokenException();
-        }
     }
 
     private static bool IsEmailValid(string email)

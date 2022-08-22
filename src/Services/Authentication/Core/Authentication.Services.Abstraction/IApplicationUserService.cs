@@ -4,7 +4,7 @@ namespace Authentication.Services.Abstraction;
 
 public interface IApplicationUserService
 {
-    Task<ApplicationUserDto> GetByEmailAsync(string email);
-    Task RegisterAsync(RegisterApplicationUserDto registerApplicationUserDto);
+    Task<UserDto> GetByEmailAsync(string email);
+    Task RegisterAsync(RegisterUserDto registerApplicationUserDto);
     Task<TokenDto> LoginAsync(LoginUserDto loginUserDto);
 }
