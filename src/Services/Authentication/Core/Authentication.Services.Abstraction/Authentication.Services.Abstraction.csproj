@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Authentication.Contracts\Authentication.Contracts.csproj" />
+    <ProjectReference Include="..\Authtentication.Domain\Authentication.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
