@@ -77,6 +77,7 @@ void AddDependencies(WebApplicationBuilder builder)
 {
     builder.Services.AddScoped<IServiceManager, ServiceManager>();
     builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+    builder.Services.AddScoped<ITokenService, TokenService>();
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 }
 

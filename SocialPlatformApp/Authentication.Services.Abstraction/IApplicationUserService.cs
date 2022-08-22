@@ -7,5 +7,4 @@ public interface IApplicationUserService
     Task<ApplicationUserDto> GetByEmailAsync(string email);
     Task RegisterAsync(RegisterApplicationUserDto registerApplicationUserDto);
     Task<TokenDto> LoginAsync(LoginUserDto loginUserDto);
-    Task<TokenDto> GenerateNewTokenAsync(TokenDto oldToken);
 }

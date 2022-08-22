@@ -50,7 +50,7 @@ public class AuthController : ControllerBase
             return BadRequest("Please provide all the required fields");
 
         TokenDto oldToken = new() { Token = token.Token, RefreshToken = token.RefreshToken };
-        var newToken = await _serviceManager.ApplicationUserService.GenerateNewTokenAsync(oldToken);
+        var newToken = await _serviceManager.TokenService.RefreshJwtAsync(oldToken);
 
         return Ok(newToken);
     }

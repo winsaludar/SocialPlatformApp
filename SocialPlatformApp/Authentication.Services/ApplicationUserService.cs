@@ -4,11 +4,6 @@ using Authentication.Domain.Exceptions;
 using Authentication.Domain.Repositories;
 using Authentication.Services.Abstraction;
 using Mapster;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Authentication.Services;
@@ -16,14 +11,12 @@ namespace Authentication.Services;
 public class ApplicationUserService : IApplicationUserService
 {
     private readonly IRepositoryManager _repositoryManager;
-    private readonly IConfiguration _configuration;
-    private readonly TokenValidationParameters _tokenValidationParameters;
+    private readonly ITokenService _tokenService;
 
-    public ApplicationUserService(IRepositoryManager repositoryManager, IConfiguration configuration, TokenValidationParameters tokenValidationParameters)
+    public ApplicationUserService(IRepositoryManager repositoryManager, ITokenService tokenService)
     {
         _repositoryManager = repositoryManager;
-        _configuration = configuration;
-        _tokenValidationParameters = tokenValidationParameters;
+        _tokenService = tokenService;
     }
 
     public async Task<ApplicationUserDto> GetByEmailAsync(string email)
@@ -75,101 +68,11 @@ public class ApplicationUserService : IApplicationUserService
         if (!isPasswordCorrect)
             throw new UnauthorizedAccessException("Invalid email or password");
 
-        return await GenerateJwtTokenAsync(existingUser);
-    }
-
-    public async Task<TokenDto> GenerateNewTokenAsync(TokenDto oldToken)
-    {
-        JwtSecurityTokenHandler jwtTokenHandler = new();
-
-        var refreshTokenDb = await _repositoryManager.RefreshTokenRepository.GetByOldRefreshTokenAsync(oldToken.RefreshToken);
-        if (refreshTokenDb is null)
-            throw new InvalidRefreshTokenException();
-
-        var userDb = await _repositoryManager.ApplicationUserRepository.GetByIdAsync(refreshTokenDb.UserId);
-        if (userDb is null)
-            throw new InvalidRefreshTokenException();
-
-        // Handle expired token
-        try
-        {
-            var tokenCheckResult = jwtTokenHandler.ValidateToken(oldToken.Token, _tokenValidationParameters, out var validatedToken);
-            return await GenerateJwtTokenAsync(userDb, refreshTokenDb);
-        }
-        catch (SecurityTokenExpiredException)
-        {
-            if (refreshTokenDb?.DateExpire >= DateTime.UtcNow)
-                return await GenerateJwtTokenAsync(userDb, refreshTokenDb);
-            else
-                return await GenerateJwtTokenAsync(userDb);
-        }
-        catch (Exception)
-        {
-            throw new InvalidRefreshTokenException();
-        }
+        return await _tokenService.GenerateJwtAsync(existingUser);
     }
 
     private static bool IsEmailValid(string email)
     {
         return Regex.IsMatch(email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
-    }
-
-    private async Task<TokenDto> GenerateJwtTokenAsync(ApplicationUser user, RefreshToken? rToken = null)
-    {
-        // Configure claims that will be added in the token
-        var authClaims = new List<Claim>()
-        {
-            new Claim(ClaimTypes.Name, user.Email),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-        // TODO: Add user role claims
-
-        // Configure access token properties
-        _ = int.TryParse(_configuration["JWT:ExpirationInMinutes"], out int expiration);
-        var authSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
-        var token = new JwtSecurityToken(
-            issuer: _configuration["JWT:Issuer"],
-            audience: _configuration["JWT:Audience"],
-            expires: DateTime.UtcNow.AddMinutes(expiration),
-            claims: authClaims,
-            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
-
-        // Generate access token
-        var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-        // Refresh existing token when requested
-        if (rToken != null)
-        {
-            return new TokenDto
-            {
-                Token = jwtToken,
-                RefreshToken = rToken.Token,
-                ExpiresAt = token.ValidTo
-            };
-        }
-
-        // Create refresh token when login
-        _ = int.TryParse(_configuration["JWT:RefreshTokenExpirationInMonths"], out int refreshTokenExpiration);
-        RefreshToken refreshToken = new()
-        {
-            JwtId = token.Id,
-            IsRevoked = false,
-            UserId = user.Id.ToString(),
-            DateAdded = DateTime.UtcNow,
-            DateExpire = DateTime.UtcNow.AddMonths(refreshTokenExpiration),
-            Token = $"{Guid.NewGuid()}-{Guid.NewGuid()}"
-        };
-        await _repositoryManager.RefreshTokenRepository.CreateAsync(refreshToken);
-
-        return new TokenDto
-        {
-            Token = jwtToken,
-            RefreshToken = refreshToken.Token,
-            ExpiresAt = token.ValidTo
-        };
     }
 }

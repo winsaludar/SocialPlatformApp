@@ -3,4 +3,5 @@
 public interface IServiceManager
 {
     IApplicationUserService ApplicationUserService { get; }
+    ITokenService TokenService { get; }
 }
