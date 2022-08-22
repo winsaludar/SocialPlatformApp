@@ -14,7 +14,7 @@ public class AuthController : ControllerBase
     public AuthController(IServiceManager serviceManager) => _serviceManager = serviceManager;
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync([FromBody] RegisterApplicationUser user)
+    public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest user)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
@@ -32,7 +32,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync([FromBody] LoginApplicationUser user)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginRequest user)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
@@ -44,7 +44,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshTokenAsync([FromBody] TokenRequest token)
+    public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenRequest token)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");

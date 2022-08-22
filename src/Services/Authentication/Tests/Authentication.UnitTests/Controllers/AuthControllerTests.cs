@@ -25,7 +25,7 @@ public class AuthControllerTests
     [Fact]
     public async Task RegisterAsync_InvalidModelState_ReturnsBadRequest()
     {
-        RegisterApplicationUser user = new() { };
+        RegisterRequest user = new() { };
         _controller.ModelState.AddModelError("FirstName", "Required");
 
         var result = await _controller.RegisterAsync(user);
@@ -40,7 +40,7 @@ public class AuthControllerTests
         _mockService.Setup(x => x.ApplicationUserService.RegisterAsync(It.IsAny<RegisterApplicationUserDto>()))
             .Callback<RegisterApplicationUserDto>(x => createdUser = x);
 
-        RegisterApplicationUser newUser = new()
+        RegisterRequest newUser = new()
         {
             FirstName = "First",
             LastName = "Last",
@@ -56,7 +56,7 @@ public class AuthControllerTests
     [Fact]
     public async Task LoginAsync_InvalidModelState_ReturnsBadRequest()
     {
-        LoginApplicationUser user = new() { };
+        LoginRequest user = new() { };
         _controller.ModelState.AddModelError("Email", "Required");
 
         var result = await _controller.LoginAsync(user);
@@ -67,7 +67,7 @@ public class AuthControllerTests
     [Fact]
     public async Task LoginAsync_ValidModelState_ReturnsOkResponse()
     {
-        LoginApplicationUser user = new() { Email = "existingemail@example.com", Password = "password" };
+        LoginRequest user = new() { Email = "existingemail@example.com", Password = "password" };
         _mockService.Setup(x => x.ApplicationUserService.LoginAsync(It.IsAny<LoginUserDto>()))
             .ReturnsAsync(new TokenDto { Token = "fake-token" });
 
@@ -80,7 +80,7 @@ public class AuthControllerTests
     [Fact]
     public async Task RefreshTokenAsync_InvalidModelState_ReturnsBadRequest()
     {
-        TokenRequest token = new();
+        RefreshTokenRequest token = new();
         _controller.ModelState.AddModelError("Email", "Required");
 
         var result = await _controller.RefreshTokenAsync(token);
@@ -91,7 +91,7 @@ public class AuthControllerTests
     [Fact]
     public async Task RefreshTokenAsync_ValidModelState_ReturnsOkResponse()
     {
-        TokenRequest token = new() { Token = "fake-token", RefreshToken = "fake-refresh-token" };
+        RefreshTokenRequest token = new() { Token = "fake-token", RefreshToken = "fake-refresh-token" };
         _mockService.Setup(x => x.TokenService.RefreshJwtAsync(It.IsAny<TokenDto>()))
             .ReturnsAsync(new TokenDto());
 

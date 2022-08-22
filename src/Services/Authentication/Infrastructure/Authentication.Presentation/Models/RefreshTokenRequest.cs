@@ -2,7 +2,7 @@
 
 namespace Authentication.Presentation.Models;
 
-public class TokenRequest
+public class RefreshTokenRequest
 {
     [Required]
     public string Token { get; set; } = default!;
