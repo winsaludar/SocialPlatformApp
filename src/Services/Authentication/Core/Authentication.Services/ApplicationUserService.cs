@@ -68,7 +68,8 @@ public class ApplicationUserService : IApplicationUserService
         if (!isPasswordCorrect)
             throw new UnauthorizedAccessException("Invalid email or password");
 
-        return await _tokenService.GenerateJwtAsync(existingUser);
+        var user = existingUser.Adapt<ApplicationUserDto>();
+        return await _tokenService.GenerateJwtAsync(user);
     }
 
     private static bool IsEmailValid(string email)

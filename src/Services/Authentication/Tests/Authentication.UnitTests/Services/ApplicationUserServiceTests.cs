@@ -191,7 +191,7 @@ public class ApplicationUserServiceTests
             });
         _mockRepo.Setup(x => x.ApplicationUserRepository.ValidateLoginPassword(email, password))
             .ReturnsAsync(true);
-        _mockTokenService.Setup(x => x.GenerateJwtAsync(It.IsAny<ApplicationUser>(), null))
+        _mockTokenService.Setup(x => x.GenerateJwtAsync(It.IsAny<ApplicationUserDto>(), null))
             .ReturnsAsync(new TokenDto { Token = "fake-token", RefreshToken = "fake-refresh-token" });
 
         var result = await _applicationUserService.LoginAsync(user);
