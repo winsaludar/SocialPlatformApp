@@ -14,9 +14,11 @@ public class AuthControllerTests
 
     public AuthControllerTests()
     {
-        var mockApplicationUserService = new Mock<IApplicationUserService>();
+        Mock<IApplicationUserService> mockApplicationUserService = new();
+        Mock<ITokenService> mockTokenService = new();
         _mockService = new Mock<IServiceManager>();
         _mockService.SetupGet(x => x.ApplicationUserService).Returns(mockApplicationUserService.Object);
+        _mockService.SetupGet(x => x.TokenService).Returns(mockTokenService.Object);
         _controller = new AuthController(_mockService.Object);
     }
 
@@ -70,6 +72,30 @@ public class AuthControllerTests
             .ReturnsAsync(new TokenDto { Token = "fake-token" });
 
         var result = await _controller.LoginAsync(user);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.IsType<TokenDto>(okResult.Value);
+    }
+
+    [Fact]
+    public async Task RefreshTokenAsync_InvalidModelState_ReturnsBadRequest()
+    {
+        TokenRequest token = new();
+        _controller.ModelState.AddModelError("Email", "Required");
+
+        var result = await _controller.RefreshTokenAsync(token);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task RefreshTokenAsync_ValidModelState_ReturnsOkResponse()
+    {
+        TokenRequest token = new() { Token = "fake-token", RefreshToken = "fake-refresh-token" };
+        _mockService.Setup(x => x.TokenService.RefreshJwtAsync(It.IsAny<TokenDto>()))
+            .ReturnsAsync(new TokenDto());
+
+        var result = await _controller.RefreshTokenAsync(token);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.IsType<TokenDto>(okResult.Value);
