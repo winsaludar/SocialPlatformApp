@@ -5,6 +5,7 @@ using Authentication.Domain.Repositories;
 using Authentication.Services;
 using Authentication.Services.Abstraction;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
 
 namespace Authentication.UnitTests.Services;
@@ -17,16 +18,19 @@ public class ApplicationUserServiceTests
     public ApplicationUserServiceTests()
     {
         var mockApplicationUserRepo = new Mock<IApplicationUserRepository>();
+        var mockRefreshTokenRepo = new Mock<IRefreshTokenRepository>();
         _mockRepo = new Mock<IRepositoryManager>();
         _mockRepo.SetupGet(x => x.ApplicationUserRepository).Returns(mockApplicationUserRepo.Object);
+        _mockRepo.SetupGet(x => x.RefreshTokenRepository).Returns(mockRefreshTokenRepo.Object);
 
         var mockConfig = new Mock<IConfiguration>();
         mockConfig.Setup(x => x["JWT:ExpirationInMinutes"]).Returns("60");
         mockConfig.Setup(x => x["JWT:Secret"]).Returns("this-is-just-a-fake-key");
         mockConfig.Setup(x => x["JWT:Issuer"]).Returns("fake-issuer");
         mockConfig.Setup(x => x["JWT:Audience"]).Returns("fake-audience");
+        mockConfig.Setup(x => x["JWT:RefreshTokenExpirationInMonths"]).Returns("6");
 
-        _applicationUserService = new ApplicationUserService(_mockRepo.Object, mockConfig.Object);
+        _applicationUserService = new ApplicationUserService(_mockRepo.Object, mockConfig.Object, new TokenValidationParameters());
     }
 
     [Theory]

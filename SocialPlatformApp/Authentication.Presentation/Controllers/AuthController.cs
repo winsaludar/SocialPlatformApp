@@ -42,4 +42,16 @@ public class AuthController : ControllerBase
 
         return Ok(token);
     }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshTokenAsync([FromBody] TokenRequest token)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Please provide all the required fields");
+
+        TokenDto oldToken = new() { Token = token.Token, RefreshToken = token.RefreshToken };
+        var newToken = await _serviceManager.ApplicationUserService.GenerateNewTokenAsync(oldToken);
+
+        return Ok(newToken);
+    }
 }

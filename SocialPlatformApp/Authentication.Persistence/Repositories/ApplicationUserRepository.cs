@@ -12,6 +12,16 @@ internal sealed class ApplicationUserRepository : IApplicationUserRepository
 
     public ApplicationUserRepository(UserManager<PersistenceModels.ApplicationUser> userManager) => _userManager = userManager;
 
+    public async Task<DomainEntities.ApplicationUser?> GetByIdAsync(string id)
+    {
+        var userDb = await _userManager.FindByIdAsync(id);
+        if (userDb is null)
+            return null;
+
+        var user = userDb.Adapt<DomainEntities.ApplicationUser>();
+        return user;
+    }
+
     public async Task<DomainEntities.ApplicationUser?> GetByEmailAsync(string email)
     {
         var userDb = await _userManager.FindByEmailAsync(email);
