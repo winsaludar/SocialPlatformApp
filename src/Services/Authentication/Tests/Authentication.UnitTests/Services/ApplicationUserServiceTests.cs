@@ -50,7 +50,7 @@ public class ApplicationUserServiceTests
 
         var result = await _applicationUserService.GetByEmailAsync(email);
 
-        Assert.IsType<ApplicationUserDto>(result);
+        Assert.IsType<UserDto>(result);
         Assert.Equal(email, result.Email);
     }
 
@@ -61,7 +61,7 @@ public class ApplicationUserServiceTests
     [InlineData("test@emailcom")]
     public async Task RegisterAsync_InvalidEmail_ThrowsInvalidEmailException(string email)
     {
-        RegisterApplicationUserDto newUser = new()
+        RegisterUserDto newUser = new()
         {
             FirstName = "First",
             LastName = "Last",
@@ -76,7 +76,7 @@ public class ApplicationUserServiceTests
     public async Task RegisterAsync_EmailAlreadyExist_ThrowsUserAlreadyExistException()
     {
         string email = "existinguser@email.com";
-        RegisterApplicationUserDto newUser = new()
+        RegisterUserDto newUser = new()
         {
             FirstName = "First",
             LastName = "Last",
@@ -92,7 +92,7 @@ public class ApplicationUserServiceTests
     [Fact]
     public async Task RegisterAsync_InvalidPassword_ThrowsInvalidPasswordException()
     {
-        RegisterApplicationUserDto newUser = new()
+        RegisterUserDto newUser = new()
         {
             FirstName = "First",
             LastName = "Last",
@@ -118,7 +118,7 @@ public class ApplicationUserServiceTests
             .ReturnsAsync(true);
         _mockRepo.Setup(x => x.ApplicationUserRepository.RegisterAsync(It.IsAny<ApplicationUser>(), password))
             .Callback<ApplicationUser, string>((x, y) => createdUser = x);
-        RegisterApplicationUserDto newUser = new()
+        RegisterUserDto newUser = new()
         {
             FirstName = "First",
             LastName = "Last",
@@ -191,7 +191,7 @@ public class ApplicationUserServiceTests
             });
         _mockRepo.Setup(x => x.ApplicationUserRepository.ValidateLoginPassword(email, password))
             .ReturnsAsync(true);
-        _mockTokenService.Setup(x => x.GenerateJwtAsync(It.IsAny<ApplicationUserDto>(), null))
+        _mockTokenService.Setup(x => x.GenerateJwtAsync(It.IsAny<UserDto>(), null))
             .ReturnsAsync(new TokenDto { Token = "fake-token", RefreshToken = "fake-refresh-token" });
 
         var result = await _applicationUserService.LoginAsync(user);

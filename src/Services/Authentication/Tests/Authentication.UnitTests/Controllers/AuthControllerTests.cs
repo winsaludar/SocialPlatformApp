@@ -36,9 +36,9 @@ public class AuthControllerTests
     [Fact]
     public async Task RegisterAsync_ValidModelState_ReturnsOkResponse()
     {
-        RegisterApplicationUserDto? createdUser = null;
-        _mockService.Setup(x => x.ApplicationUserService.RegisterAsync(It.IsAny<RegisterApplicationUserDto>()))
-            .Callback<RegisterApplicationUserDto>(x => createdUser = x);
+        RegisterUserDto? createdUser = null;
+        _mockService.Setup(x => x.ApplicationUserService.RegisterAsync(It.IsAny<RegisterUserDto>()))
+            .Callback<RegisterUserDto>(x => createdUser = x);
 
         RegisterRequest newUser = new()
         {
@@ -49,7 +49,7 @@ public class AuthControllerTests
         };
         var result = await _controller.RegisterAsync(newUser);
 
-        _mockService.Verify(x => x.ApplicationUserService.RegisterAsync(It.IsAny<RegisterApplicationUserDto>()), Times.Once);
+        _mockService.Verify(x => x.ApplicationUserService.RegisterAsync(It.IsAny<RegisterUserDto>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
 

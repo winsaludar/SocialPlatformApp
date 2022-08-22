@@ -1,6 +1,6 @@
 ﻿namespace Authentication.Contracts;
 
-public record RegisterApplicationUserDto
+public record RegisterUserDto
 {
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;

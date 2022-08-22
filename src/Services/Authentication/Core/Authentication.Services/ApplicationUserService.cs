@@ -19,7 +19,7 @@ public class ApplicationUserService : IApplicationUserService
         _tokenService = tokenService;
     }
 
-    public async Task<ApplicationUserDto> GetByEmailAsync(string email)
+    public async Task<UserDto> GetByEmailAsync(string email)
     {
         if (string.IsNullOrEmpty(email) || !IsEmailValid(email))
             throw new InvalidEmailException(email);
@@ -28,11 +28,11 @@ public class ApplicationUserService : IApplicationUserService
         if (user is null)
             throw new UserNotFoundException(email);
 
-        var userDto = user.Adapt<ApplicationUserDto>();
+        var userDto = user.Adapt<UserDto>();
         return userDto;
     }
 
-    public async Task RegisterAsync(RegisterApplicationUserDto registerApplicationUserDto)
+    public async Task RegisterAsync(RegisterUserDto registerApplicationUserDto)
     {
         if (string.IsNullOrEmpty(registerApplicationUserDto.Email) || !IsEmailValid(registerApplicationUserDto.Email))
             throw new InvalidEmailException(registerApplicationUserDto.Email);
@@ -68,7 +68,7 @@ public class ApplicationUserService : IApplicationUserService
         if (!isPasswordCorrect)
             throw new UnauthorizedAccessException("Invalid email or password");
 
-        var user = existingUser.Adapt<ApplicationUserDto>();
+        var user = existingUser.Adapt<UserDto>();
         return await _tokenService.GenerateJwtAsync(user);
     }
 

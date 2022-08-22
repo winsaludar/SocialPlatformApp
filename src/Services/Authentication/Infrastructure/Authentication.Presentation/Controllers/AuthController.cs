@@ -19,7 +19,7 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        RegisterApplicationUserDto newUser = new()
+        RegisterUserDto newUser = new()
         {
             FirstName = user.FirstName,
             LastName = user.LastName,

@@ -26,13 +26,13 @@ public class TokenService : ITokenService
         _tokenValidationParameters = tokenValidationParameters;
     }
 
-    public async Task<TokenDto> GenerateJwtAsync(ApplicationUserDto applicationUser, RefreshTokenDto? rToken = null)
+    public async Task<TokenDto> GenerateJwtAsync(UserDto userDto, RefreshTokenDto? refreshTokenDto = null)
     {
-        if (string.IsNullOrEmpty(applicationUser.Email) || !IsEmailValid(applicationUser.Email))
-            throw new InvalidEmailException(applicationUser.Email);
+        if (string.IsNullOrEmpty(userDto.Email) || !IsEmailValid(userDto.Email))
+            throw new InvalidEmailException(userDto.Email);
 
-        ApplicationUser user = applicationUser.Adapt<ApplicationUser>();
-        RefreshToken? token = rToken?.Adapt<RefreshToken>();
+        ApplicationUser user = userDto.Adapt<ApplicationUser>();
+        RefreshToken? token = refreshTokenDto?.Adapt<RefreshToken>();
 
         return await GenerateAsync(user, token);
     }

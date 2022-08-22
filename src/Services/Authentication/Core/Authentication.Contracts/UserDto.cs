@@ -1,6 +1,6 @@
 ﻿namespace Authentication.Contracts;
 
-public record ApplicationUserDto
+public record UserDto
 {
     public Guid Id { get; set; }
     public string FirstName { get; set; } = default!;

@@ -40,7 +40,7 @@ public class TokenServiceTests
     [InlineData("test@emailcom")]
     public async Task GenerateJwtAsync_InvalidEmail_ThrowsInvalidEmailException(string email)
     {
-        ApplicationUserDto user = new() { Email = email };
+        UserDto user = new() { Email = email };
 
         await Assert.ThrowsAsync<InvalidEmailException>(() => _tokenService.GenerateJwtAsync(user));
     }
@@ -48,7 +48,7 @@ public class TokenServiceTests
     [Fact]
     public async Task GenerateJwtAsync_RefreshTokenIsNotNull_ReturnsNewTokenWithoutInsertingNewItemInTheDatabase()
     {
-        ApplicationUserDto user = new()
+        UserDto user = new()
         {
             Id = Guid.NewGuid(),
             Email = "test@example.com",
@@ -65,7 +65,7 @@ public class TokenServiceTests
     [Fact]
     public async Task GenerateJwtAsync_RefreshTokenIsNull_ReturnsNewTokenAndInsertNewItemInTheDatabase()
     {
-        ApplicationUserDto user = new()
+        UserDto user = new()
         {
             Id = Guid.NewGuid(),
             Email = "test@example.com",
@@ -113,7 +113,7 @@ public class TokenServiceTests
     [Fact]
     public async Task RefreshJwtAsync_ExistingTokenIsValid_ReturnsNewToken()
     {
-        ApplicationUserDto user = new()
+        UserDto user = new()
         {
             Id = Guid.NewGuid(),
             Email = "test@example.com",
