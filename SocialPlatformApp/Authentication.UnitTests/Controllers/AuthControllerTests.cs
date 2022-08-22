@@ -50,4 +50,28 @@ public class AuthControllerTests
         _mockService.Verify(x => x.ApplicationUserService.RegisterAsync(It.IsAny<RegisterApplicationUserDto>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
+
+    [Fact]
+    public async Task LoginAsync_InvalidModelState_ReturnsBadRequest()
+    {
+        LoginApplicationUser user = new() { };
+        _controller.ModelState.AddModelError("Email", "Required");
+
+        var result = await _controller.LoginAsync(user);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task LoginAsync_ValidModelState_ReturnsOkResponse()
+    {
+        LoginApplicationUser user = new() { Email = "existingemail@example.com", Password = "password" };
+        _mockService.Setup(x => x.ApplicationUserService.LoginAsync(It.IsAny<LoginUserDto>()))
+            .ReturnsAsync(new TokenDto { Token = "fake-token" });
+
+        var result = await _controller.LoginAsync(user);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.IsType<TokenDto>(okResult.Value);
+    }
 }

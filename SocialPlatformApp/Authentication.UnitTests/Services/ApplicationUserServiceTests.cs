@@ -4,6 +4,7 @@ using Authentication.Domain.Exceptions;
 using Authentication.Domain.Repositories;
 using Authentication.Services;
 using Authentication.Services.Abstraction;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace Authentication.UnitTests.Services;
@@ -18,7 +19,14 @@ public class ApplicationUserServiceTests
         var mockApplicationUserRepo = new Mock<IApplicationUserRepository>();
         _mockRepo = new Mock<IRepositoryManager>();
         _mockRepo.SetupGet(x => x.ApplicationUserRepository).Returns(mockApplicationUserRepo.Object);
-        _applicationUserService = new ApplicationUserService(_mockRepo.Object);
+
+        var mockConfig = new Mock<IConfiguration>();
+        mockConfig.Setup(x => x["JWT:ExpirationInMinutes"]).Returns("60");
+        mockConfig.Setup(x => x["JWT:Secret"]).Returns("this-is-just-a-fake-key");
+        mockConfig.Setup(x => x["JWT:Issuer"]).Returns("fake-issuer");
+        mockConfig.Setup(x => x["JWT:Audience"]).Returns("fake-audience");
+
+        _applicationUserService = new ApplicationUserService(_mockRepo.Object, mockConfig.Object);
     }
 
     [Theory]
@@ -118,8 +126,8 @@ public class ApplicationUserServiceTests
             .Callback<ApplicationUser, string>((x, y) => createdUser = x);
         RegisterApplicationUserDto newUser = new()
         {
-            FirstName = "Test",
-            LastName = "Test",
+            FirstName = "First",
+            LastName = "Last",
             Email = email,
             Password = password
         };
@@ -130,5 +138,69 @@ public class ApplicationUserServiceTests
         Assert.Equal(createdUser?.FirstName, newUser.FirstName);
         Assert.Equal(createdUser?.LastName, newUser.LastName);
         Assert.Equal(createdUser?.Email, newUser.Email);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    [InlineData("testemail.com")]
+    [InlineData("test@emailcom")]
+    public async Task LoginAsync_InvalidEmail_ThrowsInvalidEmailException(string email)
+    {
+        LoginUserDto user = new()
+        {
+            Email = email,
+            Password = "password"
+        };
+
+        await Assert.ThrowsAsync<InvalidEmailException>(() => _applicationUserService.LoginAsync(user));
+    }
+
+    [Fact]
+    public async Task LoginAsync_EmailDoesNotExist_ThrowsUnauthorizedAccessException()
+    {
+        string email = "nonexistingemail@example.com";
+        LoginUserDto user = new() { Email = email, Password = "password" };
+        _mockRepo.Setup(x => x.ApplicationUserRepository.GetByEmailAsync(email))
+            .ReturnsAsync((ApplicationUser)null!);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _applicationUserService.LoginAsync(user));
+    }
+
+    [Fact]
+    public async Task LoginAsync_EmailDoesExistButPasswordIsIncorrect_ThrowsUnauthorizedAccessException()
+    {
+        string email = "existingemail@example.com";
+        string password = "incorrect-password";
+        LoginUserDto user = new() { Email = email, Password = password };
+        _mockRepo.Setup(x => x.ApplicationUserRepository.GetByEmailAsync(email))
+            .ReturnsAsync(new ApplicationUser());
+        _mockRepo.Setup(x => x.ApplicationUserRepository.ValidateLoginPassword(email, password))
+            .ReturnsAsync(false);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _applicationUserService.LoginAsync(user));
+    }
+
+    [Fact]
+    public async Task LoginAsync_EmailAndPasswordAreBothCorrect_ReturnsTokenObject()
+    {
+        string email = "existingemail@example.com";
+        string password = "correct-password";
+        LoginUserDto user = new() { Email = email, Password = password };
+        _mockRepo.Setup(x => x.ApplicationUserRepository.GetByEmailAsync(email))
+            .ReturnsAsync(new ApplicationUser
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "First",
+                LastName = "Last",
+                Email = email
+            });
+        _mockRepo.Setup(x => x.ApplicationUserRepository.ValidateLoginPassword(email, password))
+            .ReturnsAsync(true);
+
+        var result = await _applicationUserService.LoginAsync(user);
+
+        Assert.IsType<TokenDto>(result);
+        Assert.NotEmpty(result.Token);
     }
 }

@@ -44,4 +44,13 @@ internal sealed class ApplicationUserRepository : IApplicationUserRepository
 
         return true;
     }
+
+    public async Task<bool> ValidateLoginPassword(string email, string password)
+    {
+        var userDb = await _userManager.FindByEmailAsync(email);
+        if (userDb is null)
+            return false;
+
+        return await _userManager.CheckPasswordAsync(userDb, password);
+    }
 }
