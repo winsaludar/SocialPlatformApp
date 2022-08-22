@@ -17,7 +17,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> RegisterAsync([FromBody] RegisterApplicationUser user)
     {
         if (!ModelState.IsValid)
-            return BadRequest("Please provide all the required fields.");
+            return BadRequest("Please provide all the required fields");
 
         RegisterApplicationUserDto newUser = new()
         {
@@ -29,5 +29,17 @@ public class AuthController : ControllerBase
         await _serviceManager.ApplicationUserService.RegisterAsync(newUser);
 
         return Ok("User created");
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> LoginAsync([FromBody] LoginApplicationUser user)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Please provide all the required fields");
+
+        LoginUserDto login = new() { Email = user.Email, Password = user.Password };
+        var token = await _serviceManager.ApplicationUserService.LoginAsync(login);
+
+        return Ok(token);
     }
 }

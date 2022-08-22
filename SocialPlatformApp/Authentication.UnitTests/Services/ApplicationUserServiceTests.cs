@@ -4,6 +4,7 @@ using Authentication.Domain.Exceptions;
 using Authentication.Domain.Repositories;
 using Authentication.Services;
 using Authentication.Services.Abstraction;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace Authentication.UnitTests.Services;
@@ -18,7 +19,8 @@ public class ApplicationUserServiceTests
         var mockApplicationUserRepo = new Mock<IApplicationUserRepository>();
         _mockRepo = new Mock<IRepositoryManager>();
         _mockRepo.SetupGet(x => x.ApplicationUserRepository).Returns(mockApplicationUserRepo.Object);
-        _applicationUserService = new ApplicationUserService(_mockRepo.Object);
+        var mockConfig = new Mock<IConfiguration>();
+        _applicationUserService = new ApplicationUserService(_mockRepo.Object, mockConfig.Object);
     }
 
     [Theory]
