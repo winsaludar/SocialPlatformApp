@@ -12,8 +12,9 @@ public class SpaceConfiguration : IEntityTypeConfiguration<DomainEntities.Space>
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
+        builder.HasIndex(x => x.Name).IsUnique();
 
-        builder.Property(x => x.CreatorId).IsRequired().HasMaxLength(36);
+        builder.Property(x => x.Creator).IsRequired().HasMaxLength(200);
         builder.Property(x => x.Name).IsRequired().HasMaxLength(200);
         builder.Property(x => x.ShortDescription).IsRequired().HasMaxLength(200);
         builder.Property(x => x.LongDescription).IsRequired();

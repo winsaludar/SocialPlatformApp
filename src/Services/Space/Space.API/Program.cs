@@ -1,5 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Space.API.Middlewares;
+using Space.Domain.Repositories;
 using Space.Persistence;
+using Space.Persistence.Repositories;
+using Space.Services;
+using Space.Services.Abstraction;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 AddDatabase(builder);
@@ -11,6 +19,8 @@ AddDependencies(builder);
 var app = builder.Build();
 EnableMiddlewares(app);
 
+app.Run();
+
 void AddDatabase(WebApplicationBuilder builder)
 {
     string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -19,6 +29,28 @@ void AddDatabase(WebApplicationBuilder builder)
 
 void AddAuthentication(WebApplicationBuilder builder)
 {
+    // Configure JWT Authentication Scheme
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options =>
+    {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:Secret"])),
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["JWT:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["JWT:Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 }
 
 void AddAuthorization(WebApplicationBuilder builder)
@@ -37,6 +69,9 @@ void AddMiddlewares(WebApplicationBuilder builder)
 
 void AddDependencies(WebApplicationBuilder builder)
 {
+    builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+    builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+    builder.Services.AddScoped<IServiceManager, ServiceManager>();
 }
 
 void EnableMiddlewares(WebApplication app)
@@ -48,7 +83,7 @@ void EnableMiddlewares(WebApplication app)
         app.UseSwaggerUI();
     }
 
-    //app.UseMiddleware<ExceptionHandlingMiddleware>();
+    app.UseMiddleware<ExceptionHandlingMiddleware>();
 
     app.UseHttpsRedirection();
 

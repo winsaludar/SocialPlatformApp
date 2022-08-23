@@ -1,7 +1,8 @@
-﻿namespace Space.Domain.Entities;
+﻿namespace Space.Contracts;
 
-public class Space : BaseEntity
+public record SpaceDto
 {
+    public Guid Id { get; set; }
     public string Creator { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string ShortDescription { get; set; } = default!;
