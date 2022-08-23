@@ -41,8 +41,8 @@ public class AuthController : ControllerBase
         User user = new() { Email = request.Email };
         Token token = await user.LoginAsync(request.Password, _repositoryManager);
 
-        var dto = user.Adapt<UserDto>();
-        return Ok(token);
+        var dto = token.Adapt<TokenDto>();
+        return Ok(dto);
     }
 
     [HttpPost("refresh-token")]

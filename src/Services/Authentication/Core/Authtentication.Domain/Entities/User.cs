@@ -20,7 +20,7 @@ public class User
         if (existingUser is not null)
             throw new UserAlreadyExistException(Email);
 
-        bool isPasswordValid = await repositoryManager.ApplicationUserRepository.ValidateRegistrationPassword(password);
+        bool isPasswordValid = await repositoryManager.ApplicationUserRepository.ValidateRegistrationPasswordAsync(password);
         if (!isPasswordValid)
             throw new InvalidPasswordException();
 
@@ -36,7 +36,7 @@ public class User
         if (existingUser is null)
             throw new UnauthorizedAccessException("Invalid email or password");
 
-        bool isPasswordCorrect = await repositoryManager.ApplicationUserRepository.ValidateLoginPassword(Email, password);
+        bool isPasswordCorrect = await repositoryManager.ApplicationUserRepository.ValidateLoginPasswordAsync(Email, password);
         if (!isPasswordCorrect)
             throw new UnauthorizedAccessException("Invalid email or password");
 

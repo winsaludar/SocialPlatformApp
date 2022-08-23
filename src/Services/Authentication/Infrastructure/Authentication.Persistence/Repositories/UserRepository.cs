@@ -42,7 +42,7 @@ public class UserRepository : IUserRepository
         await _userManager.CreateAsync(newUser, password);
     }
 
-    public async Task<bool> ValidateRegistrationPassword(string password)
+    public async Task<bool> ValidateRegistrationPasswordAsync(string password)
     {
         var passwordValidators = _userManager.PasswordValidators;
         foreach (var validator in passwordValidators)
@@ -55,7 +55,7 @@ public class UserRepository : IUserRepository
         return true;
     }
 
-    public async Task<bool> ValidateLoginPassword(string email, string password)
+    public async Task<bool> ValidateLoginPasswordAsync(string email, string password)
     {
         var userDb = await _userManager.FindByEmailAsync(email);
         if (userDb is null)
