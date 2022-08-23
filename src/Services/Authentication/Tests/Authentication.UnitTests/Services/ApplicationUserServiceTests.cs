@@ -28,7 +28,7 @@ public class ApplicationUserServiceTests
     [InlineData(null)]
     [InlineData("testemail.com")]
     [InlineData("test@emailcom")]
-    public async Task GetByEmailAsync_InvalidEmail_ThrowsInvalidEmailException(string email) =>
+    public async Task GetByEmailAsync_EmailIsInvalid_ThrowsInvalidEmailException(string email) =>
         await Assert.ThrowsAsync<InvalidEmailException>(() => _applicationUserService.GetByEmailAsync(email));
 
     [Fact]
@@ -59,7 +59,7 @@ public class ApplicationUserServiceTests
     [InlineData(null)]
     [InlineData("testemail.com")]
     [InlineData("test@emailcom")]
-    public async Task RegisterAsync_InvalidEmail_ThrowsInvalidEmailException(string email)
+    public async Task RegisterAsync_EmailIsInvalid_ThrowsInvalidEmailException(string email)
     {
         RegisterUserDto newUser = new()
         {
@@ -90,7 +90,7 @@ public class ApplicationUserServiceTests
     }
 
     [Fact]
-    public async Task RegisterAsync_InvalidPassword_ThrowsInvalidPasswordException()
+    public async Task RegisterAsync_PasswordIsInvalid_ThrowsInvalidPasswordException()
     {
         RegisterUserDto newUser = new()
         {
@@ -139,7 +139,7 @@ public class ApplicationUserServiceTests
     [InlineData(null)]
     [InlineData("testemail.com")]
     [InlineData("test@emailcom")]
-    public async Task LoginAsync_InvalidEmail_ThrowsInvalidEmailException(string email)
+    public async Task LoginAsync_EmailIsInvalid_ThrowsInvalidEmailException(string email)
     {
         LoginUserDto user = new()
         {

@@ -38,7 +38,7 @@ public class TokenServiceTests
     [InlineData(null)]
     [InlineData("testemail.com")]
     [InlineData("test@emailcom")]
-    public async Task GenerateJwtAsync_InvalidEmail_ThrowsInvalidEmailException(string email)
+    public async Task GenerateJwtAsync_EmailIsInvalid_ThrowsInvalidEmailException(string email)
     {
         UserDto user = new() { Email = email };
 
