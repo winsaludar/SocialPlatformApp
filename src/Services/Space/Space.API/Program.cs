@@ -1,25 +1,61 @@
+using Microsoft.EntityFrameworkCore;
+using Space.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+AddDatabase(builder);
+AddAuthentication(builder);
+AddAuthorization(builder);
+AddMiddlewares(builder);
+AddDependencies(builder);
 
 var app = builder.Build();
+EnableMiddlewares(app);
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+void AddDatabase(WebApplicationBuilder builder)
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<SpaceDbContext>(options => options.UseSqlServer(connectionString));
 }
 
-app.UseHttpsRedirection();
+void AddAuthentication(WebApplicationBuilder builder)
+{
+}
 
-app.UseAuthorization();
+void AddAuthorization(WebApplicationBuilder builder)
+{
+}
 
-app.MapControllers();
+void AddMiddlewares(WebApplicationBuilder builder)
+{
+    builder.Services.AddRouting(options => options.LowercaseUrls = true);
+    builder.Services.AddControllers();
 
-app.Run();
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+}
+
+void AddDependencies(WebApplicationBuilder builder)
+{
+}
+
+void EnableMiddlewares(WebApplication app)
+{
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    //app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+    app.UseHttpsRedirection();
+
+    app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers();
+}
