@@ -10,5 +10,5 @@ public class RefreshToken
     public DateTime DateExpire { get; set; } = default!;
     public string UserId { get; set; } = default!;
 
-    public ApplicationUser User { get; set; } = default!;
+    public User User { get; set; } = default!;
 }

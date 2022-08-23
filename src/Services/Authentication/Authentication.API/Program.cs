@@ -3,8 +3,6 @@ using Authentication.Domain.Repositories;
 using Authentication.Persistence;
 using Authentication.Persistence.Models;
 using Authentication.Persistence.Repositories;
-using Authentication.Services;
-using Authentication.Services.Abstraction;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -75,9 +73,7 @@ void AddMiddlewares(WebApplicationBuilder builder)
 
 void AddDependencies(WebApplicationBuilder builder)
 {
-    builder.Services.AddScoped<IServiceManager, ServiceManager>();
     builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
-    builder.Services.AddScoped<ITokenService, TokenService>();
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 }
 

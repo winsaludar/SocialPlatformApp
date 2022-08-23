@@ -2,6 +2,7 @@
 
 public interface IRepositoryManager
 {
-    IApplicationUserRepository ApplicationUserRepository { get; }
+    IUserRepository ApplicationUserRepository { get; }
+    ITokenRepository TokenRepository { get; }
     IRefreshTokenRepository RefreshTokenRepository { get; }
 }

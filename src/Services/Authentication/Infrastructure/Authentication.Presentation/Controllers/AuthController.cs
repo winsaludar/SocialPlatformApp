@@ -1,6 +1,8 @@
 ﻿using Authentication.Contracts;
+using Authentication.Domain.Entities;
+using Authentication.Domain.Repositories;
 using Authentication.Presentation.Models;
-using Authentication.Services.Abstraction;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Authentication.Presentation.Controllers;
@@ -9,49 +11,50 @@ namespace Authentication.Presentation.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IServiceManager _serviceManager;
+    private readonly IRepositoryManager _repositoryManager;
 
-    public AuthController(IServiceManager serviceManager) => _serviceManager = serviceManager;
+    public AuthController(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest user)
+    public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        RegisterUserDto newUser = new()
+        User newUser = new()
         {
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email,
-            Password = user.Password
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
         };
-        await _serviceManager.ApplicationUserService.RegisterAsync(newUser);
+        await newUser.RegisterAsync(request.Password, _repositoryManager);
 
         return Ok("User created");
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync([FromBody] LoginRequest user)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        LoginUserDto login = new() { Email = user.Email, Password = user.Password };
-        var token = await _serviceManager.ApplicationUserService.LoginAsync(login);
+        User user = new() { Email = request.Email };
+        Token token = await user.LoginAsync(request.Password, _repositoryManager);
 
+        var dto = user.Adapt<UserDto>();
         return Ok(token);
     }
 
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenRequest token)
+    public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        TokenDto oldToken = new() { Token = token.Token, RefreshToken = token.RefreshToken };
-        var newToken = await _serviceManager.TokenService.RefreshJwtAsync(oldToken);
+        Token token = new() { Value = request.Token, RefreshToken = request.RefreshToken };
+        await token.RefreshAsync(_repositoryManager);
 
-        return Ok(newToken);
+        var dto = token.Adapt<TokenDto>();
+        return Ok(dto);
     }
 }
