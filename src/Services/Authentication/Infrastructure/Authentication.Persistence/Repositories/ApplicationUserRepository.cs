@@ -6,7 +6,7 @@ using PersistenceModels = Authentication.Persistence.Models;
 
 namespace Authentication.Persistence.Repositories;
 
-internal sealed class ApplicationUserRepository : IApplicationUserRepository
+public class ApplicationUserRepository : IApplicationUserRepository
 {
     private readonly UserManager<PersistenceModels.ApplicationUser> _userManager;
 

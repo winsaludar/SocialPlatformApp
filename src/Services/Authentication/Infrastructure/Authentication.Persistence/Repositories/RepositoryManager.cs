@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Authentication.Persistence.Repositories;
 
-public sealed class RepositoryManager : IRepositoryManager
+public class RepositoryManager : IRepositoryManager
 {
     private readonly Lazy<IApplicationUserRepository> _applicationUserRepository;
     private readonly Lazy<IRefreshTokenRepository> _refreshTokenRepository;
