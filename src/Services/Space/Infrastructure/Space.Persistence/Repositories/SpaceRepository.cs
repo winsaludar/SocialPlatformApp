@@ -10,9 +10,14 @@ public class SpaceRepository : ISpaceRepository
 
     public SpaceRepository(SpaceDbContext dbContext) => _dbContext = dbContext;
 
+    public async Task<IEnumerable<DomainEntities.Space>> GetAllAsync()
+    {
+        return await _dbContext.Spaces.AsNoTracking().ToListAsync();
+    }
+
     public async Task<DomainEntities.Space?> GetByNameAsync(string name)
     {
-        return await _dbContext.Spaces.FirstOrDefaultAsync(x => x.Name == name);
+        return await _dbContext.Spaces.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name);
     }
 
     public async Task CreateAsync(DomainEntities.Space newSpace)

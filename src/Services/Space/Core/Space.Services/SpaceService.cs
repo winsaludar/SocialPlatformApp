@@ -1,4 +1,5 @@
-﻿using Space.Contracts;
+﻿using Mapster;
+using Space.Contracts;
 using Space.Domain.Exceptions;
 using Space.Domain.Repositories;
 using Space.Services.Abstraction;
@@ -12,6 +13,15 @@ public class SpaceService : ISpaceService
 
     public SpaceService(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
 
+    public async Task<IEnumerable<SpaceDto>> GetAllAsync()
+    {
+        var spaces = await _repositoryManager.SpaceRepository.GetAllAsync();
+        if (spaces == null)
+            return new List<SpaceDto>();
+
+        return spaces.Adapt<IEnumerable<SpaceDto>>();
+    }
+
     public async Task CreateAsync(SpaceDto dto)
     {
         if (string.IsNullOrEmpty(dto.Name))
@@ -24,16 +34,9 @@ public class SpaceService : ISpaceService
         if (existingSpace != null)
             throw new SpaceNameAlreadyExistException(dto.Name);
 
-        DomainEntities.Space newSpace = new()
-        {
-            Name = dto.Name,
-            Creator = dto.Creator,
-            ShortDescription = dto.ShortDescription,
-            LongDescription = dto.LongDescription,
-            Thumbnail = dto.Thumbnail,
-            CreatedDateUtc = DateTime.UtcNow,
-            CreatedBy = dto.Creator
-        };
+        var newSpace = dto.Adapt<DomainEntities.Space>();
+        newSpace.CreatedDateUtc = DateTime.UtcNow;
+        newSpace.CreatedBy = dto.Creator;
 
         await _repositoryManager.SpaceRepository.CreateAsync(newSpace);
     }
