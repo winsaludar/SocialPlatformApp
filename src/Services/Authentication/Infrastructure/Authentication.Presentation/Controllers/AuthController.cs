@@ -1,8 +1,8 @@
 ﻿using Authentication.Contracts;
-using Authentication.Domain.Entities;
-using Authentication.Domain.Repositories;
 using Authentication.Presentation.Models;
+using Authentication.Services.Abstraction;
 using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Authentication.Presentation.Controllers;
@@ -11,50 +11,49 @@ namespace Authentication.Presentation.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IRepositoryManager _repositoryManager;
+    private readonly IServiceManager _serviceManager;
 
-    public AuthController(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
+    public AuthController(IServiceManager serviceManager) => _serviceManager = serviceManager;
 
     [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        User newUser = new()
-        {
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            Email = request.Email,
-        };
-        await newUser.RegisterAsync(request.Password, _repositoryManager);
+        var userDto = request.Adapt<UserDto>();
+        await _serviceManager.AuthenticationService.RegisterUserAsync(userDto);
 
         return Ok("User created");
     }
 
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        User user = new() { Email = request.Email };
-        Token token = await user.LoginAsync(request.Password, _repositoryManager);
+        var userDto = request.Adapt<UserDto>();
+        TokenDto tokenDto = await _serviceManager.AuthenticationService.LoginUserAsync(userDto);
 
-        var dto = token.Adapt<TokenDto>();
-        return Ok(dto);
+        return Ok(tokenDto);
     }
 
     [HttpPost("refresh-token")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        Token token = new() { Value = request.Token, RefreshToken = request.RefreshToken };
-        await token.RefreshAsync(_repositoryManager);
+        var tokenDto = request.Adapt<TokenDto>();
+        TokenDto newTokenDto = await _serviceManager.AuthenticationService.RefreshTokenAsync(tokenDto);
 
-        var dto = token.Adapt<TokenDto>();
-        return Ok(dto);
+        return Ok(newTokenDto);
     }
 }

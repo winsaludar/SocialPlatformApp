@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Authentication.Services.Abstraction\Authentication.Services.Abstraction.csproj" />
-    <ProjectReference Include="..\..\Core\Authtentication.Domain\Authentication.Domain.csproj" />
   </ItemGroup>
 
 </Project>
