@@ -6,7 +6,7 @@ using PersistenceModels = Authentication.Persistence.Models;
 
 namespace Authentication.Persistence.Repositories;
 
-internal sealed class RefreshTokenRepository : IRefreshTokenRepository
+public class RefreshTokenRepository : IRefreshTokenRepository
 {
     private readonly AuthenticationDbContext _dbContext;
 

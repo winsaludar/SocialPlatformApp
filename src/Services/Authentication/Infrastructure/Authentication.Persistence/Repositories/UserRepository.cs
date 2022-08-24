@@ -6,33 +6,33 @@ using PersistenceModels = Authentication.Persistence.Models;
 
 namespace Authentication.Persistence.Repositories;
 
-internal sealed class ApplicationUserRepository : IApplicationUserRepository
+public class UserRepository : IUserRepository
 {
     private readonly UserManager<PersistenceModels.ApplicationUser> _userManager;
 
-    public ApplicationUserRepository(UserManager<PersistenceModels.ApplicationUser> userManager) => _userManager = userManager;
+    public UserRepository(UserManager<PersistenceModels.ApplicationUser> userManager) => _userManager = userManager;
 
-    public async Task<DomainEntities.ApplicationUser?> GetByIdAsync(string id)
+    public async Task<DomainEntities.User?> GetByIdAsync(string id)
     {
         var userDb = await _userManager.FindByIdAsync(id);
         if (userDb is null)
             return null;
 
-        var user = userDb.Adapt<DomainEntities.ApplicationUser>();
+        var user = userDb.Adapt<DomainEntities.User>();
         return user;
     }
 
-    public async Task<DomainEntities.ApplicationUser?> GetByEmailAsync(string email)
+    public async Task<DomainEntities.User?> GetByEmailAsync(string email)
     {
         var userDb = await _userManager.FindByEmailAsync(email);
         if (userDb is null)
             return null;
 
-        var user = userDb.Adapt<DomainEntities.ApplicationUser>();
+        var user = userDb.Adapt<DomainEntities.User>();
         return user;
     }
 
-    public async Task RegisterAsync(DomainEntities.ApplicationUser applicationUser, string password)
+    public async Task RegisterAsync(DomainEntities.User applicationUser, string password)
     {
         var newUser = applicationUser.Adapt<PersistenceModels.ApplicationUser>();
         newUser.Id = Guid.NewGuid().ToString();
@@ -42,7 +42,7 @@ internal sealed class ApplicationUserRepository : IApplicationUserRepository
         await _userManager.CreateAsync(newUser, password);
     }
 
-    public async Task<bool> ValidateRegistrationPassword(string password)
+    public async Task<bool> ValidateRegistrationPasswordAsync(string password)
     {
         var passwordValidators = _userManager.PasswordValidators;
         foreach (var validator in passwordValidators)
@@ -55,7 +55,7 @@ internal sealed class ApplicationUserRepository : IApplicationUserRepository
         return true;
     }
 
-    public async Task<bool> ValidateLoginPassword(string email, string password)
+    public async Task<bool> ValidateLoginPasswordAsync(string email, string password)
     {
         var userDb = await _userManager.FindByEmailAsync(email);
         if (userDb is null)
