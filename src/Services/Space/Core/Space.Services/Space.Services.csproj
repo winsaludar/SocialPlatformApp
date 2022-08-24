@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Space.Contracts\Space.Contracts.csproj" />
     <ProjectReference Include="..\Space.Domain\Space.Domain.csproj" />
     <ProjectReference Include="..\Space.Services.Abstraction\Space.Services.Abstraction.csproj" />
