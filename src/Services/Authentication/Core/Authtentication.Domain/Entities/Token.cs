@@ -15,7 +15,7 @@ public class Token
         if (refreshTokenDb is null)
             throw new InvalidRefreshTokenException();
 
-        var userDb = await repositoryManager.ApplicationUserRepository.GetByIdAsync(refreshTokenDb.UserId);
+        var userDb = await repositoryManager.UserRepository.GetByIdAsync(refreshTokenDb.UserId);
         if (userDb is null)
             throw new InvalidRefreshTokenException();
 

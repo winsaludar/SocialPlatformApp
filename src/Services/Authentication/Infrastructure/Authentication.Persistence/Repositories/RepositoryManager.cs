@@ -8,7 +8,7 @@ namespace Authentication.Persistence.Repositories;
 
 public class RepositoryManager : IRepositoryManager
 {
-    private readonly Lazy<IUserRepository> _lazyApplicationUserRepository;
+    private readonly Lazy<IUserRepository> _lazyUserRepository;
     private readonly Lazy<IRefreshTokenRepository> _lazyRefreshTokenRepository;
     private readonly Lazy<ITokenRepository> _lazyTokenRepository;
 
@@ -18,12 +18,12 @@ public class RepositoryManager : IRepositoryManager
         TokenValidationParameters tokenValidationParameters,
         IConfiguration configuration)
     {
-        _lazyApplicationUserRepository = new Lazy<IUserRepository>(() => new UserRepository(userManager));
+        _lazyUserRepository = new Lazy<IUserRepository>(() => new UserRepository(userManager));
         _lazyRefreshTokenRepository = new Lazy<IRefreshTokenRepository>(() => new RefreshTokenRepository(dbContext));
         _lazyTokenRepository = new Lazy<ITokenRepository>(() => new TokenRepository(tokenValidationParameters, configuration, _lazyRefreshTokenRepository.Value));
     }
 
-    public IUserRepository ApplicationUserRepository => _lazyApplicationUserRepository.Value;
+    public IUserRepository UserRepository => _lazyUserRepository.Value;
     public IRefreshTokenRepository RefreshTokenRepository => _lazyRefreshTokenRepository.Value;
     public ITokenRepository TokenRepository => _lazyTokenRepository.Value;
 }

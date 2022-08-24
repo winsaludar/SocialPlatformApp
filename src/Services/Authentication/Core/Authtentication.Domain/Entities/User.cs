@@ -16,15 +16,15 @@ public class User
         if (string.IsNullOrEmpty(Email) || !IsEmailValid(Email))
             throw new InvalidEmailException(Email);
 
-        var existingUser = await repositoryManager.ApplicationUserRepository.GetByEmailAsync(Email);
+        var existingUser = await repositoryManager.UserRepository.GetByEmailAsync(Email);
         if (existingUser is not null)
             throw new UserAlreadyExistException(Email);
 
-        bool isPasswordValid = await repositoryManager.ApplicationUserRepository.ValidateRegistrationPasswordAsync(password);
+        bool isPasswordValid = await repositoryManager.UserRepository.ValidateRegistrationPasswordAsync(password);
         if (!isPasswordValid)
             throw new InvalidPasswordException();
 
-        await repositoryManager.ApplicationUserRepository.RegisterAsync(this, password);
+        await repositoryManager.UserRepository.RegisterAsync(this, password);
     }
 
     public async Task<Token> LoginAsync(string password, IRepositoryManager repositoryManager)
@@ -32,11 +32,11 @@ public class User
         if (string.IsNullOrEmpty(Email) || !IsEmailValid(Email))
             throw new InvalidEmailException(Email);
 
-        var existingUser = await repositoryManager.ApplicationUserRepository.GetByEmailAsync(Email);
+        var existingUser = await repositoryManager.UserRepository.GetByEmailAsync(Email);
         if (existingUser is null)
             throw new UnauthorizedAccessException("Invalid email or password");
 
-        bool isPasswordCorrect = await repositoryManager.ApplicationUserRepository.ValidateLoginPasswordAsync(Email, password);
+        bool isPasswordCorrect = await repositoryManager.UserRepository.ValidateLoginPasswordAsync(Email, password);
         if (!isPasswordCorrect)
             throw new UnauthorizedAccessException("Invalid email or password");
 
