@@ -23,6 +23,38 @@ public class SpaceControllerTests
     }
 
     [Fact]
+    public async Task GetAsync_SpacesAreEmpty_ReturnsOkResultWithEmptyData()
+    {
+        _mockService.Setup(x => x.SpaceService.GetAllAsync())
+           .ReturnsAsync((IEnumerable<SpaceDto>)new List<SpaceDto>());
+
+        var result = await _controller.GetAsync();
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var spaces = Assert.IsType<List<SpaceDto>>(okResult.Value);
+        Assert.Empty(spaces);
+    }
+
+    [Fact]
+    public async Task GetAsync_SpacesAreNotEmpty_ReturnsOkResultWithData()
+    {
+        _mockService.Setup(x => x.SpaceService.GetAllAsync())
+           .ReturnsAsync((IEnumerable<SpaceDto>)new List<SpaceDto>
+           {
+               new SpaceDto(),
+               new SpaceDto(),
+               new SpaceDto()
+           });
+
+        var result = await _controller.GetAsync();
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var spaces = Assert.IsType<List<SpaceDto>>(okResult.Value);
+        Assert.NotEmpty(spaces);
+        Assert.Equal(3, spaces.Count());
+    }
+
+    [Fact]
     public async Task PostAsync_ModelStateIsInvalid_ReturnsBadRequest()
     {
         CreateSpaceRequest request = new() { };

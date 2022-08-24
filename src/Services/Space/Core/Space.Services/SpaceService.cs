@@ -19,7 +19,7 @@ public class SpaceService : ISpaceService
         if (spaces == null)
             return new List<SpaceDto>();
 
-        return spaces.Adapt<IEnumerable<SpaceDto>>();
+        return spaces.Adapt<List<SpaceDto>>();
     }
 
     public async Task CreateAsync(SpaceDto dto)
