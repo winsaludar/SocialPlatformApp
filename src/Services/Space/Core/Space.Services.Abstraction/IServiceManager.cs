@@ -3,4 +3,5 @@
 public interface IServiceManager
 {
     ISpaceService SpaceService { get; }
+    ISoulService SoulService { get; }
 }

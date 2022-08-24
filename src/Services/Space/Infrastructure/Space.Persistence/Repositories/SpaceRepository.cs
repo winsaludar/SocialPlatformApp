@@ -20,9 +20,19 @@ public class SpaceRepository : ISpaceRepository
         return await _dbContext.Spaces.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name);
     }
 
+    public async Task<DomainEntities.Space?> GetByIdAsync(Guid id)
+    {
+        return await _dbContext.Spaces.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task CreateAsync(DomainEntities.Space newSpace)
     {
         await _dbContext.Spaces.AddAsync(newSpace);
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(DomainEntities.Space space)
+    {
+        _dbContext.Spaces.Update(space);
     }
 }
