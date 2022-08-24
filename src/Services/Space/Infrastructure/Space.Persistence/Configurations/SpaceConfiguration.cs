@@ -21,5 +21,10 @@ public class SpaceConfiguration : IEntityTypeConfiguration<DomainEntities.Space>
 
         builder.Property(x => x.CreatedBy).IsRequired().HasMaxLength(36);
         builder.Property(x => x.CreatedDateUtc).IsRequired();
+
+        // Build many-to-many relationship with Soul
+        builder.HasMany(x => x.Souls)
+            .WithMany(y => y.Spaces)
+            .UsingEntity<DomainEntities.SpaceSoul>();
     }
 }
