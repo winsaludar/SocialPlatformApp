@@ -16,6 +16,14 @@ public class Soul : BaseEntity
 
         await repositoryManager.UnitOfWork.BeginTransactionAsync();
 
+        // Make sure space is valid
+        Space? targetSpace = await repositoryManager.SpaceRepository.GetByIdAsync(spaceId);
+        if (targetSpace == null)
+        {
+            await repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSpaceIdException(spaceId);
+        }
+
         // Create/Get soul info
         Soul? existingSoul = await repositoryManager.SoulRepository.GetByEmailAsync(Email);
         if (existingSoul == null)
@@ -33,14 +41,6 @@ public class Soul : BaseEntity
             CreatedDateUtc = existingSoul.CreatedDateUtc;
             LastModifiedBy = existingSoul.LastModifiedBy;
             LastModifiedDateUtc = existingSoul.LastModifiedDateUtc;
-        }
-
-        // Make sure space is valid
-        Space? targetSpace = await repositoryManager.SpaceRepository.GetByIdAsync(spaceId);
-        if (targetSpace == null)
-        {
-            await repositoryManager.UnitOfWork.RollbackAsync();
-            throw new InvalidSpaceIdException(spaceId);
         }
 
         // Make sure soul is not a member yet of the target space
