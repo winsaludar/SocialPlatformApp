@@ -25,4 +25,10 @@ public class SoulService : ISoulService
         Soul soul = new() { Email = email };
         await soul.JoinSpaceAsync(spaceId, _repositoryManager);
     }
+
+    public async Task LeaveSpaceAsync(Guid spaceId, string email)
+    {
+        Soul soul = new() { Email = email };
+        await soul.LeaveSpaceAsync(spaceId, _repositoryManager);
+    }
 }

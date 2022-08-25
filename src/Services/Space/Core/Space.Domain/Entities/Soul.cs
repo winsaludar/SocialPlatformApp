@@ -89,7 +89,7 @@ public class Soul : BaseEntity
         }
 
         // Make sure soul is not a member yet of the target space
-        bool isMemberAlready = await repositoryManager.SoulRepository.IsMemberOfSpace(Id, spaceId);
+        bool isMemberAlready = await repositoryManager.SoulRepository.IsMemberOfSpaceAsync(Id, spaceId);
         if (isMemberAlready)
         {
             await repositoryManager.UnitOfWork.RollbackAsync();
@@ -98,6 +98,41 @@ public class Soul : BaseEntity
 
         targetSpace.Souls.Add(this);
         await repositoryManager.SpaceRepository.UpdateAsync(targetSpace);
+        await repositoryManager.UnitOfWork.CommitAsync();
+    }
+
+    public async Task LeaveSpaceAsync(Guid spaceId, IRepositoryManager repositoryManager)
+    {
+        if (string.IsNullOrEmpty(Email))
+            throw new InvalidSoulException(Email);
+
+        await repositoryManager.UnitOfWork.BeginTransactionAsync();
+
+        // Make sure space is valid
+        Space? targetSpace = await repositoryManager.SpaceRepository.GetByIdAsync(spaceId);
+        if (targetSpace == null)
+        {
+            await repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSpaceIdException(spaceId);
+        }
+
+        // Make sure soul is valid
+        Soul? existingSoul = await repositoryManager.SoulRepository.GetByEmailAsync(Email);
+        if (existingSoul == null)
+        {
+            await repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSoulException(Email);
+        }
+
+        // Make sure soul is a member of the target space
+        bool isMember = await repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, spaceId);
+        if (!isMember)
+        {
+            await repositoryManager.UnitOfWork.RollbackAsync();
+            throw new SoulNotMemberException(Email, targetSpace.Name);
+        }
+
+        await repositoryManager.SoulRepository.DeleteSoulSpaceAsync(existingSoul.Id, spaceId);
         await repositoryManager.UnitOfWork.CommitAsync();
     }
 }

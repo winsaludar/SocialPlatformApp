@@ -10,9 +10,13 @@ public class SoulRepository : ISoulRepository
 
     public SoulRepository(SpaceDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<Soul?> GetByEmailAsync(string email)
+    public async Task<Soul?> GetByEmailAsync(string email, bool includeSpaces = false)
     {
-        return await _dbContext.Souls.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
+        IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
+        if (includeSpaces)
+            query = query.Include(x => x.Spaces);
+
+        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
     }
 
     public async Task CreateAsync(Soul newSoul)
@@ -20,17 +24,23 @@ public class SoulRepository : ISoulRepository
         await _dbContext.Souls.AddAsync(newSoul);
     }
 
-    public async Task<bool> IsMemberOfSpace(Guid soulId, Guid spaceId)
+    public async Task<bool> IsMemberOfSpaceAsync(Guid soulId, Guid spaceId)
     {
-        Domain.Entities.Space? space = await _dbContext.Spaces.Where(x => x.Id == spaceId).AsNoTracking().FirstOrDefaultAsync();
-        if (space == null)
-            return false;
-
-        Soul? soul = await _dbContext.Souls.Include(x => x.Spaces)
-            .Where(x => x.Id == soulId && x.Spaces.Contains(space))
+        SpaceSoul? spaceSoul = await _dbContext.SpacesSouls
+            .Where(x => x.SoulId == soulId && x.SpaceId == spaceId)
             .AsNoTracking()
             .FirstOrDefaultAsync();
 
-        return soul != null;
+        return spaceSoul != null;
+    }
+
+    public async Task DeleteSoulSpaceAsync(Guid soulId, Guid spaceId)
+    {
+        await Task.Run(() =>
+        {
+            SpaceSoul spaceSoul = new() { SoulId = soulId, SpaceId = spaceId };
+            _dbContext.SpacesSouls.Attach(spaceSoul);
+            _dbContext.SpacesSouls.Remove(spaceSoul);
+        });
     }
 }

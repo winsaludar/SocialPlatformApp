@@ -9,6 +9,7 @@ public class SpaceDbContext : DbContext
 
     public DbSet<DomainEntities.Space> Spaces { get; set; } = null!;
     public DbSet<DomainEntities.Soul> Souls { get; set; } = null!;
+    public DbSet<DomainEntities.SpaceSoul> SpacesSouls { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
