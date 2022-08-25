@@ -51,8 +51,8 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        var tokenDto = request.Adapt<TokenDto>();
-        TokenDto newTokenDto = await _serviceManager.AuthenticationService.RefreshTokenAsync(tokenDto);
+        TokenDto dto = new() { Value = request.Token, RefreshToken = request.RefreshToken };
+        TokenDto newTokenDto = await _serviceManager.AuthenticationService.RefreshTokenAsync(dto);
 
         return Ok(newTokenDto);
     }
