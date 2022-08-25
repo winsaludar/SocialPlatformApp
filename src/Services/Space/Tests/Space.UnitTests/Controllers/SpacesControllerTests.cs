@@ -164,4 +164,44 @@ public class SpacesControllerTests
         _mockService.Verify(x => x.SoulService.JoinSpaceAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
+
+    [Fact]
+    public async Task LeaveSpaceAsync_UserIdentityIsNull_ReturnsUnauthorized()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+        Guid spaceId = Guid.NewGuid();
+
+        var result = await _controller.LeaveSpaceAsync(spaceId);
+
+        Assert.IsType<UnauthorizedResult>(result);
+    }
+
+    [Fact]
+    public async Task LeaveSpaceAsync_RequestIsValid_ReturnsOkResponse()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+        Guid spaceId = Guid.NewGuid();
+
+        var result = await _controller.LeaveSpaceAsync(spaceId);
+
+        _mockService.Verify(x => x.SoulService.LeaveSpaceAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
 }

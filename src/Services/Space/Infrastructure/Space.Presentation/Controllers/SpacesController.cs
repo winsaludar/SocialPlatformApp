@@ -57,4 +57,18 @@ public class SpacesController : ControllerBase
 
         return Ok("Welcome new soul!");
     }
+
+    [HttpPost]
+    [Route("{spaceId}/leave")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> LeaveSpaceAsync(Guid spaceId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        await _serviceManager.SoulService.LeaveSpaceAsync(spaceId, User.Identity.Name);
+
+        return Ok("Farewell my favorite soul");
+    }
 }

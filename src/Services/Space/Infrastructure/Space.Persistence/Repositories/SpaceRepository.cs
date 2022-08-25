@@ -10,19 +10,31 @@ public class SpaceRepository : ISpaceRepository
 
     public SpaceRepository(SpaceDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<IEnumerable<DomainEntities.Space>> GetAllAsync()
+    public async Task<IEnumerable<DomainEntities.Space>> GetAllAsync(bool includeSouls = false)
     {
-        return await _dbContext.Spaces.AsNoTracking().ToListAsync();
+        IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
+        if (includeSouls)
+            query = query.Include(x => x.Souls);
+
+        return await query.AsNoTracking().ToListAsync();
     }
 
-    public async Task<DomainEntities.Space?> GetByNameAsync(string name)
+    public async Task<DomainEntities.Space?> GetByNameAsync(string name, bool includeSouls = false)
     {
-        return await _dbContext.Spaces.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name);
+        IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
+        if (includeSouls)
+            query = query.Include(x => x.Souls);
+
+        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name);
     }
 
-    public async Task<DomainEntities.Space?> GetByIdAsync(Guid id)
+    public async Task<DomainEntities.Space?> GetByIdAsync(Guid id, bool includeSouls = false)
     {
-        return await _dbContext.Spaces.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
+        if (includeSouls)
+            query = query.Include(x => x.Souls);
+
+        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task CreateAsync(DomainEntities.Space newSpace)
