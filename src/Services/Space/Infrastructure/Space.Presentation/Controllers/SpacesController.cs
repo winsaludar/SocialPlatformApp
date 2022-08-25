@@ -39,7 +39,7 @@ public class SpacesController : ControllerBase
 
         var dto = request.Adapt<SpaceDto>();
         dto.Creator = User.Identity.Name;
-        await _serviceManager.SpaceService.CreateAsync(dto);
+        await _serviceManager.SoulService.CreateSpaceAsync(dto);
 
         return Ok("Space created");
     }

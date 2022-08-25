@@ -5,5 +5,4 @@ namespace Space.Services.Abstraction;
 public interface ISpaceService
 {
     Task<IEnumerable<SpaceDto>> GetAllAsync();
-    Task CreateAsync(SpaceDto dto);
 }
