@@ -9,12 +9,12 @@ using System.Security.Claims;
 
 namespace Space.UnitTests.Controllers;
 
-public class SpaceControllerTests
+public class SpacesControllerTests
 {
     private readonly Mock<IServiceManager> _mockService;
     private readonly SpacesController _controller;
 
-    public SpaceControllerTests()
+    public SpacesControllerTests()
     {
         Mock<ISpaceService> mockSpaceService = new();
         Mock<ISoulService> mockSoulService = new();
@@ -92,7 +92,7 @@ public class SpaceControllerTests
     public async Task PostAsync_RequestIsValid_ReturnsOkResponse()
     {
         SpaceDto? createdSpace = null;
-        _mockService.Setup(x => x.SpaceService.CreateAsync(It.IsAny<SpaceDto>()))
+        _mockService.Setup(x => x.SoulService.CreateSpaceAsync(It.IsAny<SpaceDto>()))
             .Callback<SpaceDto>(x => createdSpace = x);
 
         // Setup User.Identity
@@ -118,7 +118,7 @@ public class SpaceControllerTests
 
         var result = await _controller.PostAsync(request);
 
-        _mockService.Verify(x => x.SpaceService.CreateAsync(It.IsAny<SpaceDto>()), Times.Once);
+        _mockService.Verify(x => x.SoulService.CreateSpaceAsync(It.IsAny<SpaceDto>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
         Assert.Equal(createdSpace?.Name, request.Name);
         Assert.Equal(createdSpace?.ShortDescription, request.ShortDescription);
@@ -144,10 +144,6 @@ public class SpaceControllerTests
     [Fact]
     public async Task JoinSpaceAsync_RequestIsValid_ReturnsOkResponse()
     {
-        SpaceDto? createdSpace = null;
-        _mockService.Setup(x => x.SpaceService.CreateAsync(It.IsAny<SpaceDto>()))
-            .Callback<SpaceDto>(x => createdSpace = x);
-
         // Setup User.Identity
         List<Claim> claims = new()
         {

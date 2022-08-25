@@ -28,7 +28,6 @@ public class SpaceRepository : ISpaceRepository
     public async Task CreateAsync(DomainEntities.Space newSpace)
     {
         await _dbContext.Spaces.AddAsync(newSpace);
-        await _dbContext.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(DomainEntities.Space space)
