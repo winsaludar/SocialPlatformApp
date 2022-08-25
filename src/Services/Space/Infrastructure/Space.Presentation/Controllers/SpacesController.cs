@@ -28,6 +28,7 @@ public class SpacesController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> PostAsync([FromBody] CreateSpaceRequest request)
     {
         if (!ModelState.IsValid)
@@ -41,5 +42,19 @@ public class SpacesController : ControllerBase
         await _serviceManager.SpaceService.CreateAsync(dto);
 
         return Ok("Space created");
+    }
+
+    [HttpPost]
+    [Route("{spaceId}/join")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> JoinSpaceAsync(Guid spaceId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        await _serviceManager.SoulService.JoinSpaceAsync(spaceId, User.Identity.Name);
+
+        return Ok("Welcome new soul!");
     }
 }

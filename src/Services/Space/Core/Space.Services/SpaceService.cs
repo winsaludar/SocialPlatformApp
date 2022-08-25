@@ -28,7 +28,7 @@ public class SpaceService : ISpaceService
             throw new InvalidSpaceNameException(dto.Name);
 
         if (string.IsNullOrEmpty(dto.Creator))
-            throw new InvalidSpaceCreatorException(dto.Creator);
+            throw new InvalidSoulException(dto.Creator);
 
         var existingSpace = await _repositoryManager.SpaceRepository.GetByNameAsync(dto.Name);
         if (existingSpace != null)

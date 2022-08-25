@@ -68,7 +68,7 @@ public class SpaceServiceTests
     {
         SpaceDto space = new() { Name = "Test", Creator = creator };
 
-        await Assert.ThrowsAsync<InvalidSpaceCreatorException>(() => _spaceService.CreateAsync(space));
+        await Assert.ThrowsAsync<InvalidSoulException>(() => _spaceService.CreateAsync(space));
     }
 
     [Fact]

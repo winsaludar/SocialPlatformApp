@@ -17,8 +17,10 @@ public class SpaceControllerTests
     public SpaceControllerTests()
     {
         Mock<ISpaceService> mockSpaceService = new();
+        Mock<ISoulService> mockSoulService = new();
         _mockService = new Mock<IServiceManager>();
         _mockService.Setup(x => x.SpaceService).Returns(mockSpaceService.Object);
+        _mockService.Setup(x => x.SoulService).Returns(mockSoulService.Object);
         _controller = new SpacesController(_mockService.Object);
     }
 
@@ -121,5 +123,49 @@ public class SpaceControllerTests
         Assert.Equal(createdSpace?.Name, request.Name);
         Assert.Equal(createdSpace?.ShortDescription, request.ShortDescription);
         Assert.Equal(createdSpace?.LongDescription, request.LongDescription);
+    }
+
+    [Fact]
+    public async Task JoinSpaceAsync_UserIdentityIsNull_ReturnsUnauthorized()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+        Guid spaceId = Guid.NewGuid();
+
+        var result = await _controller.JoinSpaceAsync(spaceId);
+
+        Assert.IsType<UnauthorizedResult>(result);
+    }
+
+    [Fact]
+    public async Task JoinSpaceAsync_RequestIsValid_ReturnsOkResponse()
+    {
+        SpaceDto? createdSpace = null;
+        _mockService.Setup(x => x.SpaceService.CreateAsync(It.IsAny<SpaceDto>()))
+            .Callback<SpaceDto>(x => createdSpace = x);
+
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+        Guid spaceId = Guid.NewGuid();
+
+        var result = await _controller.JoinSpaceAsync(spaceId);
+
+        _mockService.Verify(x => x.SoulService.JoinSpaceAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
     }
 }
