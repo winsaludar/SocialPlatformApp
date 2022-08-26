@@ -71,4 +71,20 @@ public class SpacesController : ControllerBase
 
         return Ok("Farewell my favorite soul");
     }
+
+    [HttpPost]
+    [Route("{spaceId}/kick")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> KickSoulAsync(Guid spaceId, [FromBody] KickSoulRequest request)
+    {
+        // TODO: Only the admins of the target space can call this
+
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        await _serviceManager.SpaceService.KickSoulAsync(spaceId, request.Email);
+
+        return Ok("Begone! You do not belong here");
+    }
 }
