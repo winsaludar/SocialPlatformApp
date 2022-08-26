@@ -17,6 +17,8 @@ public class Space : BaseEntity
         if (string.IsNullOrEmpty(email))
             throw new InvalidSoulException(email);
 
+        // TODO: Only the admins of this space can kick a member
+
         await repositoryManager.UnitOfWork.BeginTransactionAsync();
 
         // Make sure space id is valid

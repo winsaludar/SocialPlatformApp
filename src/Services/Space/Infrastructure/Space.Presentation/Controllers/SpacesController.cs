@@ -78,8 +78,6 @@ public class SpacesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> KickSoulAsync(Guid spaceId, [FromBody] KickSoulRequest request)
     {
-        // TODO: Only the admins of the target space can call this
-
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized();
 
