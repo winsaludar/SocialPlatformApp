@@ -204,4 +204,46 @@ public class SpacesControllerTests
         _mockService.Verify(x => x.SoulService.LeaveSpaceAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
+
+    [Fact]
+    public async Task KickSoulAsync_UserIdentityIsNull_ReturnsUnauthorized()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+        Guid spaceId = Guid.NewGuid();
+        KickSoulRequest request = new();
+
+        var result = await _controller.KickSoulAsync(spaceId, request);
+
+        Assert.IsType<UnauthorizedResult>(result);
+    }
+
+    [Fact]
+    public async Task KickSoulAsync_RequestIsValid_ReturnsOkResponse()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+        Guid spaceId = Guid.NewGuid();
+        KickSoulRequest request = new() { Email = "member@example.com" };
+
+        var result = await _controller.KickSoulAsync(spaceId, request);
+
+        _mockService.Verify(x => x.SpaceService.KickSoulAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
 }

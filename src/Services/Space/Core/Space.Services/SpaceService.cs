@@ -19,4 +19,10 @@ public class SpaceService : ISpaceService
 
         return spaces.Adapt<List<SpaceDto>>();
     }
+
+    public async Task KickSoulAsync(Guid spaceId, string email)
+    {
+        Domain.Entities.Space space = new() { Id = spaceId };
+        await space.KickSoulAsync(email, _repositoryManager);
+    }
 }
