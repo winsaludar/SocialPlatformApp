@@ -44,6 +44,6 @@ public class SpaceRepository : ISpaceRepository
 
     public async Task UpdateAsync(DomainEntities.Space space)
     {
-        _dbContext.Spaces.Update(space);
+        await Task.Run(() => _dbContext.Spaces.Update(space));
     }
 }
