@@ -5,23 +5,32 @@ namespace Authentication.Domain.Entities;
 
 public class Token
 {
+    private readonly IRepositoryManager? _repositoryManager;
+
+    public Token() { }
+
+    public Token(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
+
     public string Value { get; set; } = default!;
     public string RefreshToken { get; set; } = default!;
     public DateTime ExpiresAt { get; set; } = default!;
 
-    public async Task RefreshAsync(IRepositoryManager repositoryManager)
+    public async Task RefreshAsync()
     {
-        var refreshTokenDb = await repositoryManager.RefreshTokenRepository.GetByOldRefreshTokenAsync(RefreshToken);
+        if (_repositoryManager == null)
+            throw new ArgumentNullException("IRepositoryManager is null");
+
+        var refreshTokenDb = await _repositoryManager.RefreshTokenRepository.GetByOldRefreshTokenAsync(RefreshToken);
         if (refreshTokenDb is null)
             throw new InvalidRefreshTokenException();
 
-        var userDb = await repositoryManager.UserRepository.GetByIdAsync(refreshTokenDb.UserId);
+        var userDb = await _repositoryManager.UserRepository.GetByIdAsync(refreshTokenDb.UserId);
         if (userDb is null)
             throw new InvalidRefreshTokenException();
 
         try
         {
-            Token newToken = await repositoryManager.TokenRepository.RefreshJwtAsync(this, userDb, refreshTokenDb);
+            Token newToken = await _repositoryManager.TokenRepository.RefreshJwtAsync(this, userDb, refreshTokenDb);
             Value = newToken.Value;
             RefreshToken = newToken.RefreshToken;
             ExpiresAt = newToken.ExpiresAt;

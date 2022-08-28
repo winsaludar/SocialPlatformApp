@@ -6,41 +6,53 @@ namespace Authentication.Domain.Entities;
 
 public class User
 {
+    private readonly IRepositoryManager? _repositoryManager;
+
+    public User() { }
+
+    public User(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
+
     public Guid Id { get; set; }
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public string Email { get; set; } = default!;
 
-    public async Task RegisterAsync(string password, IRepositoryManager repositoryManager)
+    public async Task RegisterAsync(string password)
     {
+        if (_repositoryManager == null)
+            throw new ArgumentNullException("IRepositoryManager is null");
+
         if (string.IsNullOrEmpty(Email) || !IsEmailValid(Email))
             throw new InvalidEmailException(Email);
 
-        var existingUser = await repositoryManager.UserRepository.GetByEmailAsync(Email);
+        var existingUser = await _repositoryManager.UserRepository.GetByEmailAsync(Email);
         if (existingUser is not null)
             throw new UserAlreadyExistException(Email);
 
-        bool isPasswordValid = await repositoryManager.UserRepository.ValidateRegistrationPasswordAsync(password);
+        bool isPasswordValid = await _repositoryManager.UserRepository.ValidateRegistrationPasswordAsync(password);
         if (!isPasswordValid)
             throw new InvalidPasswordException();
 
-        await repositoryManager.UserRepository.RegisterAsync(this, password);
+        await _repositoryManager.UserRepository.RegisterAsync(this, password);
     }
 
-    public async Task<Token> LoginAsync(string password, IRepositoryManager repositoryManager)
+    public async Task<Token> LoginAsync(string password)
     {
+        if (_repositoryManager == null)
+            throw new ArgumentNullException("IRepositoryManager is null");
+
         if (string.IsNullOrEmpty(Email) || !IsEmailValid(Email))
             throw new InvalidEmailException(Email);
 
-        var existingUser = await repositoryManager.UserRepository.GetByEmailAsync(Email);
+        var existingUser = await _repositoryManager.UserRepository.GetByEmailAsync(Email);
         if (existingUser is null)
             throw new UnauthorizedAccessException("Invalid email or password");
 
-        bool isPasswordCorrect = await repositoryManager.UserRepository.ValidateLoginPasswordAsync(Email, password);
+        bool isPasswordCorrect = await _repositoryManager.UserRepository.ValidateLoginPasswordAsync(Email, password);
         if (!isPasswordCorrect)
             throw new UnauthorizedAccessException("Invalid email or password");
 
-        return await repositoryManager.TokenRepository.GenerateJwtAsync(existingUser);
+        return await _repositoryManager.TokenRepository.GenerateJwtAsync(existingUser);
     }
 
     private static bool IsEmailValid(string email)
