@@ -20,6 +20,14 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository).Returns(mockSoulRepo.Object);
     }
 
+    [Fact]
+    public async Task CreateSpaceAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        Soul soul = new() { Name = "test@example.com" };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => soul.CreateSpaceAsync(It.IsAny<Domain.Entities.Space>()));
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(null)]
@@ -122,6 +130,14 @@ public class SoulTests
         Assert.Equal(createdSpace?.ShortDescription, newSpace.ShortDescription);
         Assert.Equal(createdSpace?.LongDescription, newSpace.LongDescription);
         Assert.Equal(1, createdSpace?.Souls.Count);
+    }
+
+    [Fact]
+    public async Task JoinSpaceAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        Soul soul = new() { Name = "test@example.com" };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => soul.JoinSpaceAsync(It.IsAny<Guid>()));
     }
 
     [Theory]
@@ -238,6 +254,14 @@ public class SoulTests
         _mockRepo.Verify(x => x.SpaceRepository.UpdateAsync(targetSpace), Times.Once);
         _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);
         Assert.Equal(1, targetSpace.Souls.Count);
+    }
+
+    [Fact]
+    public async Task LeaveSpaceAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        Soul soul = new() { Name = "test@example.com" };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => soul.LeaveSpaceAsync(It.IsAny<Guid>()));
     }
 
     [Theory]
