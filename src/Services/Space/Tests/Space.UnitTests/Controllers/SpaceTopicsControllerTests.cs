@@ -25,6 +25,42 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
+    public async Task GetAsync_TopicsAreEmpty_ReturnsOkResultWithEmptyData()
+    {
+        Guid spaceId = Guid.NewGuid();
+
+        _mockService.Setup(x => x.SpaceService.GetAllTopicsAsync(spaceId))
+           .ReturnsAsync((IEnumerable<TopicDto>)new List<TopicDto>());
+
+        var result = await _controller.GetAsync(spaceId);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var spaces = Assert.IsType<List<TopicDto>>(okResult.Value);
+        Assert.Empty(spaces);
+    }
+
+    [Fact]
+    public async Task GetAsync_TopicsAreNotEmpty_ReturnsOkResultWithData()
+    {
+        Guid spaceId = Guid.NewGuid();
+
+        _mockService.Setup(x => x.SpaceService.GetAllTopicsAsync(spaceId))
+           .ReturnsAsync((IEnumerable<TopicDto>)new List<TopicDto>
+           {
+               new TopicDto(),
+               new TopicDto(),
+               new TopicDto()
+           });
+
+        var result = await _controller.GetAsync(spaceId);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var topics = Assert.IsType<List<TopicDto>>(okResult.Value);
+        Assert.NotEmpty(topics);
+        Assert.Equal(3, topics.Count());
+    }
+
+    [Fact]
     public async Task PostAsync_ModelStateIsInvalid_ReturnsBadRequest()
     {
         Guid spaceId = Guid.NewGuid();

@@ -28,32 +28,86 @@ public class SpaceTests
         _mockHelper.Setup(x => x.SlugHelper).Returns(_mockSlugHelper.Object);
     }
 
+    [Fact]
+    public void Topics_RepositoryManagerIsNull_ReturnsEmptyList()
+    {
+        DomainEntities.Space space = new() { };
+
+        var topics = space.Topics;
+
+        Assert.IsType<List<Topic>>(topics);
+        Assert.Empty(topics);
+    }
+
+    [Fact]
+    public void Topics_DatabaseReturnsNull_ReturnsEmptyList()
+    {
+        DomainEntities.Space space = new(_mockRepo.Object) { };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetAllTopicsAsync(It.IsAny<Guid>()))
+            .ReturnsAsync((IEnumerable<Topic>)null!);
+
+        var topics = space.Topics;
+
+        Assert.IsType<List<Topic>>(topics);
+        Assert.Empty(topics);
+    }
+
+    [Fact]
+    public void Topics_DatabaseReturnsNotEmpty_ReturnsNotEmptyList()
+    {
+        DomainEntities.Space space = new(_mockRepo.Object) { };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetAllTopicsAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(new List<Topic>
+            {
+                new Topic(),
+                new Topic(),
+                new Topic()
+            });
+
+        var topics = space.Topics;
+
+        Assert.IsType<List<Topic>>(topics);
+        Assert.NotEmpty(topics);
+        Assert.Equal(3, topics.Count);
+    }
+
+    [Fact]
+    public async Task KickSoulAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        DomainEntities.Space space = new() { };
+        string email = "member@example.com";
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => space.KickSoulAsync(email));
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(null)]
     public async Task KickSoulAsync_EmailIsInvalid_ThrowsInvalidSoulException(string email)
     {
-        DomainEntities.Space space = new() { };
+        DomainEntities.Space space = new(_mockRepo.Object) { };
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickSoulAsync(email, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickSoulAsync(email));
     }
 
     [Fact]
     public async Task KickSoulAsync_SpaceIsInvalid_ThrowsInvalidSpaceIdException()
     {
-        DomainEntities.Space space = new() { Id = Guid.NewGuid() };
+        DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
         string email = "member@example.com";
 
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((DomainEntities.Space)null!);
 
-        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.KickSoulAsync(email, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.KickSoulAsync(email));
     }
 
     [Fact]
     public async Task KickSoulAsync_SoulDoesNotExist_ThrowsInvalidSoulException()
     {
-        DomainEntities.Space space = new() { Id = Guid.NewGuid() };
+        DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
         string email = "notexisting@example.com";
 
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
@@ -61,13 +115,13 @@ public class SpaceTests
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickSoulAsync(email, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickSoulAsync(email));
     }
 
     [Fact]
     public async Task KickSoulAsync_SoulIsNotAMemberOfTheSpace_ThrowsSoulNotMemberException()
     {
-        DomainEntities.Space space = new() { Id = Guid.NewGuid() };
+        DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
         string email = "notmember@example.com";
 
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
@@ -77,13 +131,13 @@ public class SpaceTests
         _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(false);
 
-        await Assert.ThrowsAsync<SoulNotMemberException>(() => space.KickSoulAsync(email, _mockRepo.Object));
+        await Assert.ThrowsAsync<SoulNotMemberException>(() => space.KickSoulAsync(email));
     }
 
     [Fact]
     public async Task KickSoulAsync_SoulAndSpaceAreBothValidAndSoulIsAMember_RemoveToSpace()
     {
-        DomainEntities.Space space = new() { Id = Guid.NewGuid() };
+        DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
         Soul existingSoul = new()
         {
             Id = Guid.NewGuid(),
@@ -100,10 +154,26 @@ public class SpaceTests
         _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(true);
 
-        await space.KickSoulAsync(existingSoul.Email, _mockRepo.Object);
+        await space.KickSoulAsync(existingSoul.Email);
 
         _mockRepo.Verify(x => x.SoulRepository.DeleteSoulSpaceAsync(existingSoul.Id, space.Id), Times.Once);
         _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateTopicAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        DomainEntities.Space space = new() { };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+    }
+
+    [Fact]
+    public async Task CreateTopicAsync_HelperManagerIsNull_ThrowsArgumentNullException()
+    {
+        DomainEntities.Space space = new(_mockRepo.Object) { };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
     }
 
     [Theory]
@@ -111,17 +181,17 @@ public class SpaceTests
     [InlineData(null)]
     public async Task CreateTopicAsync_AuthorEmailIsInvalid_ThrowsInvalidSoulException(string authorEmail)
     {
-        DomainEntities.Space space = new() { };
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { };
         string title = "Fake Title";
         string content = "Fake Content";
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => space.CreateTopicAsync(authorEmail, title, content, _mockRepo.Object, _mockHelper.Object));
+        await Assert.ThrowsAsync<InvalidSoulException>(() => space.CreateTopicAsync(authorEmail, title, content));
     }
 
     [Fact]
     public async Task CreateTopicAsync_SpaceIsInvalid_ThrowsInvalidSpaceIdException()
     {
-        DomainEntities.Space space = new() { Id = Guid.NewGuid() };
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid() };
         string authorEmail = "author@example.com";
         string title = "Fake Title";
         string content = "Fake Content";
@@ -129,13 +199,13 @@ public class SpaceTests
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((DomainEntities.Space)null!);
 
-        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.CreateTopicAsync(authorEmail, title, content, _mockRepo.Object, _mockHelper.Object));
+        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.CreateTopicAsync(authorEmail, title, content));
     }
 
     [Fact]
     public async Task CreateTopicAsync_SoulDoesNotExist_ThrowsInvalidSoulException()
     {
-        DomainEntities.Space space = new() { Id = Guid.NewGuid() };
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid() };
         string authorEmail = "notexisting@example.com";
         string title = "Fake Title";
         string content = "Fake Content";
@@ -145,13 +215,13 @@ public class SpaceTests
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => space.CreateTopicAsync(authorEmail, title, content, _mockRepo.Object, _mockHelper.Object));
+        await Assert.ThrowsAsync<InvalidSoulException>(() => space.CreateTopicAsync(authorEmail, title, content));
     }
 
     [Fact]
     public async Task CreateTopicAsync_SoulIsNotAMemberOfTheSpace_ThrowsSoulNotMemberException()
     {
-        DomainEntities.Space space = new() { Id = Guid.NewGuid() };
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid() };
         string authorEmail = "notmember@example.com";
         string title = "Fake Title";
         string content = "Fake Content";
@@ -163,14 +233,14 @@ public class SpaceTests
         _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(false);
 
-        await Assert.ThrowsAsync<SoulNotMemberException>(() => space.CreateTopicAsync(authorEmail, title, content, _mockRepo.Object, _mockHelper.Object));
+        await Assert.ThrowsAsync<SoulNotMemberException>(() => space.CreateTopicAsync(authorEmail, title, content));
     }
 
     [Fact]
     public async Task CreateTopicAsync_SoulAndSpaceAreBothValidAndSoulIsAMember_CreateTopic()
     {
         Topic? createdTopic = null;
-        DomainEntities.Space space = new() { Id = Guid.NewGuid() };
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid() };
         string authorEmail = "member@example.com";
         Topic newTopic = new(_mockHelper.Object)
         {
@@ -201,7 +271,7 @@ public class SpaceTests
                 CreatedDateUtc = newTopic.CreatedDateUtc
             });
 
-        await space.CreateTopicAsync(authorEmail, newTopic.Title, newTopic.Content, _mockRepo.Object, _mockHelper.Object);
+        await space.CreateTopicAsync(authorEmail, newTopic.Title, newTopic.Content);
 
         _mockRepo.Verify(x => x.SpaceRepository.CreateTopicAsync(It.IsAny<Topic>()), Times.Once);
         Assert.NotNull(createdTopic);

@@ -4,10 +4,12 @@ namespace Space.Domain.Repositories;
 
 public interface ISpaceRepository
 {
-    Task<IEnumerable<Domain.Entities.Space>> GetAllAsync(bool includeSouls = false);
-    Task<Domain.Entities.Space?> GetByNameAsync(string name, bool includeSouls = false);
-    Task<Domain.Entities.Space?> GetByIdAsync(Guid id, bool includeSouls = false);
-    Task CreateAsync(Domain.Entities.Space newSpace);
-    Task UpdateAsync(Domain.Entities.Space space);
+    Task<IEnumerable<Entities.Space>> GetAllAsync(bool includeSouls = false);
+    Task<Entities.Space?> GetByNameAsync(string name, bool includeSouls = false);
+    Task<Entities.Space?> GetByIdAsync(Guid id, bool includeSouls = false);
+    Task CreateAsync(Entities.Space newSpace);
+    Task UpdateAsync(Entities.Space space);
+
+    Task<IEnumerable<Topic>> GetAllTopicsAsync(Guid id);
     Task CreateTopicAsync(Topic newTopic);
 }

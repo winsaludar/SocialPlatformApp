@@ -20,15 +20,23 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository).Returns(mockSoulRepo.Object);
     }
 
+    [Fact]
+    public async Task CreateSpaceAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        Soul soul = new() { Name = "test@example.com" };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => soul.CreateSpaceAsync(It.IsAny<Domain.Entities.Space>()));
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(null)]
     public async Task CreateSpaceAsync_SpaceNameIsInvalid_ThrowsInvalidSpaceNameException(string name)
     {
-        Soul soul = new() { Name = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Name = "test@example.com" };
         Domain.Entities.Space newSpace = new() { Name = name };
 
-        await Assert.ThrowsAsync<InvalidSpaceNameException>(() => soul.CreateSpaceAsync(newSpace, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSpaceNameException>(() => soul.CreateSpaceAsync(newSpace));
     }
 
     [Theory]
@@ -36,16 +44,16 @@ public class SoulTests
     [InlineData(null)]
     public async Task CreateSpaceAsync_SpaceCreatorIsInvalid_ThrowsInvalidSoulException(string creator)
     {
-        Soul soul = new() { Name = creator };
+        Soul soul = new(_mockRepo.Object) { Name = creator };
         Domain.Entities.Space newSpace = new() { Name = "Test Space" };
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => soul.CreateSpaceAsync(newSpace, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSoulException>(() => soul.CreateSpaceAsync(newSpace));
     }
 
     [Fact]
     public async Task CreateSpaceAsync_SoulDoesNotExist_CreateNewSoul()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Domain.Entities.Space newSpace = new() { Name = "Test Space" };
 
         Soul? createdSoul = null;
@@ -54,7 +62,7 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository.CreateAsync(It.IsAny<Soul>()))
             .Callback<Soul>(x => createdSoul = new Soul() { Id = Guid.NewGuid() });
 
-        await soul.CreateSpaceAsync(newSpace, _mockRepo.Object);
+        await soul.CreateSpaceAsync(newSpace);
 
         _mockRepo.Verify(x => x.SoulRepository.CreateAsync(soul), Times.Once);
         Assert.NotNull(createdSoul);
@@ -64,13 +72,13 @@ public class SoulTests
     [Fact]
     public async Task CreateSpaceAsync_SoulDoesExist_SetExistingDataToCurrentSoul()
     {
-        Soul currentSoul = new() { Email = "existing@example.com" };
+        Soul currentSoul = new(_mockRepo.Object) { Email = "existing@example.com" };
         Soul existingSoul = new()
         {
             Id = Guid.NewGuid(),
-            Email = "exisintg@example.com",
-            Name = "exisintg@example.com",
-            CreatedBy = "exisintg@example.com",
+            Email = "existing@example.com",
+            Name = "existing@example.com",
+            CreatedBy = "existing@example.com",
             CreatedDateUtc = DateTime.UtcNow
         };
         Domain.Entities.Space newSpace = new() { Name = "Test Space" };
@@ -78,7 +86,7 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(existingSoul);
 
-        await currentSoul.CreateSpaceAsync(newSpace, _mockRepo.Object);
+        await currentSoul.CreateSpaceAsync(newSpace);
 
         Assert.Equal(existingSoul.Id, currentSoul.Id);
         Assert.Equal(existingSoul.Name, currentSoul.Name);
@@ -89,7 +97,7 @@ public class SoulTests
     [Fact]
     public async Task CreateSpaceAsync_SpaceNameAlreadyExist_ThrowsSpaceNameAlreadyExistException()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Domain.Entities.Space newSpace = new() { Name = "Test Space" };
 
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
@@ -97,14 +105,14 @@ public class SoulTests
         _mockRepo.Setup(x => x.SpaceRepository.GetByNameAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(new Domain.Entities.Space());
 
-        await Assert.ThrowsAsync<SpaceNameAlreadyExistException>(() => soul.CreateSpaceAsync(newSpace, _mockRepo.Object));
+        await Assert.ThrowsAsync<SpaceNameAlreadyExistException>(() => soul.CreateSpaceAsync(newSpace));
     }
 
     [Fact]
     public async Task CreateSpaceAsync_SpaceIsValid_CreateSpace()
     {
         Domain.Entities.Space? createdSpace = null;
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Domain.Entities.Space newSpace = new() { Name = "Test Space" };
 
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
@@ -114,7 +122,7 @@ public class SoulTests
         _mockRepo.Setup(x => x.SpaceRepository.CreateAsync(It.IsAny<Domain.Entities.Space>()))
             .Callback<Domain.Entities.Space>(x => createdSpace = x);
 
-        await soul.CreateSpaceAsync(newSpace, _mockRepo.Object);
+        await soul.CreateSpaceAsync(newSpace);
 
         _mockRepo.Verify(x => x.SpaceRepository.CreateAsync(It.IsAny<Domain.Entities.Space>()), Times.Once);
         Assert.Equal(createdSpace?.Name, newSpace.Name);
@@ -124,33 +132,41 @@ public class SoulTests
         Assert.Equal(1, createdSpace?.Souls.Count);
     }
 
+    [Fact]
+    public async Task JoinSpaceAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        Soul soul = new() { Name = "test@example.com" };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => soul.JoinSpaceAsync(It.IsAny<Guid>()));
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(null)]
     public async Task JoinSpaceAsync_EmailIsInvalid_ThrowsInvalidSoulException(string email)
     {
-        Soul soul = new() { Email = email };
+        Soul soul = new(_mockRepo.Object) { Email = email };
         Guid spaceId = Guid.NewGuid();
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => soul.JoinSpaceAsync(spaceId, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSoulException>(() => soul.JoinSpaceAsync(spaceId));
     }
 
     [Fact]
     public async Task JoinSpaceAsync_SpaceIsInvalid_ThrowsInvalidSpaceIdException()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Guid spaceId = Guid.NewGuid();
 
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((Domain.Entities.Space)null!);
 
-        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => soul.JoinSpaceAsync(spaceId, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => soul.JoinSpaceAsync(spaceId));
     }
 
     [Fact]
     public async Task JoinSpaceAsync_SoulDoesNotExist_CreateNewSoul()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Guid spaceId = Guid.NewGuid();
 
         Soul? createdSoul = null;
@@ -161,7 +177,7 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository.CreateAsync(It.IsAny<Soul>()))
             .Callback<Soul>(x => createdSoul = new Soul() { Id = Guid.NewGuid() });
 
-        await soul.JoinSpaceAsync(spaceId, _mockRepo.Object);
+        await soul.JoinSpaceAsync(spaceId);
 
         _mockRepo.Verify(x => x.SoulRepository.CreateAsync(soul), Times.Once);
         Assert.NotNull(createdSoul);
@@ -171,13 +187,13 @@ public class SoulTests
     [Fact]
     public async Task JoinSpaceAsync_SoulDoesExist_SetExistingDataToCurrentSoul()
     {
-        Soul currentSoul = new() { Email = "existing@example.com" };
+        Soul currentSoul = new(_mockRepo.Object) { Email = "existing@example.com" };
         Soul existingSoul = new()
         {
             Id = Guid.NewGuid(),
-            Email = "exisintg@example.com",
-            Name = "exisintg@example.com",
-            CreatedBy = "exisintg@example.com",
+            Email = "existing@example.com",
+            Name = "existing@example.com",
+            CreatedBy = "existing@example.com",
             CreatedDateUtc = DateTime.UtcNow
         };
         Guid spaceId = Guid.NewGuid();
@@ -187,7 +203,7 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(existingSoul);
 
-        await currentSoul.JoinSpaceAsync(spaceId, _mockRepo.Object);
+        await currentSoul.JoinSpaceAsync(spaceId);
 
         Assert.Equal(existingSoul.Id, currentSoul.Id);
         Assert.Equal(existingSoul.Name, currentSoul.Name);
@@ -198,7 +214,7 @@ public class SoulTests
     [Fact]
     public async Task JoinSpaceAsync_SoulIsAlreadyAMemberOfTheSpace_ThrowsSoulMemberAlreadyException()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Guid spaceId = Guid.NewGuid();
 
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
@@ -208,19 +224,19 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(true);
 
-        await Assert.ThrowsAsync<SoulMemberAlreadyException>(() => soul.JoinSpaceAsync(spaceId, _mockRepo.Object));
+        await Assert.ThrowsAsync<SoulMemberAlreadyException>(() => soul.JoinSpaceAsync(spaceId));
     }
 
     [Fact]
     public async Task JoinSpaceAsync_SoulIsValidAndNotYetAMember_AddToSpace()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Soul existingSoul = new()
         {
             Id = Guid.NewGuid(),
-            Email = "exisintg@example.com",
-            Name = "exisintg@example.com",
-            CreatedBy = "exisintg@example.com",
+            Email = "existing@example.com",
+            Name = "existing@example.com",
+            CreatedBy = "existing@example.com",
             CreatedDateUtc = DateTime.UtcNow
         };
         Guid spaceId = Guid.NewGuid();
@@ -233,11 +249,19 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(false);
 
-        await soul.JoinSpaceAsync(spaceId, _mockRepo.Object);
+        await soul.JoinSpaceAsync(spaceId);
 
         _mockRepo.Verify(x => x.SpaceRepository.UpdateAsync(targetSpace), Times.Once);
         _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);
         Assert.Equal(1, targetSpace.Souls.Count);
+    }
+
+    [Fact]
+    public async Task LeaveSpaceAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        Soul soul = new() { Name = "test@example.com" };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => soul.LeaveSpaceAsync(It.IsAny<Guid>()));
     }
 
     [Theory]
@@ -245,28 +269,28 @@ public class SoulTests
     [InlineData(null)]
     public async Task LeaveSpaceAsync_EmailIsInvalid_ThrowsInvalidSoulException(string email)
     {
-        Soul soul = new() { Email = email };
+        Soul soul = new(_mockRepo.Object) { Email = email };
         Guid spaceId = Guid.NewGuid();
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => soul.LeaveSpaceAsync(spaceId, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSoulException>(() => soul.LeaveSpaceAsync(spaceId));
     }
 
     [Fact]
     public async Task LeaveSpaceAsync_SpaceIsInvalid_ThrowsInvalidSpaceIdException()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Guid spaceId = Guid.NewGuid();
 
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((Domain.Entities.Space)null!);
 
-        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => soul.LeaveSpaceAsync(spaceId, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => soul.LeaveSpaceAsync(spaceId));
     }
 
     [Fact]
     public async Task LeaveSpaceAsync_SoulDoesNotExist_ThrowsInvalidSoulException()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Guid spaceId = Guid.NewGuid();
 
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
@@ -274,13 +298,13 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => soul.LeaveSpaceAsync(spaceId, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidSoulException>(() => soul.LeaveSpaceAsync(spaceId));
     }
 
     [Fact]
     public async Task LeaveSpaceAsync_SoulIsNotAMemberOfTheSpace_ThrowsSoulNotMemberException()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Guid spaceId = Guid.NewGuid();
 
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
@@ -290,19 +314,19 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(false);
 
-        await Assert.ThrowsAsync<SoulNotMemberException>(() => soul.LeaveSpaceAsync(spaceId, _mockRepo.Object));
+        await Assert.ThrowsAsync<SoulNotMemberException>(() => soul.LeaveSpaceAsync(spaceId));
     }
 
     [Fact]
     public async Task LeaveSpaceAsync_SoulAndSpaceAreBothValidAndSoulIsAMember_RemoveToSpace()
     {
-        Soul soul = new() { Email = "test@example.com" };
+        Soul soul = new(_mockRepo.Object) { Email = "test@example.com" };
         Soul existingSoul = new()
         {
             Id = Guid.NewGuid(),
-            Email = "exisintg@example.com",
-            Name = "exisintg@example.com",
-            CreatedBy = "exisintg@example.com",
+            Email = "existing@example.com",
+            Name = "existing@example.com",
+            CreatedBy = "existing@example.com",
             CreatedDateUtc = DateTime.UtcNow
         };
         Guid spaceId = Guid.NewGuid();
@@ -315,7 +339,7 @@ public class SoulTests
         _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(true);
 
-        await soul.LeaveSpaceAsync(spaceId, _mockRepo.Object);
+        await soul.LeaveSpaceAsync(spaceId);
 
         _mockRepo.Verify(x => x.SoulRepository.DeleteSoulSpaceAsync(existingSoul.Id, targetSpace.Id), Times.Once);
         _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);

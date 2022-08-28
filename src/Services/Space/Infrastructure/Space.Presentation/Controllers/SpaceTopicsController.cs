@@ -16,6 +16,15 @@ public class SpaceTopicsController : ControllerBase
 
     public SpaceTopicsController(IServiceManager serviceManager) => _serviceManager = serviceManager;
 
+    [HttpGet]
+    [Route("{spaceId}/topics")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TopicDto>))]
+    public async Task<IActionResult> GetAsync(Guid spaceId)
+    {
+        var result = await _serviceManager.SpaceService.GetAllTopicsAsync(spaceId);
+        return Ok(result);
+    }
+
     [HttpPost]
     [Route("{spaceId}/topics")]
     [ProducesResponseType(StatusCodes.Status200OK)]
