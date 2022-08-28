@@ -30,7 +30,7 @@ public class SpaceServiceTests
     [Fact]
     public async Task GetAllAsync_SpacesAreEmptyFromDatabase_ReturnsEmptySpacesDto()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetAllAsync(It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetAllAsync(It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((IEnumerable<DomainEntities.Space>)null!);
 
         var result = await _spaceService.GetAllAsync();
@@ -42,7 +42,7 @@ public class SpaceServiceTests
     [Fact]
     public async Task GetAllAsync_SpacesAreNotEmptyFromDatabase_ReturnsSpacesDto()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetAllAsync(It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetAllAsync(It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new List<DomainEntities.Space>()
             {
                 new DomainEntities.Space { },

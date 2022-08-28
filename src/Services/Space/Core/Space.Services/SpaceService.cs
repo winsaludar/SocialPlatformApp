@@ -27,10 +27,16 @@ public class SpaceService : ISpaceService
         return spaces.Adapt<List<SpaceDto>>();
     }
 
-    public async Task KickSoulAsync(Guid spaceId, string email)
+    public async Task<IEnumerable<SoulDto>> GetAllSoulsAsync(Guid spaceId)
     {
-        Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
-        await space.KickSoulAsync(email);
+        List<SoulDto> result = new();
+
+        var space = await _repositoryManager.SpaceRepository.GetByIdAsync(spaceId, true, false);
+        if (space == null)
+            return result;
+
+        result = space.Souls.Adapt<List<SoulDto>>();
+        return result;
     }
 
     public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid spaceId)
@@ -48,6 +54,12 @@ public class SpaceService : ISpaceService
         }
 
         return result;
+    }
+
+    public async Task KickSoulAsync(Guid spaceId, string email)
+    {
+        Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
+        await space.KickSoulAsync(email);
     }
 
     public async Task CreateTopicAsync(TopicDto dto)

@@ -85,4 +85,13 @@ public class SpacesController : ControllerBase
 
         return Ok("Begone! You do not belong here");
     }
+
+    [HttpGet]
+    [Route("{spaceId}/members")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SoulDto>))]
+    public async Task<IActionResult> GetAllMembers(Guid spaceId)
+    {
+        var result = await _serviceManager.SpaceService.GetAllSoulsAsync(spaceId);
+        return Ok(result);
+    }
 }
