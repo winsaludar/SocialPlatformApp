@@ -6,4 +6,5 @@ public interface ISpaceService
 {
     Task<IEnumerable<SpaceDto>> GetAllAsync();
     Task KickSoulAsync(Guid spaceId, string email);
+    Task CreateTopicAsync(TopicDto dto);
 }

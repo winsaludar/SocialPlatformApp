@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.Services", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Space", "Space", "{E65C1D53-9284-4A10-A31E-5E21248D8D5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space.API", "Services\Space\Space.API\Space.API.csproj", "{E1830FFC-B49B-42FC-91BA-8B19F1FABE4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Space.API", "Services\Space\Space.API\Space.API.csproj", "{E1830FFC-B49B-42FC-91BA-8B19F1FABE4F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{6B1255E3-12D5-4496-BE12-178C03D7C2A9}"
 EndProject
@@ -41,19 +41,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1AF16FFE-BAE0-4688-BF0E-0DCDAE08CC22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space.Domain", "Services\Space\Core\Space.Domain\Space.Domain.csproj", "{628DAB95-D325-47E6-84E0-877CA5FA2346}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Space.Domain", "Services\Space\Core\Space.Domain\Space.Domain.csproj", "{628DAB95-D325-47E6-84E0-877CA5FA2346}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space.Contracts", "Services\Space\Core\Space.Contracts\Space.Contracts.csproj", "{D861C7B5-C7BE-4E0F-9817-9621CE55937C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Space.Contracts", "Services\Space\Core\Space.Contracts\Space.Contracts.csproj", "{D861C7B5-C7BE-4E0F-9817-9621CE55937C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space.Services", "Services\Space\Core\Space.Services\Space.Services.csproj", "{8949D201-181D-43AF-898F-0E776C00426B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Space.Services", "Services\Space\Core\Space.Services\Space.Services.csproj", "{8949D201-181D-43AF-898F-0E776C00426B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space.Services.Abstraction", "Services\Space\Core\Space.Services.Abstraction\Space.Services.Abstraction.csproj", "{7ACE9EFC-A846-4DC4-8D0E-B591EF90D9CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Space.Services.Abstraction", "Services\Space\Core\Space.Services.Abstraction\Space.Services.Abstraction.csproj", "{7ACE9EFC-A846-4DC4-8D0E-B591EF90D9CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space.Persistence", "Services\Space\Infrastructure\Space.Persistence\Space.Persistence.csproj", "{12AE4339-680B-4E2C-A0AB-14B16086BAA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Space.Persistence", "Services\Space\Infrastructure\Space.Persistence\Space.Persistence.csproj", "{12AE4339-680B-4E2C-A0AB-14B16086BAA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space.Presentation", "Services\Space\Infrastructure\Space.Presentation\Space.Presentation.csproj", "{BC3FA508-C2AA-476A-9E4F-80EB8229A6C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Space.Presentation", "Services\Space\Infrastructure\Space.Presentation\Space.Presentation.csproj", "{BC3FA508-C2AA-476A-9E4F-80EB8229A6C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space.UnitTests", "Services\Space\Tests\Space.UnitTests\Space.UnitTests.csproj", "{B1F57D19-FB87-4D99-BE21-684262E11522}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Space.UnitTests", "Services\Space\Tests\Space.UnitTests\Space.UnitTests.csproj", "{B1F57D19-FB87-4D99-BE21-684262E11522}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Space.Common", "Services\Space\Infrastructure\Space.Common\Space.Common.csproj", "{43E3691A-FD72-4786-9782-9759AB7D35C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,6 +127,10 @@ Global
 		{B1F57D19-FB87-4D99-BE21-684262E11522}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1F57D19-FB87-4D99-BE21-684262E11522}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1F57D19-FB87-4D99-BE21-684262E11522}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43E3691A-FD72-4786-9782-9759AB7D35C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43E3691A-FD72-4786-9782-9759AB7D35C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43E3691A-FD72-4786-9782-9759AB7D35C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43E3691A-FD72-4786-9782-9759AB7D35C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,6 +161,7 @@ Global
 		{12AE4339-680B-4E2C-A0AB-14B16086BAA4} = {B4BDC03F-16D4-40C5-94D7-5421DAE8C7CB}
 		{BC3FA508-C2AA-476A-9E4F-80EB8229A6C1} = {B4BDC03F-16D4-40C5-94D7-5421DAE8C7CB}
 		{B1F57D19-FB87-4D99-BE21-684262E11522} = {1AF16FFE-BAE0-4688-BF0E-0DCDAE08CC22}
+		{43E3691A-FD72-4786-9782-9759AB7D35C9} = {B4BDC03F-16D4-40C5-94D7-5421DAE8C7CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DDC09963-D1D6-41FD-8109-7391429CB4C6}

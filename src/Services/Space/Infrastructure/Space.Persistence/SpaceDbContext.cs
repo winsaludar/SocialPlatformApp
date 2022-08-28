@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DomainEntities = Space.Domain.Entities;
+using Space.Domain.Entities;
 
 namespace Space.Persistence;
 
@@ -7,9 +7,10 @@ public class SpaceDbContext : DbContext
 {
     public SpaceDbContext(DbContextOptions<SpaceDbContext> options) : base(options) { }
 
-    public DbSet<DomainEntities.Space> Spaces { get; set; } = null!;
-    public DbSet<DomainEntities.Soul> Souls { get; set; } = null!;
-    public DbSet<DomainEntities.SpaceSoul> SpacesSouls { get; set; } = null!;
+    public DbSet<Domain.Entities.Space> Spaces { get; set; } = null!;
+    public DbSet<Soul> Souls { get; set; } = null!;
+    public DbSet<SpaceSoul> SpacesSouls { get; set; } = null!;
+    public DbSet<Topic> Topics { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Space.API.Middlewares;
+using Space.Common.Helpers;
+using Space.Domain.Helpers;
 using Space.Domain.Repositories;
 using Space.Persistence;
 using Space.Persistence.Repositories;
@@ -72,6 +74,7 @@ void AddDependencies(WebApplicationBuilder builder)
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
     builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
     builder.Services.AddScoped<IServiceManager, ServiceManager>();
+    builder.Services.AddScoped<IHelperManager, HelperManager>();
 }
 
 void EnableMiddlewares(WebApplication app)

@@ -26,5 +26,10 @@ public class SpaceConfiguration : IEntityTypeConfiguration<DomainEntities.Space>
         builder.HasMany(x => x.Souls)
             .WithMany(y => y.Spaces)
             .UsingEntity<DomainEntities.SpaceSoul>(x => x.ToTable(nameof(DomainEntities.SpaceSoul)));
+
+        // Build one-to-many relationship with Topic
+        builder.HasMany(x => x.Topics)
+            .WithOne(y => y.Space)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

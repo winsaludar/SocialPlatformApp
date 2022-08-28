@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Space.Domain.Entities;
 using Space.Domain.Repositories;
 using DomainEntities = Space.Domain.Entities;
 
@@ -45,5 +46,10 @@ public class SpaceRepository : ISpaceRepository
     public async Task UpdateAsync(DomainEntities.Space space)
     {
         await Task.Run(() => _dbContext.Spaces.Update(space));
+    }
+
+    public async Task CreateTopicAsync(Topic newTopic)
+    {
+        await _dbContext.Topics.AddAsync(newTopic);
     }
 }
