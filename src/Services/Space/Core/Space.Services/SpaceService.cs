@@ -33,7 +33,14 @@ public class SpaceService : ISpaceService
         if (space == null)
             return new List<SoulDto>();
 
-        return space.Souls.Adapt<List<SoulDto>>();
+        List<SoulDto> result = space.Souls.Select(x => new SoulDto
+        {
+            Id = x.Id,
+            Username = x.Name,
+            Email = x.Email
+        }).ToList();
+
+        return result;
     }
 
     public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid spaceId)
