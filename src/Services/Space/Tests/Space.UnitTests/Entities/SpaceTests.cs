@@ -29,51 +29,6 @@ public class SpaceTests
     }
 
     [Fact]
-    public void Topics_RepositoryManagerIsNull_ReturnsEmptyList()
-    {
-        DomainEntities.Space space = new() { };
-
-        var topics = space.Topics;
-
-        Assert.IsType<List<Topic>>(topics);
-        Assert.Empty(topics);
-    }
-
-    [Fact]
-    public void Topics_DatabaseReturnsNull_ReturnsEmptyList()
-    {
-        DomainEntities.Space space = new(_mockRepo.Object) { };
-
-        _mockRepo.Setup(x => x.SpaceRepository.GetAllTopicsAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((IEnumerable<Topic>)null!);
-
-        var topics = space.Topics;
-
-        Assert.IsType<List<Topic>>(topics);
-        Assert.Empty(topics);
-    }
-
-    [Fact]
-    public void Topics_DatabaseReturnsNotEmpty_ReturnsNotEmptyList()
-    {
-        DomainEntities.Space space = new(_mockRepo.Object) { };
-
-        _mockRepo.Setup(x => x.SpaceRepository.GetAllTopicsAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new List<Topic>
-            {
-                new Topic(),
-                new Topic(),
-                new Topic()
-            });
-
-        var topics = space.Topics;
-
-        Assert.IsType<List<Topic>>(topics);
-        Assert.NotEmpty(topics);
-        Assert.Equal(3, topics.Count);
-    }
-
-    [Fact]
     public async Task KickSoulAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
     {
         DomainEntities.Space space = new() { };

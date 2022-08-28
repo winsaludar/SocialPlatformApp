@@ -21,8 +21,11 @@ public class SpaceServiceTests
         _mockHelper = new Mock<IHelperManager>();
 
         Mock<ISpaceRepository> mockSpaceRepo = new();
-        Mock<ISlugHelper> mockSlugHelper = new();
+        Mock<ISoulRepository> mockSoulRepo = new();
         _mockRepo.Setup(x => x.SpaceRepository).Returns(mockSpaceRepo.Object);
+        _mockRepo.Setup(x => x.SoulRepository).Returns(mockSoulRepo.Object);
+
+        Mock<ISlugHelper> mockSlugHelper = new();
         _mockHelper.Setup(x => x.SlugHelper).Returns(mockSlugHelper.Object);
 
         _spaceService = new SpaceService(_mockRepo.Object, _mockHelper.Object);
@@ -59,7 +62,7 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetAllSoulsAsync_SoulsAreEmptyFromDatabase_ReturnsEmptySoulsDto()
+    public async Task GetAllSoulsAsync_SpaceIsNull_ReturnsEmptySoulsDto()
     {
         Guid spaceId = Guid.NewGuid();
 
@@ -76,7 +79,7 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetAllSoulsAsync_SoulsAreNotEmptyFromDatabase_ReturnsNotEmptySoulsDto()
+    public async Task GetAllSoulsAsync_SpaceIsNotNull_ReturnsNotEmptySoulsDto()
     {
         Guid spaceId = Guid.NewGuid();
 
@@ -94,6 +97,45 @@ public class SpaceServiceTests
         var result = await _spaceService.GetAllSoulsAsync(spaceId);
 
         Assert.IsType<List<SoulDto>>(result);
+        Assert.NotEmpty(result);
+        Assert.Equal(3, result.Count());
+    }
+
+    [Fact]
+    public async Task GetAllTopicsAsync_SpaceIsNull_ReturnsEmptyTopicsDto()
+    {
+        Guid spaceId = Guid.NewGuid();
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync((DomainEntities.Space)null!);
+
+        var result = await _spaceService.GetAllTopicsAsync(spaceId);
+
+        Assert.IsType<List<TopicDto>>(result);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllTopicsAsync_SpaceIsNotNull_ReturnsNotEmptyTopicsDto()
+    {
+        Guid spaceId = Guid.NewGuid();
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space
+            {
+                Topics = new List<Topic>
+                {
+                    new Topic(),
+                    new Topic(),
+                    new Topic()
+                }
+            });
+        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul { Name = "Member", Email = "member@example.com" });
+
+        var result = await _spaceService.GetAllTopicsAsync(spaceId);
+
+        Assert.IsType<List<TopicDto>>(result);
         Assert.NotEmpty(result);
         Assert.Equal(3, result.Count());
     }
