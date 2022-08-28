@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Space.Contracts;
+using Space.Domain.Entities;
 using Space.Domain.Helpers;
 using Space.Domain.Repositories;
 using Space.Services.Abstraction;
@@ -34,10 +35,19 @@ public class SpaceService : ISpaceService
 
     public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid spaceId)
     {
-        Domain.Entities.Space space = new() { Id = spaceId };
-        //var topics = await space.
+        Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
+        List<TopicDto> result = space.Topics.Adapt<List<TopicDto>>();
+        foreach (var item in result)
+        {
+            Soul? author = await _repositoryManager.SoulRepository.GetByIdAsync(item.SoulId);
+            if (author == null)
+                continue;
 
-        return null;
+            item.AuthorEmail = author.Email;
+            item.AuthorUsername = author.Name;
+        }
+
+        return result;
     }
 
     public async Task CreateTopicAsync(TopicDto dto)

@@ -25,7 +25,21 @@ public class Space : BaseEntity
     public string LongDescription { get; set; } = default!;
     public string? Thumbnail { get; set; }
     public IList<Soul> Souls { get; set; } = new List<Soul>();
-    public IList<Topic> Topics { get; set; } = new List<Topic>();
+    public IList<Topic> Topics
+    {
+        get
+        {
+            if (_repositoryManager == null)
+                return new List<Topic>();
+
+            var topics = _repositoryManager.SpaceRepository.GetAllTopicsAsync(Id).Result;
+            if (topics == null)
+                return new List<Topic>();
+
+            return topics.ToList();
+        }
+        private set { }
+    }
 
     public async Task KickSoulAsync(string email)
     {

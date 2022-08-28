@@ -19,6 +19,15 @@ public class SoulRepository : ISoulRepository
         return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
     }
 
+    public async Task<Soul?> GetByIdAsync(Guid id, bool includeSpaces = false)
+    {
+        IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
+        if (includeSpaces)
+            query = query.Include(x => x.Spaces);
+
+        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task CreateAsync(Soul newSoul)
     {
         await _dbContext.Souls.AddAsync(newSoul);
