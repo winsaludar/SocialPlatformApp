@@ -29,14 +29,11 @@ public class SpaceService : ISpaceService
 
     public async Task<IEnumerable<SoulDto>> GetAllSoulsAsync(Guid spaceId)
     {
-        List<SoulDto> result = new();
-
         var space = await _repositoryManager.SpaceRepository.GetByIdAsync(spaceId, true, false);
         if (space == null)
-            return result;
+            return new List<SoulDto>();
 
-        result = space.Souls.Adapt<List<SoulDto>>();
-        return result;
+        return space.Souls.Adapt<List<SoulDto>>();
     }
 
     public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid spaceId)

@@ -246,4 +246,40 @@ public class SpacesControllerTests
         _mockService.Verify(x => x.SpaceService.KickSoulAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
+
+    [Fact]
+    public async Task GetAllMembersAsync_SoulsAreEmpty_ReturnsOkResultWithEmptyData()
+    {
+        Guid spaceId = Guid.NewGuid();
+
+        _mockService.Setup(x => x.SpaceService.GetAllSoulsAsync(spaceId))
+           .ReturnsAsync((IEnumerable<SoulDto>)new List<SoulDto>());
+
+        var result = await _controller.GetAllMembers(spaceId);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var spaces = Assert.IsType<List<SoulDto>>(okResult.Value);
+        Assert.Empty(spaces);
+    }
+
+    [Fact]
+    public async Task GetAllMembersAsync_SoulsAreNotEmpty_ReturnsOkResultWithData()
+    {
+        Guid spaceId = Guid.NewGuid();
+
+        _mockService.Setup(x => x.SpaceService.GetAllSoulsAsync(spaceId))
+           .ReturnsAsync((IEnumerable<SoulDto>)new List<SoulDto>
+           {
+               new SoulDto(),
+               new SoulDto(),
+               new SoulDto()
+           });
+
+        var result = await _controller.GetAllMembers(spaceId);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var souls = Assert.IsType<List<SoulDto>>(okResult.Value);
+        Assert.NotEmpty(souls);
+        Assert.Equal(3, souls.Count());
+    }
 }
