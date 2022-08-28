@@ -18,6 +18,14 @@ public class UserTests
         _mockRepo.Setup(x => x.TokenRepository).Returns(mockTokenRepo.Object);
     }
 
+    [Fact]
+    public async Task RegisterAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        User newUser = new() { };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => newUser.RegisterAsync(It.IsAny<string>()));
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(null)]
@@ -25,7 +33,7 @@ public class UserTests
     [InlineData("test@emailcom")]
     public async Task RegisterAsync_EmailIsInvalid_ThrowsInvalidEmailException(string email)
     {
-        User newUser = new()
+        User newUser = new(_mockRepo.Object)
         {
             FirstName = "First",
             LastName = "Last",
@@ -33,14 +41,14 @@ public class UserTests
         };
         string password = "password";
 
-        await Assert.ThrowsAsync<InvalidEmailException>(() => newUser.RegisterAsync(password, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidEmailException>(() => newUser.RegisterAsync(password));
     }
 
     [Fact]
     public async Task RegisterAsync_EmailAlreadyExist_ThrowsUserAlreadyExistException()
     {
         string email = "existinguser@email.com";
-        User newUser = new()
+        User newUser = new(_mockRepo.Object)
         {
             FirstName = "First",
             LastName = "Last",
@@ -51,13 +59,13 @@ public class UserTests
         _mockRepo.Setup(x => x.UserRepository.GetByEmailAsync(email))
             .ReturnsAsync(new User { Email = email });
 
-        await Assert.ThrowsAsync<UserAlreadyExistException>(() => newUser.RegisterAsync(password, _mockRepo.Object));
+        await Assert.ThrowsAsync<UserAlreadyExistException>(() => newUser.RegisterAsync(password));
     }
 
     [Fact]
     public async Task RegisterAsync_PasswordIsInvalid_ThrowsInvalidPasswordException()
     {
-        User newUser = new()
+        User newUser = new(_mockRepo.Object)
         {
             FirstName = "First",
             LastName = "Last",
@@ -68,7 +76,7 @@ public class UserTests
         _mockRepo.Setup(x => x.UserRepository.ValidateRegistrationPasswordAsync(password))
             .ReturnsAsync(false);
 
-        await Assert.ThrowsAsync<InvalidPasswordException>(() => newUser.RegisterAsync(password, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidPasswordException>(() => newUser.RegisterAsync(password));
     }
 
     [Fact]
@@ -77,7 +85,7 @@ public class UserTests
         User? createdUser = null;
         string email = "nonexistinguser@email.com";
         string password = "P@$$w0rd1";
-        User newUser = new()
+        User newUser = new(_mockRepo.Object)
         {
             FirstName = "First",
             LastName = "Last",
@@ -91,12 +99,20 @@ public class UserTests
         _mockRepo.Setup(x => x.UserRepository.RegisterAsync(It.IsAny<User>(), password))
             .Callback<User, string>((x, y) => createdUser = x);
 
-        await newUser.RegisterAsync(password, _mockRepo.Object);
+        await newUser.RegisterAsync(password);
 
         _mockRepo.Verify(x => x.UserRepository.RegisterAsync(It.IsAny<User>(), password), Times.Once);
         Assert.Equal(createdUser?.FirstName, newUser.FirstName);
         Assert.Equal(createdUser?.LastName, newUser.LastName);
         Assert.Equal(createdUser?.Email, newUser.Email);
+    }
+
+    [Fact]
+    public async Task LoginAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    {
+        User user = new() { };
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => user.LoginAsync(It.IsAny<string>()));
     }
 
     [Theory]
@@ -106,10 +122,10 @@ public class UserTests
     [InlineData("test@emailcom")]
     public async Task LoginAsync_EmailIsInvalid_ThrowsInvalidEmailException(string email)
     {
-        User user = new() { Email = email };
+        User user = new(_mockRepo.Object) { Email = email };
         string password = "password";
 
-        await Assert.ThrowsAsync<InvalidEmailException>(() => user.LoginAsync(password, _mockRepo.Object));
+        await Assert.ThrowsAsync<InvalidEmailException>(() => user.LoginAsync(password));
     }
 
     [Fact]
@@ -117,12 +133,12 @@ public class UserTests
     {
         string email = "nonexistingemail@example.com";
         string password = "password";
-        User user = new() { Email = email };
+        User user = new(_mockRepo.Object) { Email = email };
 
         _mockRepo.Setup(x => x.UserRepository.GetByEmailAsync(email))
             .ReturnsAsync((User)null!);
 
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => user.LoginAsync(password, _mockRepo.Object));
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => user.LoginAsync(password));
     }
 
     [Fact]
@@ -130,14 +146,14 @@ public class UserTests
     {
         string email = "existingemail@example.com";
         string password = "incorrect-password";
-        User user = new() { Email = email };
+        User user = new(_mockRepo.Object) { Email = email };
 
         _mockRepo.Setup(x => x.UserRepository.GetByEmailAsync(email))
             .ReturnsAsync(new User());
         _mockRepo.Setup(x => x.UserRepository.ValidateLoginPasswordAsync(email, password))
             .ReturnsAsync(false);
 
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => user.LoginAsync(password, _mockRepo.Object));
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => user.LoginAsync(password));
     }
 
     [Fact]
@@ -145,7 +161,7 @@ public class UserTests
     {
         string email = "existingemail@example.com";
         string password = "correct-password";
-        User user = new() { Email = email };
+        User user = new(_mockRepo.Object) { Email = email };
 
         _mockRepo.Setup(x => x.UserRepository.GetByEmailAsync(email))
             .ReturnsAsync(new User
@@ -160,7 +176,7 @@ public class UserTests
         _mockRepo.Setup(x => x.TokenRepository.GenerateJwtAsync(It.IsAny<User>(), null))
             .ReturnsAsync(new Token { Value = "fake-token", RefreshToken = "fake-refresh-token" });
 
-        var result = await user.LoginAsync(password, _mockRepo.Object);
+        var result = await user.LoginAsync(password);
 
         Assert.IsType<Token>(result);
         Assert.NotEmpty(result.Value);

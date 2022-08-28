@@ -14,26 +14,37 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task RegisterUserAsync(UserDto dto)
     {
-        var newUser = dto.Adapt<User>();
-        await newUser.RegisterAsync(dto.Password, _repositoryManager);
+        User newUser = new(_repositoryManager)
+        {
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email
+        };
+        await newUser.RegisterAsync(dto.Password);
     }
 
     public async Task<TokenDto> LoginUserAsync(UserDto dto)
     {
-        var user = dto.Adapt<User>();
-        Token token = await user.LoginAsync(dto.Password, _repositoryManager);
-        var tokenDto = token.Adapt<TokenDto>();
-
-        return tokenDto;
+        User user = new(_repositoryManager)
+        {
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email
+        };
+        Token token = await user.LoginAsync(dto.Password);
+        return token.Adapt<TokenDto>();
     }
 
     public async Task<TokenDto> RefreshTokenAsync(TokenDto dto)
     {
-        var token = dto.Adapt<Token>();
-        await token.RefreshAsync(_repositoryManager);
-        var newTokenDto = token.Adapt<TokenDto>();
-
-        return newTokenDto;
+        Token token = new(_repositoryManager)
+        {
+            Value = dto.Value,
+            RefreshToken = dto.RefreshToken,
+            ExpiresAt = dto.ExpiresAt
+        };
+        await token.RefreshAsync();
+        return token.Adapt<TokenDto>();
     }
 
 
