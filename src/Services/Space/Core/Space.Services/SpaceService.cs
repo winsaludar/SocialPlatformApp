@@ -45,7 +45,10 @@ public class SpaceService : ISpaceService
 
     public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid spaceId)
     {
-        Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
+        var space = await _repositoryManager.SpaceRepository.GetByIdAsync(spaceId, false, true);
+        if (space == null)
+            return new List<TopicDto>();
+
         List<TopicDto> result = space.Topics.Adapt<List<TopicDto>>();
         foreach (var item in result)
         {
