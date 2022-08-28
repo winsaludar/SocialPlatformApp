@@ -98,7 +98,7 @@ public class SpaceTests
         DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
         string email = "member@example.com";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((DomainEntities.Space)null!);
 
         await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.KickSoulAsync(email));
@@ -110,7 +110,7 @@ public class SpaceTests
         DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
         string email = "notexisting@example.com";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space());
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
@@ -124,7 +124,7 @@ public class SpaceTests
         DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
         string email = "notmember@example.com";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space());
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul());
@@ -147,7 +147,7 @@ public class SpaceTests
             CreatedDateUtc = DateTime.UtcNow
         };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(space);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(existingSoul);
@@ -196,7 +196,7 @@ public class SpaceTests
         string title = "Fake Title";
         string content = "Fake Content";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((DomainEntities.Space)null!);
 
         await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.CreateTopicAsync(authorEmail, title, content));
@@ -210,7 +210,7 @@ public class SpaceTests
         string title = "Fake Title";
         string content = "Fake Content";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space());
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
@@ -226,7 +226,7 @@ public class SpaceTests
         string title = "Fake Title";
         string content = "Fake Content";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space());
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul());
@@ -252,7 +252,7 @@ public class SpaceTests
             CreatedDateUtc = DateTime.UtcNow
         };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space());
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul());
