@@ -17,5 +17,10 @@ public class SoulConfiguration : IEntityTypeConfiguration<Soul>
 
         builder.Property(x => x.CreatedBy).IsRequired().HasMaxLength(36);
         builder.Property(x => x.CreatedDateUtc).IsRequired();
+
+        // Build one-to-many relationship with Topic
+        builder.HasMany(x => x.Topics)
+            .WithOne(y => y.Soul)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

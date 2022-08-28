@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Space.Services\Space.Services.csproj" />
+    <ProjectReference Include="..\Infrastructure\Space.Common\Space.Common.csproj" />
     <ProjectReference Include="..\Infrastructure\Space.Persistence\Space.Persistence.csproj" />
     <ProjectReference Include="..\Infrastructure\Space.Presentation\Space.Presentation.csproj" />
   </ItemGroup>
