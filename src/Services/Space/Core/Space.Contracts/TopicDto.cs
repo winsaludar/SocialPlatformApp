@@ -2,8 +2,13 @@
 
 public record TopicDto
 {
-    public string AuthorEmail { get; set; } = default!;
     public string Title { get; set; } = default!;
     public string Content { get; set; } = default!;
+    public string Slug { get; set; } = default!;
+    public string AuthorEmail { get; set; } = default!;
+    public string AuthorUsername { get; set; } = default!;
+    public DateTime DateCreatedUtc { get; set; }
+
     public Guid SpaceId { get; set; } = default!;
+    public Guid SoulId { get; set; } = default!;
 }

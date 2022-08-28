@@ -6,6 +6,19 @@ namespace Space.Domain.Entities;
 
 public class Space : BaseEntity
 {
+    private readonly IRepositoryManager? _repositoryManager;
+    private readonly IHelperManager? _helperManager;
+
+    public Space() { }
+
+    public Space(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
+
+    public Space(IRepositoryManager repositoryManager, IHelperManager helperManager)
+    {
+        _repositoryManager = repositoryManager;
+        _helperManager = helperManager;
+    }
+
     public string Creator { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string ShortDescription { get; set; } = default!;
@@ -14,76 +27,85 @@ public class Space : BaseEntity
     public IList<Soul> Souls { get; set; } = new List<Soul>();
     public IList<Topic> Topics { get; set; } = new List<Topic>();
 
-    public async Task KickSoulAsync(string email, IRepositoryManager repositoryManager)
+    public async Task KickSoulAsync(string email)
     {
+        if (_repositoryManager == null)
+            throw new ArgumentNullException("IRepositoryManager is null");
+
         if (string.IsNullOrEmpty(email))
             throw new InvalidSoulException(email);
 
         // TODO: Only the admins of this space can kick a member
 
-        await repositoryManager.UnitOfWork.BeginTransactionAsync();
+        await _repositoryManager.UnitOfWork.BeginTransactionAsync();
 
         // Make sure space id is valid
-        Space? targetSpace = await repositoryManager.SpaceRepository.GetByIdAsync(Id);
+        Space? targetSpace = await _repositoryManager.SpaceRepository.GetByIdAsync(Id);
         if (targetSpace == null)
         {
-            await repositoryManager.UnitOfWork.RollbackAsync();
+            await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new InvalidSpaceIdException(Id);
         }
 
         // Make sure soul email is valid
-        Soul? existingSoul = await repositoryManager.SoulRepository.GetByEmailAsync(email);
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(email);
         if (existingSoul == null)
         {
-            await repositoryManager.UnitOfWork.RollbackAsync();
+            await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new InvalidSoulException(email);
         }
 
         // Make sure soul is a member
-        bool isMember = await repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, Id);
+        bool isMember = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, Id);
         if (!isMember)
         {
-            await repositoryManager.UnitOfWork.RollbackAsync();
+            await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new SoulNotMemberException(email, targetSpace.Name);
         }
 
         // Remove soul
-        await repositoryManager.SoulRepository.DeleteSoulSpaceAsync(existingSoul.Id, Id);
-        await repositoryManager.UnitOfWork.CommitAsync();
+        await _repositoryManager.SoulRepository.DeleteSoulSpaceAsync(existingSoul.Id, Id);
+        await _repositoryManager.UnitOfWork.CommitAsync();
     }
 
-    public async Task CreateTopicAsync(string authorEmail, string title, string content, IRepositoryManager repositoryManager, IHelperManager helperManager)
+    public async Task CreateTopicAsync(string authorEmail, string title, string content)
     {
+        if (_repositoryManager == null)
+            throw new ArgumentNullException("IRepositoryManager is null");
+
+        if (_helperManager == null)
+            throw new ArgumentNullException("IHelperManager is null");
+
         if (string.IsNullOrEmpty(authorEmail))
             throw new InvalidSoulException(authorEmail);
 
-        await repositoryManager.UnitOfWork.BeginTransactionAsync();
+        await _repositoryManager.UnitOfWork.BeginTransactionAsync();
 
         // Make sure space id is valid
-        Space? targetSpace = await repositoryManager.SpaceRepository.GetByIdAsync(Id);
+        Space? targetSpace = await _repositoryManager.SpaceRepository.GetByIdAsync(Id);
         if (targetSpace == null)
         {
-            await repositoryManager.UnitOfWork.RollbackAsync();
+            await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new InvalidSpaceIdException(Id);
         }
 
         // Make sure author email is valid
-        Soul? existingSoul = await repositoryManager.SoulRepository.GetByEmailAsync(authorEmail);
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(authorEmail);
         if (existingSoul == null)
         {
-            await repositoryManager.UnitOfWork.RollbackAsync();
+            await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new InvalidSoulException(authorEmail);
         }
 
         // Make sure soul is a member
-        bool isMember = await repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, Id);
+        bool isMember = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, Id);
         if (!isMember)
         {
-            await repositoryManager.UnitOfWork.RollbackAsync();
+            await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new SoulNotMemberException(authorEmail, targetSpace.Name);
         }
 
-        Topic newTopic = new(helperManager)
+        Topic newTopic = new(_helperManager)
         {
             Title = title,
             Content = content,
@@ -93,7 +115,7 @@ public class Space : BaseEntity
             CreatedDateUtc = DateTime.UtcNow
         };
 
-        await repositoryManager.SpaceRepository.CreateTopicAsync(newTopic);
-        await repositoryManager.UnitOfWork.CommitAsync();
+        await _repositoryManager.SpaceRepository.CreateTopicAsync(newTopic);
+        await _repositoryManager.UnitOfWork.CommitAsync();
     }
 }

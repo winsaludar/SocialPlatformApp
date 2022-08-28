@@ -28,13 +28,21 @@ public class SpaceService : ISpaceService
 
     public async Task KickSoulAsync(Guid spaceId, string email)
     {
+        Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
+        await space.KickSoulAsync(email);
+    }
+
+    public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid spaceId)
+    {
         Domain.Entities.Space space = new() { Id = spaceId };
-        await space.KickSoulAsync(email, _repositoryManager);
+        //var topics = await space.
+
+        return null;
     }
 
     public async Task CreateTopicAsync(TopicDto dto)
     {
-        Domain.Entities.Space space = new() { Id = dto.SpaceId };
-        await space.CreateTopicAsync(dto.AuthorEmail, dto.Title, dto.Content, _repositoryManager, _helperManager);
+        Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
+        await space.CreateTopicAsync(dto.AuthorEmail, dto.Title, dto.Content);
     }
 }
