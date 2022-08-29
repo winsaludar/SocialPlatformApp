@@ -64,7 +64,7 @@ public class SpaceTopicsControllerTests
     public async Task PostAsync_ModelStateIsInvalid_ReturnsBadRequest()
     {
         Guid spaceId = Guid.NewGuid();
-        CreateSpaceTopicRequest request = new() { };
+        CreateEditSpaceTopicRequest request = new() { };
         _controller.ModelState.AddModelError("Title", "Required");
 
         var result = await _controller.PostAsync(spaceId, request);
@@ -83,7 +83,7 @@ public class SpaceTopicsControllerTests
         };
 
         Guid spaceId = Guid.NewGuid();
-        CreateSpaceTopicRequest request = new()
+        CreateEditSpaceTopicRequest request = new()
         {
             Title = "Fake Title",
             Content = "Fake Content"
@@ -116,7 +116,7 @@ public class SpaceTopicsControllerTests
         };
 
         Guid spaceId = Guid.NewGuid();
-        CreateSpaceTopicRequest request = new()
+        CreateEditSpaceTopicRequest request = new()
         {
             Title = "Fake Title",
             Content = "Fake Content"

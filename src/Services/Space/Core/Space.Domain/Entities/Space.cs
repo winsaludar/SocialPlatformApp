@@ -118,4 +118,65 @@ public class Space : BaseEntity
         await _repositoryManager.SpaceRepository.CreateTopicAsync(newTopic);
         await _repositoryManager.UnitOfWork.CommitAsync();
     }
+
+    public async Task UpdateTopicAsync(Guid topicId, string modifiedBy, string updatedTitle, string updatedContent)
+    {
+        if (_repositoryManager == null)
+            throw new ArgumentNullException("IRepositoryManager is null");
+
+        if (_helperManager == null)
+            throw new ArgumentNullException("IHelperManager is null");
+
+        if (string.IsNullOrEmpty(modifiedBy))
+            throw new InvalidSoulException(modifiedBy);
+
+        await _repositoryManager.UnitOfWork.BeginTransactionAsync();
+
+        // Make sure topic id is valid
+        Topic? existingTopic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(topicId);
+        if (existingTopic == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidTopicIdException(topicId);
+        }
+
+        // Make sure space id is valid
+        Space? targetSpace = await _repositoryManager.SpaceRepository.GetByIdAsync(Id);
+        if (targetSpace == null || existingTopic.SpaceId != targetSpace.Id)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSpaceIdException(Id);
+        }
+
+        // Make sure author email is valid
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(modifiedBy);
+        if (existingSoul == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSoulException(modifiedBy);
+        }
+
+        // Make sure editor is the same as the author
+        if (existingTopic.SoulId != existingSoul.Id)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidTopicEditorException(modifiedBy);
+        }
+
+        // Make sure soul is a member
+        bool isMember = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, Id);
+        if (!isMember)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new SoulNotMemberException(modifiedBy, targetSpace.Name);
+        }
+
+        existingTopic.Title = updatedTitle;
+        existingTopic.Content = updatedContent;
+        existingTopic.LastModifiedBy = modifiedBy;
+        existingTopic.LastModifiedDateUtc = DateTime.UtcNow;
+
+        await _repositoryManager.SpaceRepository.UpdateTopicAsync(existingTopic);
+        await _repositoryManager.UnitOfWork.CommitAsync();
+    }
 }

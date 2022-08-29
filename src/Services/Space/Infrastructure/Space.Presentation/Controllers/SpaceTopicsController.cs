@@ -30,7 +30,7 @@ public class SpaceTopicsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> PostAsync(Guid spaceId, [FromBody] CreateSpaceTopicRequest request)
+    public async Task<IActionResult> PostAsync(Guid spaceId, [FromBody] CreateEditSpaceTopicRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
@@ -48,5 +48,31 @@ public class SpaceTopicsController : ControllerBase
         await _serviceManager.SpaceService.CreateTopicAsync(dto);
 
         return Ok("Your topic has been created");
+    }
+
+    [HttpPut]
+    [Route("{spaceId}/topics/{topicId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> PutAsync(Guid spaceId, Guid topicId, [FromBody] CreateEditSpaceTopicRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Please provide all the required fields");
+
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        TopicDto dto = new()
+        {
+            Id = topicId,
+            AuthorEmail = User.Identity.Name,
+            SpaceId = spaceId,
+            Title = request.Title,
+            Content = request.Content
+        };
+        await _serviceManager.SpaceService.UpdateTopicAsync(dto);
+
+        return Ok("Your topic has been updated");
     }
 }
