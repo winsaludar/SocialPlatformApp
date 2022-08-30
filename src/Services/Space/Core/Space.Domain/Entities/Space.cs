@@ -150,20 +150,13 @@ public class Space : BaseEntity
 
         // Make sure author email is valid
         Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(modifiedBy);
-        if (existingSoul == null)
+        if (existingSoul == null || existingTopic.SoulId != existingSoul.Id)
         {
             await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new InvalidSoulException(modifiedBy);
         }
 
-        // Make sure editor is the same as the author
-        if (existingTopic.SoulId != existingSoul.Id)
-        {
-            await _repositoryManager.UnitOfWork.RollbackAsync();
-            throw new InvalidTopicEditorException(modifiedBy);
-        }
-
-        // Make sure soul is a member
+        // Make sure soul is still a member
         bool isMember = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, Id);
         if (!isMember)
         {
