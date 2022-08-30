@@ -29,12 +29,12 @@ public class SpaceTests
     }
 
     [Fact]
-    public async Task KickSoulAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task KickSoulAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         DomainEntities.Space space = new() { };
         string email = "member@example.com";
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => space.KickSoulAsync(email));
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.KickSoulAsync(email));
     }
 
     [Theory]
@@ -116,19 +116,19 @@ public class SpaceTests
     }
 
     [Fact]
-    public async Task CreateTopicAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task CreateTopicAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         DomainEntities.Space space = new() { };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
     }
 
     [Fact]
-    public async Task CreateTopicAsync_HelperManagerIsNull_ThrowsArgumentNullException()
+    public async Task CreateTopicAsync_HelperManagerIsNull_ThrowsNullReferenceException()
     {
         DomainEntities.Space space = new(_mockRepo.Object) { };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
     }
 
     [Theory]
@@ -231,5 +231,179 @@ public class SpaceTests
         _mockRepo.Verify(x => x.SpaceRepository.CreateTopicAsync(It.IsAny<Topic>()), Times.Once);
         Assert.NotNull(createdTopic);
         Assert.NotEqual(Guid.Empty, createdTopic?.Id);
+    }
+
+    [Fact]
+    public async Task UpdateTopicAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
+    {
+        DomainEntities.Space space = new() { };
+
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.UpdateTopicAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+    }
+
+    [Fact]
+    public async Task UpdateTopicAsync_HelperManagerIsNull_ThrowsNullReferenceException()
+    {
+        DomainEntities.Space space = new(_mockRepo.Object) { };
+
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.UpdateTopicAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    public async Task UpdateTopicAsync_ModifiedByIsInvalid_ThrowsInvalidSoulException(string authorEmail)
+    {
+        Guid topicId = Guid.NewGuid();
+        string title = "Updated Title";
+        string content = "Updated Content";
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { };
+
+        await Assert.ThrowsAsync<InvalidSoulException>(() => space.UpdateTopicAsync(topicId, authorEmail, title, content));
+    }
+
+    [Fact]
+    public async Task UpdateTopicAsync_TopicIsInvalid_ThrowsInvalidTopicIdException()
+    {
+        Guid topicId = Guid.NewGuid();
+        string modifiedBy = "author@example.com";
+        string title = "Updated Title";
+        string content = "Updated Content";
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(topicId))
+            .ReturnsAsync((Topic)null!);
+
+        await Assert.ThrowsAsync<InvalidTopicIdException>(() => space.UpdateTopicAsync(topicId, modifiedBy, title, content));
+    }
+
+    [Fact]
+    public async Task UpdateTopicAsync_SpaceIsInvalid_ThrowsInvalidSpaceIdException()
+    {
+        Guid topicId = Guid.NewGuid();
+        string modifiedBy = "author@example.com";
+        string title = "Updated Title";
+        string content = "Updated Content";
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(topicId))
+            .ReturnsAsync(new Topic());
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync((DomainEntities.Space)null!);
+
+        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.UpdateTopicAsync(topicId, modifiedBy, title, content));
+    }
+
+    [Fact]
+    public async Task UpdateTopicAsync_TopicSpaceIdAndExistingSpaceIdDoesNotMatch_ThrowsInvalidSoulException()
+    {
+        Guid topicId = Guid.NewGuid();
+        string modifiedBy = "author@example.com";
+        string title = "Updated Title";
+        string content = "Updated Content";
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(topicId))
+            .ReturnsAsync(new Topic { SpaceId = Guid.NewGuid() });
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space() { Id = Guid.NewGuid() });
+
+        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.UpdateTopicAsync(topicId, modifiedBy, title, content));
+    }
+
+    [Fact]
+    public async Task UpdateTopicAsync_SoulDoesNotExist_ThrowsInvalidSoulException()
+    {
+        Guid topicId = Guid.NewGuid();
+        string modifiedBy = "notexisting@example.com";
+        string title = "Updated Title";
+        string content = "Updated Content";
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(topicId))
+            .ReturnsAsync(new Topic());
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space());
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
+            .ReturnsAsync((Soul)null!);
+
+        await Assert.ThrowsAsync<InvalidSoulException>(() => space.UpdateTopicAsync(topicId, modifiedBy, title, content));
+    }
+
+    [Fact]
+    public async Task UpdateTopicAsync_TopicSoulIdAndExistingSoulIdDoesNotMatch_ThrowsInvalidSoulException()
+    {
+        Guid topicId = Guid.NewGuid();
+        string modifiedBy = "differentperson@example.com";
+        string title = "Updated Title";
+        string content = "Updated Content";
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(topicId))
+            .ReturnsAsync(new Topic { SoulId = Guid.NewGuid() });
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space());
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul { Id = Guid.NewGuid() });
+
+        await Assert.ThrowsAsync<InvalidSoulException>(() => space.UpdateTopicAsync(topicId, modifiedBy, title, content));
+    }
+
+    [Fact]
+    public async Task UpdateTopicAsync_SoulIsNotAMemberOfTheSpace_ThrowsSoulNotMemberException()
+    {
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        Guid soulId = Guid.NewGuid();
+        string modifiedBy = "nontmember@example.com";
+        string title = "Updated Title";
+        string content = "Updated Content";
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = spaceId };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(topicId))
+            .ReturnsAsync(new Topic { SoulId = soulId, SpaceId = spaceId });
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space() { Id = spaceId });
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul { Id = soulId });
+        _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .ReturnsAsync(false);
+
+        await Assert.ThrowsAsync<SoulNotMemberException>(() => space.UpdateTopicAsync(topicId, modifiedBy, title, content));
+    }
+
+    [Fact]
+    public async Task UpdateTopicAsync_SoulSpaceAndTopicAreAllValidAndSoulIsAMember_UpdateTopic()
+    {
+        Topic? updatedTopic = null;
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        Guid soulId = Guid.NewGuid();
+        string modifiedBy = "author@example.com";
+        string title = "Updated Title";
+        string content = "Updated Content";
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = spaceId };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(topicId))
+            .ReturnsAsync(new Topic { SoulId = soulId, SpaceId = spaceId });
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space() { Id = spaceId });
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul { Id = soulId });
+        _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .ReturnsAsync(true);
+        _mockRepo.Setup(x => x.SpaceRepository.UpdateTopicAsync(It.IsAny<Topic>()))
+            .Callback<Topic>(x => updatedTopic = new Topic
+            {
+                Title = title,
+                Content = content
+            });
+
+        await space.UpdateTopicAsync(topicId, modifiedBy, title, content);
+
+        _mockRepo.Verify(x => x.SpaceRepository.UpdateTopicAsync(It.IsAny<Topic>()), Times.Once);
+        Assert.NotNull(updatedTopic);
+        Assert.Equal(title, updatedTopic?.Title);
+        Assert.Equal(content, updatedTopic?.Content);
     }
 }

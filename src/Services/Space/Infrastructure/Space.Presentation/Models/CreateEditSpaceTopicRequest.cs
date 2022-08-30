@@ -2,7 +2,7 @@
 
 namespace Space.Presentation.Models;
 
-public class CreateSpaceTopicRequest
+public class CreateEditSpaceTopicRequest
 {
     [Required]
     public string Title { get; set; } = default!;

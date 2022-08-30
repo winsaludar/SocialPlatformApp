@@ -21,11 +21,11 @@ public class SoulTests
     }
 
     [Fact]
-    public async Task CreateSpaceAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task CreateSpaceAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         Soul soul = new() { Name = "test@example.com" };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => soul.CreateSpaceAsync(It.IsAny<Domain.Entities.Space>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => soul.CreateSpaceAsync(It.IsAny<Domain.Entities.Space>()));
     }
 
     [Theory]
@@ -133,11 +133,11 @@ public class SoulTests
     }
 
     [Fact]
-    public async Task JoinSpaceAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task JoinSpaceAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         Soul soul = new() { Name = "test@example.com" };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => soul.JoinSpaceAsync(It.IsAny<Guid>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => soul.JoinSpaceAsync(It.IsAny<Guid>()));
     }
 
     [Theory]
@@ -257,11 +257,11 @@ public class SoulTests
     }
 
     [Fact]
-    public async Task LeaveSpaceAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task LeaveSpaceAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         Soul soul = new() { Name = "test@example.com" };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => soul.LeaveSpaceAsync(It.IsAny<Guid>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => soul.LeaveSpaceAsync(It.IsAny<Guid>()));
     }
 
     [Theory]

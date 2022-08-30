@@ -72,4 +72,17 @@ public class SpaceRepository : ISpaceRepository
     {
         await _dbContext.Topics.AddAsync(newTopic);
     }
+
+    public async Task<Topic?> GetTopicByIdAsync(Guid topicId)
+    {
+        return await _dbContext.Topics
+            .Where(x => x.Id == topicId)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task UpdateTopicAsync(Topic topic)
+    {
+        await Task.Run(() => _dbContext.Topics.Update(topic));
+    }
 }

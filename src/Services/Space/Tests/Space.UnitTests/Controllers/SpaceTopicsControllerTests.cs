@@ -64,7 +64,7 @@ public class SpaceTopicsControllerTests
     public async Task PostAsync_ModelStateIsInvalid_ReturnsBadRequest()
     {
         Guid spaceId = Guid.NewGuid();
-        CreateSpaceTopicRequest request = new() { };
+        CreateEditSpaceTopicRequest request = new() { };
         _controller.ModelState.AddModelError("Title", "Required");
 
         var result = await _controller.PostAsync(spaceId, request);
@@ -83,7 +83,7 @@ public class SpaceTopicsControllerTests
         };
 
         Guid spaceId = Guid.NewGuid();
-        CreateSpaceTopicRequest request = new()
+        CreateEditSpaceTopicRequest request = new()
         {
             Title = "Fake Title",
             Content = "Fake Content"
@@ -116,7 +116,7 @@ public class SpaceTopicsControllerTests
         };
 
         Guid spaceId = Guid.NewGuid();
-        CreateSpaceTopicRequest request = new()
+        CreateEditSpaceTopicRequest request = new()
         {
             Title = "Fake Title",
             Content = "Fake Content"
@@ -128,5 +128,78 @@ public class SpaceTopicsControllerTests
         Assert.IsType<OkObjectResult>(result);
         Assert.Equal(createdTopic?.Title, request.Title);
         Assert.Equal(createdTopic?.Content, request.Content);
+    }
+
+    [Fact]
+    public async Task PutAsync_ModelStateIsInvalid_ReturnsBadRequest()
+    {
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        CreateEditSpaceTopicRequest request = new() { };
+        _controller.ModelState.AddModelError("Title", "Required");
+
+        var result = await _controller.PutAsync(spaceId, topicId, request);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task PutAsync_UserIdentityIsNull_ReturnsUnauthorized()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        CreateEditSpaceTopicRequest request = new()
+        {
+            Title = "Updated Title",
+            Content = "Updated Content"
+        };
+
+        var result = await _controller.PutAsync(spaceId, topicId, request);
+
+        Assert.IsType<UnauthorizedResult>(result);
+    }
+
+    [Fact]
+    public async Task PutAsync_RequestIsValid_ReturnsOkResponse()
+    {
+        TopicDto? updatedTopic = null;
+        _mockService.Setup(x => x.SpaceService.UpdateTopicAsync(It.IsAny<TopicDto>()))
+            .Callback<TopicDto>(x => updatedTopic = x);
+
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        CreateEditSpaceTopicRequest request = new()
+        {
+            Title = "Updated Title",
+            Content = "Updated Content"
+        };
+
+        var result = await _controller.PutAsync(spaceId, topicId, request);
+
+        _mockService.Verify(x => x.SpaceService.UpdateTopicAsync(It.IsAny<TopicDto>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(updatedTopic?.Title, request.Title);
+        Assert.Equal(updatedTopic?.Content, request.Content);
     }
 }
