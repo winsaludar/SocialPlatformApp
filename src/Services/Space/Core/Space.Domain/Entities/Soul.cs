@@ -19,7 +19,7 @@ public class Soul : BaseEntity
     public async Task CreateSpaceAsync(Space newSpace)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (string.IsNullOrEmpty(newSpace.Name))
             throw new InvalidSpaceNameException(newSpace.Name);
@@ -67,7 +67,7 @@ public class Soul : BaseEntity
     public async Task JoinSpaceAsync(Guid spaceId)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (string.IsNullOrEmpty(Email))
             throw new InvalidSoulException(Email);
@@ -117,7 +117,7 @@ public class Soul : BaseEntity
     public async Task LeaveSpaceAsync(Guid spaceId)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (string.IsNullOrEmpty(Email))
             throw new InvalidSoulException(Email);

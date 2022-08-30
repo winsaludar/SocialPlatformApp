@@ -30,7 +30,7 @@ public class Space : BaseEntity
     public async Task KickSoulAsync(string email)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (string.IsNullOrEmpty(email))
             throw new InvalidSoulException(email);
@@ -71,10 +71,10 @@ public class Space : BaseEntity
     public async Task CreateTopicAsync(string authorEmail, string title, string content)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (_helperManager == null)
-            throw new ArgumentNullException("IHelperManager is null");
+            throw new NullReferenceException("IHelperManager is null");
 
         if (string.IsNullOrEmpty(authorEmail))
             throw new InvalidSoulException(authorEmail);
@@ -122,10 +122,10 @@ public class Space : BaseEntity
     public async Task UpdateTopicAsync(Guid topicId, string modifiedBy, string updatedTitle, string updatedContent)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (_helperManager == null)
-            throw new ArgumentNullException("IHelperManager is null");
+            throw new NullReferenceException("IHelperManager is null");
 
         if (string.IsNullOrEmpty(modifiedBy))
             throw new InvalidSoulException(modifiedBy);

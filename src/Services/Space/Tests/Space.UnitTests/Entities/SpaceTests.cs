@@ -29,12 +29,12 @@ public class SpaceTests
     }
 
     [Fact]
-    public async Task KickSoulAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task KickSoulAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         DomainEntities.Space space = new() { };
         string email = "member@example.com";
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => space.KickSoulAsync(email));
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.KickSoulAsync(email));
     }
 
     [Theory]
@@ -116,19 +116,19 @@ public class SpaceTests
     }
 
     [Fact]
-    public async Task CreateTopicAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task CreateTopicAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         DomainEntities.Space space = new() { };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
     }
 
     [Fact]
-    public async Task CreateTopicAsync_HelperManagerIsNull_ThrowsArgumentNullException()
+    public async Task CreateTopicAsync_HelperManagerIsNull_ThrowsNullReferenceException()
     {
         DomainEntities.Space space = new(_mockRepo.Object) { };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.CreateTopicAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
     }
 
     [Theory]
@@ -234,19 +234,19 @@ public class SpaceTests
     }
 
     [Fact]
-    public async Task UpdateTopicAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task UpdateTopicAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         DomainEntities.Space space = new() { };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => space.UpdateTopicAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.UpdateTopicAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
     }
 
     [Fact]
-    public async Task UpdateTopicAsync_HelperManagerIsNull_ThrowsArgumentNullException()
+    public async Task UpdateTopicAsync_HelperManagerIsNull_ThrowsNullReferenceException()
     {
         DomainEntities.Space space = new(_mockRepo.Object) { };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => space.UpdateTopicAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => space.UpdateTopicAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
     }
 
     [Theory]
