@@ -156,7 +156,7 @@ public class Space : BaseEntity
             throw new InvalidSoulException(modifiedBy);
         }
 
-        // TODO: Allow admin of the space to delete the topic
+        // TODO: Allow admin of the space to edit the topic
 
         // Make sure soul is still a member
         bool isMember = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, Id);
