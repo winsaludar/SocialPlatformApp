@@ -10,4 +10,5 @@ public interface ISpaceService
     Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid spaceId);
     Task CreateTopicAsync(TopicDto dto);
     Task UpdateTopicAsync(TopicDto dto);
+    Task DeleteTopicAsync(TopicDto dto);
 }
