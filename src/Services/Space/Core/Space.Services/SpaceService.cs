@@ -80,4 +80,10 @@ public class SpaceService : ISpaceService
         Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
         await space.UpdateTopicAsync(dto.Id, dto.AuthorEmail, dto.Title, dto.Content);
     }
+
+    public async Task DeleteTopicAsync(TopicDto dto)
+    {
+        Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
+        await space.DeleteTopicAsync(dto.Id, dto.AuthorEmail);
+    }
 }

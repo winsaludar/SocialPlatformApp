@@ -85,4 +85,9 @@ public class SpaceRepository : ISpaceRepository
     {
         await Task.Run(() => _dbContext.Topics.Update(topic));
     }
+
+    public async Task DeleteTopicAsync(Topic topic)
+    {
+        await Task.Run(() => _dbContext.Topics.Remove(topic));
+    }
 }

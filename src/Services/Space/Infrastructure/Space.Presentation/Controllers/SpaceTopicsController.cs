@@ -75,4 +75,24 @@ public class SpaceTopicsController : ControllerBase
 
         return Ok("Your topic has been updated");
     }
+
+    [HttpDelete]
+    [Route("{spaceId}/topics/{topicId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteAsync(Guid spaceId, Guid topicId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        TopicDto dto = new()
+        {
+            Id = topicId,
+            SpaceId = spaceId,
+            AuthorEmail = User.Identity.Name
+        };
+        await _serviceManager.SpaceService.DeleteTopicAsync(dto);
+
+        return Ok("Your topic has beed deleted");
+    }
 }
