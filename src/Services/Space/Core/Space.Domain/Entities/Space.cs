@@ -175,13 +175,13 @@ public class Space : BaseEntity
         await _repositoryManager.UnitOfWork.CommitAsync();
     }
 
-    public async Task DeleteTopicAsync(Guid topicId, string deleteBy)
+    public async Task DeleteTopicAsync(Guid topicId, string deletedBy)
     {
         if (_repositoryManager == null)
             throw new NullReferenceException("IRepositoryManager is null");
 
-        if (string.IsNullOrEmpty(deleteBy))
-            throw new InvalidSoulException(deleteBy);
+        if (string.IsNullOrEmpty(deletedBy))
+            throw new InvalidSoulException(deletedBy);
 
         await _repositoryManager.UnitOfWork.BeginTransactionAsync();
 
@@ -202,11 +202,11 @@ public class Space : BaseEntity
         }
 
         // Make sure the deleter is the same as the author
-        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(deleteBy);
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(deletedBy);
         if (existingSoul == null || existingTopic.SoulId != existingSoul.Id)
         {
             await _repositoryManager.UnitOfWork.RollbackAsync();
-            throw new InvalidSoulException(deleteBy);
+            throw new InvalidSoulException(deletedBy);
         }
 
         // TODO: Allow admin of the space to delete the topic
