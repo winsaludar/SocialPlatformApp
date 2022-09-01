@@ -10,20 +10,28 @@ public class SoulRepository : ISoulRepository
 
     public SoulRepository(SpaceDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<Soul?> GetByEmailAsync(string email, bool includeSpaces = false)
+    public async Task<Soul?> GetByEmailAsync(string email, bool includeSpaces = false, bool includeTopics = false)
     {
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
+
         if (includeSpaces)
             query = query.Include(x => x.Spaces);
+
+        if (includeTopics)
+            query = query.Include(x => x.Topics);
 
         return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
     }
 
-    public async Task<Soul?> GetByIdAsync(Guid id, bool includeSpaces = false)
+    public async Task<Soul?> GetByIdAsync(Guid id, bool includeSpaces = false, bool includeTopics = false)
     {
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
+
         if (includeSpaces)
             query = query.Include(x => x.Spaces);
+
+        if (includeTopics)
+            query = query.Include(x => x.Topics);
 
         return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
     }

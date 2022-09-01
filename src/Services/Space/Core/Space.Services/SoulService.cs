@@ -31,4 +31,20 @@ public class SoulService : ISoulService
         Soul soul = new(_repositoryManager) { Email = email };
         await soul.LeaveSpaceAsync(spaceId);
     }
+
+    public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid soulId)
+    {
+        var soul = await _repositoryManager.SoulRepository.GetByIdAsync(soulId, false, true);
+        if (soul == null)
+            return new List<TopicDto>();
+
+        var result = soul.Topics.Adapt<List<TopicDto>>();
+        foreach (var item in result)
+        {
+            item.AuthorEmail = soul.Email;
+            item.AuthorUsername = soul.Name;
+        }
+
+        return result;
+    }
 }

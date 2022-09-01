@@ -130,7 +130,7 @@ public class SpaceServiceTests
                     new Topic()
                 }
             });
-        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul { Name = "Member", Email = "member@example.com" });
 
         var result = await _spaceService.GetAllTopicsAsync(spaceId);
