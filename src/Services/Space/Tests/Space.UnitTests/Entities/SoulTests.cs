@@ -341,7 +341,7 @@ public class SoulTests
 
         await soul.LeaveSpaceAsync(spaceId);
 
-        _mockRepo.Verify(x => x.SoulRepository.DeleteSoulSpaceAsync(existingSoul.Id, targetSpace.Id), Times.Once);
+        _mockRepo.Verify(x => x.SoulRepository.DeleteSpaceMemberAsync(existingSoul.Id, targetSpace.Id), Times.Once);
         _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);
     }
 }

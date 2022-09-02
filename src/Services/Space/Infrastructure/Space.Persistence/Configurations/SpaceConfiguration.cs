@@ -25,7 +25,7 @@ public class SpaceConfiguration : IEntityTypeConfiguration<Domain.Entities.Space
         // Build many-to-many relationship with Soul
         builder.HasMany(x => x.Souls)
             .WithMany(y => y.Spaces)
-            .UsingEntity<SpaceSoul>(x => x.ToTable(nameof(SpaceSoul)));
+            .UsingEntity<SpaceMember>(x => x.ToTable(nameof(SpaceMember)));
 
         // Build many-to-many relationship with Moderator
         builder.HasMany(x => x.Moderators)

@@ -65,7 +65,7 @@ public class Space : BaseEntity
         }
 
         // Remove soul
-        await _repositoryManager.SoulRepository.DeleteSoulSpaceAsync(existingSoul.Id, Id);
+        await _repositoryManager.SoulRepository.DeleteSpaceMemberAsync(existingSoul.Id, Id);
         await _repositoryManager.UnitOfWork.CommitAsync();
     }
 

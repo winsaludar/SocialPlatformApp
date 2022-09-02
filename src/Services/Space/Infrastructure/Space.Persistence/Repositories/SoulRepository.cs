@@ -43,21 +43,21 @@ public class SoulRepository : ISoulRepository
 
     public async Task<bool> IsMemberOfSpaceAsync(Guid soulId, Guid spaceId)
     {
-        SpaceSoul? spaceSoul = await _dbContext.SpacesSouls
+        SpaceMember? spaceMember = await _dbContext.SpaceMembers
             .Where(x => x.SoulId == soulId && x.SpaceId == spaceId)
             .AsNoTracking()
             .FirstOrDefaultAsync();
 
-        return spaceSoul != null;
+        return spaceMember != null;
     }
 
-    public async Task DeleteSoulSpaceAsync(Guid soulId, Guid spaceId)
+    public async Task DeleteSpaceMemberAsync(Guid soulId, Guid spaceId)
     {
         await Task.Run(() =>
         {
-            SpaceSoul spaceSoul = new() { SoulId = soulId, SpaceId = spaceId };
-            _dbContext.SpacesSouls.Attach(spaceSoul);
-            _dbContext.SpacesSouls.Remove(spaceSoul);
+            SpaceMember spaceMember = new() { SoulId = soulId, SpaceId = spaceId };
+            _dbContext.SpaceMembers.Attach(spaceMember);
+            _dbContext.SpaceMembers.Remove(spaceMember);
         });
     }
 }

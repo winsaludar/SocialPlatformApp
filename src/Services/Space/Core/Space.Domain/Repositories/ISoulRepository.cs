@@ -8,5 +8,5 @@ public interface ISoulRepository
     Task<Soul?> GetByIdAsync(Guid id, bool includeSpaces = false, bool includeTopics = false);
     Task CreateAsync(Soul newSoul);
     Task<bool> IsMemberOfSpaceAsync(Guid soulId, Guid spaceId);
-    Task DeleteSoulSpaceAsync(Guid soulId, Guid spaceId);
+    Task DeleteSpaceMemberAsync(Guid soulId, Guid spaceId);
 }

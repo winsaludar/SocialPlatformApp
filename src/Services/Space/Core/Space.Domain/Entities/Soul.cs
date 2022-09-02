@@ -148,7 +148,7 @@ public class Soul : BaseEntity
             throw new SoulNotMemberException(Email, targetSpace.Name);
         }
 
-        await _repositoryManager.SoulRepository.DeleteSoulSpaceAsync(existingSoul.Id, spaceId);
+        await _repositoryManager.SoulRepository.DeleteSpaceMemberAsync(existingSoul.Id, spaceId);
         await _repositoryManager.UnitOfWork.CommitAsync();
     }
 }
