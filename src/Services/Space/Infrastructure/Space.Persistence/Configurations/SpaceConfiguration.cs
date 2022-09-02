@@ -23,7 +23,7 @@ public class SpaceConfiguration : IEntityTypeConfiguration<Domain.Entities.Space
         builder.Property(x => x.CreatedDateUtc).IsRequired();
 
         // Build many-to-many relationship with Soul
-        builder.HasMany(x => x.Souls)
+        builder.HasMany(x => x.Members)
             .WithMany(y => y.Spaces)
             .UsingEntity<SpaceMember>(x => x.ToTable(nameof(SpaceMember)));
 

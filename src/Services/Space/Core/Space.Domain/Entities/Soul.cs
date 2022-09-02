@@ -58,7 +58,7 @@ public class Soul : BaseEntity
 
         newSpace.CreatedDateUtc = DateTime.UtcNow;
         newSpace.CreatedBy = Email;
-        newSpace.Souls.Add(this);
+        newSpace.Members.Add(this);
 
         await _repositoryManager.SpaceRepository.CreateAsync(newSpace);
         await _repositoryManager.UnitOfWork.CommitAsync();
@@ -109,7 +109,7 @@ public class Soul : BaseEntity
             throw new SoulMemberAlreadyException(Email, targetSpace.Name);
         }
 
-        targetSpace.Souls.Add(this);
+        targetSpace.Members.Add(this);
         await _repositoryManager.SpaceRepository.UpdateAsync(targetSpace);
         await _repositoryManager.UnitOfWork.CommitAsync();
     }

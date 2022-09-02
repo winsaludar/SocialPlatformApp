@@ -24,7 +24,7 @@ public class Space : BaseEntity
     public string ShortDescription { get; set; } = default!;
     public string LongDescription { get; set; } = default!;
     public string? Thumbnail { get; set; }
-    public IList<Soul> Souls { get; set; } = new List<Soul>();
+    public IList<Soul> Members { get; set; } = new List<Soul>();
     public IList<Topic> Topics { get; set; } = new List<Topic>();
     public IList<Soul> Moderators { get; set; } = new List<Soul>();
 

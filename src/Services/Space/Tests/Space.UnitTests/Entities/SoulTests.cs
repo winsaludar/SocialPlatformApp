@@ -129,7 +129,7 @@ public class SoulTests
         Assert.Equal(createdSpace?.Creator, newSpace.Creator);
         Assert.Equal(createdSpace?.ShortDescription, newSpace.ShortDescription);
         Assert.Equal(createdSpace?.LongDescription, newSpace.LongDescription);
-        Assert.Equal(1, createdSpace?.Souls.Count);
+        Assert.Equal(1, createdSpace?.Members.Count);
     }
 
     [Fact]
@@ -253,7 +253,7 @@ public class SoulTests
 
         _mockRepo.Verify(x => x.SpaceRepository.UpdateAsync(targetSpace), Times.Once);
         _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);
-        Assert.Equal(1, targetSpace.Souls.Count);
+        Assert.Equal(1, targetSpace.Members.Count);
     }
 
     [Fact]

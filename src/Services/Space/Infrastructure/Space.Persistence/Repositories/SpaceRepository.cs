@@ -16,7 +16,7 @@ public class SpaceRepository : ISpaceRepository
         IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
 
         if (includeSouls)
-            query = query.Include(x => x.Souls);
+            query = query.Include(x => x.Members);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
@@ -29,7 +29,7 @@ public class SpaceRepository : ISpaceRepository
         IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
 
         if (includeSouls)
-            query = query.Include(x => x.Souls);
+            query = query.Include(x => x.Members);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
@@ -42,7 +42,7 @@ public class SpaceRepository : ISpaceRepository
         IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
 
         if (includeSouls)
-            query = query.Include(x => x.Souls);
+            query = query.Include(x => x.Members);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
