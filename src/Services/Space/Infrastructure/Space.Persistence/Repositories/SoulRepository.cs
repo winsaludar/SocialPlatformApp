@@ -56,6 +56,16 @@ public class SoulRepository : ISoulRepository
         return spaceMember != null;
     }
 
+    public async Task<bool> IsModeratorOfSpaceAsync(Guid soulId, Guid spaceId)
+    {
+        SpaceModerator? spaceModerator = await _dbContext.SpaceModerators
+            .Where(x => x.SoulId == soulId && x.SpaceId == spaceId)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+
+        return spaceModerator != null;
+    }
+
     public async Task DeleteSpaceMemberAsync(Guid soulId, Guid spaceId)
     {
         await Task.Run(() =>

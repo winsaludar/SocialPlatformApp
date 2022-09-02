@@ -76,12 +76,12 @@ public class SpacesController : ControllerBase
     [Route("{spaceId}/kick")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> KickSoulAsync(Guid spaceId, [FromBody] KickSoulRequest request)
+    public async Task<IActionResult> KickMemberAsync(Guid spaceId, [FromBody] KickSoulRequest request)
     {
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized();
 
-        await _serviceManager.SpaceService.KickSoulAsync(spaceId, request.Email);
+        await _serviceManager.SpaceService.KickMemberAsync(spaceId, request.Email);
 
         return Ok("Begone! You do not belong here");
     }
@@ -89,9 +89,9 @@ public class SpacesController : ControllerBase
     [HttpGet]
     [Route("{spaceId}/members")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SoulDto>))]
-    public async Task<IActionResult> GetAllMembers(Guid spaceId)
+    public async Task<IActionResult> GetAllMembersAsync(Guid spaceId)
     {
-        var result = await _serviceManager.SpaceService.GetAllSoulsAsync(spaceId);
+        var result = await _serviceManager.SpaceService.GetAllMembersAsync(spaceId);
         return Ok(result);
     }
 }

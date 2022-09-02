@@ -217,7 +217,7 @@ public class SpacesControllerTests
         Guid spaceId = Guid.NewGuid();
         KickSoulRequest request = new();
 
-        var result = await _controller.KickSoulAsync(spaceId, request);
+        var result = await _controller.KickMemberAsync(spaceId, request);
 
         Assert.IsType<UnauthorizedResult>(result);
     }
@@ -241,9 +241,9 @@ public class SpacesControllerTests
         Guid spaceId = Guid.NewGuid();
         KickSoulRequest request = new() { Email = "member@example.com" };
 
-        var result = await _controller.KickSoulAsync(spaceId, request);
+        var result = await _controller.KickMemberAsync(spaceId, request);
 
-        _mockService.Verify(x => x.SpaceService.KickSoulAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+        _mockService.Verify(x => x.SpaceService.KickMemberAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
 
@@ -252,10 +252,10 @@ public class SpacesControllerTests
     {
         Guid spaceId = Guid.NewGuid();
 
-        _mockService.Setup(x => x.SpaceService.GetAllSoulsAsync(spaceId))
+        _mockService.Setup(x => x.SpaceService.GetAllMembersAsync(spaceId))
            .ReturnsAsync((IEnumerable<SoulDto>)new List<SoulDto>());
 
-        var result = await _controller.GetAllMembers(spaceId);
+        var result = await _controller.GetAllMembersAsync(spaceId);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var spaces = Assert.IsType<List<SoulDto>>(okResult.Value);
@@ -267,7 +267,7 @@ public class SpacesControllerTests
     {
         Guid spaceId = Guid.NewGuid();
 
-        _mockService.Setup(x => x.SpaceService.GetAllSoulsAsync(spaceId))
+        _mockService.Setup(x => x.SpaceService.GetAllMembersAsync(spaceId))
            .ReturnsAsync((IEnumerable<SoulDto>)new List<SoulDto>
            {
                new SoulDto(),
@@ -275,7 +275,7 @@ public class SpacesControllerTests
                new SoulDto()
            });
 
-        var result = await _controller.GetAllMembers(spaceId);
+        var result = await _controller.GetAllMembersAsync(spaceId);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var souls = Assert.IsType<List<SoulDto>>(okResult.Value);

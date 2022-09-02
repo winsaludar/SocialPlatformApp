@@ -62,7 +62,7 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetAllSoulsAsync_SpaceIsNull_ReturnsEmptySoulsDto()
+    public async Task GetAllMembersAsync_SpaceIsNull_ReturnsEmptySoulsDto()
     {
         Guid spaceId = Guid.NewGuid();
 
@@ -72,14 +72,14 @@ public class SpaceServiceTests
                 Members = new List<Soul>()
             });
 
-        var result = await _spaceService.GetAllSoulsAsync(spaceId);
+        var result = await _spaceService.GetAllMembersAsync(spaceId);
 
         Assert.IsType<List<SoulDto>>(result);
         Assert.Empty(result);
     }
 
     [Fact]
-    public async Task GetAllSoulsAsync_SpaceIsNotNull_ReturnsNotEmptySoulsDto()
+    public async Task GetAllMembersAsync_SpaceIsNotNull_ReturnsNotEmptySoulsDto()
     {
         Guid spaceId = Guid.NewGuid();
 
@@ -94,7 +94,7 @@ public class SpaceServiceTests
                 }
             });
 
-        var result = await _spaceService.GetAllSoulsAsync(spaceId);
+        var result = await _spaceService.GetAllMembersAsync(spaceId);
 
         Assert.IsType<List<SoulDto>>(result);
         Assert.NotEmpty(result);

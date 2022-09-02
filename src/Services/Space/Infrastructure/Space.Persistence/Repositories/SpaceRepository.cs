@@ -60,19 +60,16 @@ public class SpaceRepository : ISpaceRepository
         await Task.Run(() => _dbContext.Spaces.Update(space));
     }
 
-    public async Task<IEnumerable<Topic>> GetAllTopicsAsync(Guid id)
+    #region TOPICS
+
+    public async Task<Topic?> GetTopicByIdAsync(Guid topicId)
     {
-        return await _dbContext.Topics.Where(x => x.SpaceId == id).AsNoTracking().ToListAsync();
+        return await _dbContext.Topics.Where(x => x.Id == topicId).FirstOrDefaultAsync();
     }
 
     public async Task CreateTopicAsync(Topic newTopic)
     {
         await _dbContext.Topics.AddAsync(newTopic);
-    }
-
-    public async Task<Topic?> GetTopicByIdAsync(Guid topicId)
-    {
-        return await _dbContext.Topics.Where(x => x.Id == topicId).FirstOrDefaultAsync();
     }
 
     public async Task UpdateTopicAsync(Topic topic)
@@ -84,4 +81,6 @@ public class SpaceRepository : ISpaceRepository
     {
         await Task.Run(() => _dbContext.Topics.Remove(topic));
     }
+
+    #endregion
 }
