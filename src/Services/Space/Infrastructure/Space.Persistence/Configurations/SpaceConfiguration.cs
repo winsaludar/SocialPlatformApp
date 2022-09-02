@@ -22,14 +22,14 @@ public class SpaceConfiguration : IEntityTypeConfiguration<Domain.Entities.Space
         builder.Property(x => x.CreatedBy).IsRequired().HasMaxLength(36);
         builder.Property(x => x.CreatedDateUtc).IsRequired();
 
-        // Build many-to-many relationship with Soul
+        // Build many-to-many relationship with Soul as a Member
         builder.HasMany(x => x.Members)
-            .WithMany(y => y.Spaces)
+            .WithMany(y => y.SpacesAsMember)
             .UsingEntity<SpaceMember>(x => x.ToTable(nameof(SpaceMember)));
 
-        // Build many-to-many relationship with Moderator
+        // Build many-to-many relationship with Soul as a Moderator
         builder.HasMany(x => x.Moderators)
-            .WithMany(y => y.Spaces)
+            .WithMany(y => y.SpacesAsModerator)
             .UsingEntity<SpaceModerator>(x => x.ToTable(nameof(SpaceModerator)));
 
         // Build one-to-many relationship with Topic

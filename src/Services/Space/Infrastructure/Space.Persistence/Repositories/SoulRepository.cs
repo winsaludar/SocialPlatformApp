@@ -15,7 +15,7 @@ public class SoulRepository : ISoulRepository
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
         if (includeSpaces)
-            query = query.Include(x => x.Spaces);
+            query = query.Include(x => x.SpacesAsMember);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
@@ -28,7 +28,7 @@ public class SoulRepository : ISoulRepository
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
         if (includeSpaces)
-            query = query.Include(x => x.Spaces);
+            query = query.Include(x => x.SpacesAsMember);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
