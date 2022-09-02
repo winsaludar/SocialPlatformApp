@@ -15,12 +15,12 @@ public class SoulRepository : ISoulRepository
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
         if (includeSpaces)
-            query = query.Include(x => x.Spaces);
+            query = query.Include(x => x.SpacesAsMember);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
 
-        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
+        return await query.FirstOrDefaultAsync(x => x.Email == email);
     }
 
     public async Task<Soul?> GetByIdAsync(Guid id, bool includeSpaces = false, bool includeTopics = false)
@@ -28,12 +28,12 @@ public class SoulRepository : ISoulRepository
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
         if (includeSpaces)
-            query = query.Include(x => x.Spaces);
+            query = query.Include(x => x.SpacesAsMember);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
 
-        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        return await query.FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task CreateAsync(Soul newSoul)
@@ -41,23 +41,28 @@ public class SoulRepository : ISoulRepository
         await _dbContext.Souls.AddAsync(newSoul);
     }
 
+    public async Task UpdateAsync(Soul soul)
+    {
+        await Task.Run(() => _dbContext.Souls.Update(soul));
+    }
+
     public async Task<bool> IsMemberOfSpaceAsync(Guid soulId, Guid spaceId)
     {
-        SpaceSoul? spaceSoul = await _dbContext.SpacesSouls
+        SpaceMember? spaceMember = await _dbContext.SpaceMembers
             .Where(x => x.SoulId == soulId && x.SpaceId == spaceId)
             .AsNoTracking()
             .FirstOrDefaultAsync();
 
-        return spaceSoul != null;
+        return spaceMember != null;
     }
 
-    public async Task DeleteSoulSpaceAsync(Guid soulId, Guid spaceId)
+    public async Task DeleteSpaceMemberAsync(Guid soulId, Guid spaceId)
     {
         await Task.Run(() =>
         {
-            SpaceSoul spaceSoul = new() { SoulId = soulId, SpaceId = spaceId };
-            _dbContext.SpacesSouls.Attach(spaceSoul);
-            _dbContext.SpacesSouls.Remove(spaceSoul);
+            SpaceMember spaceMember = new() { SoulId = soulId, SpaceId = spaceId };
+            _dbContext.SpaceMembers.Attach(spaceMember);
+            _dbContext.SpaceMembers.Remove(spaceMember);
         });
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Space.Persistence;
 
@@ -11,9 +12,10 @@ using Space.Persistence;
 namespace Space.Persistence.Migrations
 {
     [DbContext(typeof(SpaceDbContext))]
-    partial class SpaceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220902040845_AddSpaceModeratorTable")]
+    partial class AddSpaceModeratorTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,21 +113,6 @@ namespace Space.Persistence.Migrations
                     b.ToTable("Space", (string)null);
                 });
 
-            modelBuilder.Entity("Space.Domain.Entities.SpaceMember", b =>
-                {
-                    b.Property<Guid>("SoulId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SpaceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("SoulId", "SpaceId");
-
-                    b.HasIndex("SpaceId");
-
-                    b.ToTable("SpaceMember", (string)null);
-                });
-
             modelBuilder.Entity("Space.Domain.Entities.SpaceModerator", b =>
                 {
                     b.Property<Guid>("SoulId")
@@ -139,6 +126,21 @@ namespace Space.Persistence.Migrations
                     b.HasIndex("SpaceId");
 
                     b.ToTable("SpaceModerator", (string)null);
+                });
+
+            modelBuilder.Entity("Space.Domain.Entities.SpaceSoul", b =>
+                {
+                    b.Property<Guid>("SoulId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SpaceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("SoulId", "SpaceId");
+
+                    b.HasIndex("SpaceId");
+
+                    b.ToTable("SpaceSoul", (string)null);
                 });
 
             modelBuilder.Entity("Space.Domain.Entities.Topic", b =>
@@ -190,7 +192,7 @@ namespace Space.Persistence.Migrations
                     b.ToTable("Topic", (string)null);
                 });
 
-            modelBuilder.Entity("Space.Domain.Entities.SpaceMember", b =>
+            modelBuilder.Entity("Space.Domain.Entities.SpaceModerator", b =>
                 {
                     b.HasOne("Space.Domain.Entities.Soul", null)
                         .WithMany()
@@ -205,7 +207,7 @@ namespace Space.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Space.Domain.Entities.SpaceModerator", b =>
+            modelBuilder.Entity("Space.Domain.Entities.SpaceSoul", b =>
                 {
                     b.HasOne("Space.Domain.Entities.Soul", null)
                         .WithMany()

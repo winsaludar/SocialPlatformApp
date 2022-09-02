@@ -69,7 +69,7 @@ public class SpaceServiceTests
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space
             {
-                Souls = new List<Soul>()
+                Members = new List<Soul>()
             });
 
         var result = await _spaceService.GetAllSoulsAsync(spaceId);
@@ -86,7 +86,7 @@ public class SpaceServiceTests
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space
             {
-                Souls = new List<Soul>
+                Members = new List<Soul>
                 {
                     new Soul(),
                     new Soul(),
