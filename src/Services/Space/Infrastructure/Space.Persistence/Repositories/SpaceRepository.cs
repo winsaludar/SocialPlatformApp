@@ -34,7 +34,7 @@ public class SpaceRepository : ISpaceRepository
         if (includeTopics)
             query = query.Include(x => x.Topics);
 
-        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name);
+        return await query.FirstOrDefaultAsync(x => x.Name == name);
     }
 
     public async Task<DomainEntities.Space?> GetByIdAsync(Guid id, bool includeSouls = false, bool includeTopics = false)
@@ -47,7 +47,7 @@ public class SpaceRepository : ISpaceRepository
         if (includeTopics)
             query = query.Include(x => x.Topics);
 
-        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        return await query.FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task CreateAsync(DomainEntities.Space newSpace)
@@ -62,10 +62,7 @@ public class SpaceRepository : ISpaceRepository
 
     public async Task<IEnumerable<Topic>> GetAllTopicsAsync(Guid id)
     {
-        return await _dbContext.Topics
-            .Where(x => x.SpaceId == id)
-            .AsNoTracking()
-            .ToListAsync();
+        return await _dbContext.Topics.Where(x => x.SpaceId == id).AsNoTracking().ToListAsync();
     }
 
     public async Task CreateTopicAsync(Topic newTopic)
@@ -75,10 +72,7 @@ public class SpaceRepository : ISpaceRepository
 
     public async Task<Topic?> GetTopicByIdAsync(Guid topicId)
     {
-        return await _dbContext.Topics
-            .Where(x => x.Id == topicId)
-            .AsNoTracking()
-            .FirstOrDefaultAsync();
+        return await _dbContext.Topics.Where(x => x.Id == topicId).FirstOrDefaultAsync();
     }
 
     public async Task UpdateTopicAsync(Topic topic)

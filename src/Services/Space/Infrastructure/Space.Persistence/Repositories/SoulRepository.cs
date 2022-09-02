@@ -20,7 +20,7 @@ public class SoulRepository : ISoulRepository
         if (includeTopics)
             query = query.Include(x => x.Topics);
 
-        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
+        return await query.FirstOrDefaultAsync(x => x.Email == email);
     }
 
     public async Task<Soul?> GetByIdAsync(Guid id, bool includeSpaces = false, bool includeTopics = false)
@@ -33,12 +33,17 @@ public class SoulRepository : ISoulRepository
         if (includeTopics)
             query = query.Include(x => x.Topics);
 
-        return await query.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        return await query.FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task CreateAsync(Soul newSoul)
     {
         await _dbContext.Souls.AddAsync(newSoul);
+    }
+
+    public async Task UpdateAsync(Soul soul)
+    {
+        await Task.Run(() => _dbContext.Souls.Update(soul));
     }
 
     public async Task<bool> IsMemberOfSpaceAsync(Guid soulId, Guid spaceId)

@@ -31,22 +31,17 @@ public class Soul : BaseEntity
         await _repositoryManager.UnitOfWork.BeginTransactionAsync();
 
         // Create/Get soul info
-        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(Email);
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(Email, true, true);
         if (existingSoul == null)
         {
-            Name = Email;
-            CreatedBy = Email;
-            CreatedDateUtc = DateTime.UtcNow;
-            await _repositoryManager.SoulRepository.CreateAsync(this);
-        }
-        else
-        {
-            Id = existingSoul.Id;
-            Name = existingSoul.Name;
-            CreatedBy = existingSoul.CreatedBy;
-            CreatedDateUtc = existingSoul.CreatedDateUtc;
-            LastModifiedBy = existingSoul.LastModifiedBy;
-            LastModifiedDateUtc = existingSoul.LastModifiedDateUtc;
+            existingSoul = new()
+            {
+                Name = Email,
+                Email = Email,
+                CreatedBy = Email,
+                CreatedDateUtc = DateTime.UtcNow
+            };
+            await _repositoryManager.SoulRepository.CreateAsync(existingSoul);
         }
 
         // Make sure space name does not exist yet
@@ -59,9 +54,10 @@ public class Soul : BaseEntity
 
         newSpace.CreatedDateUtc = DateTime.UtcNow;
         newSpace.CreatedBy = Email;
-        newSpace.Members.Add(this);
-
+        newSpace.Moderators.Add(existingSoul);
+        newSpace.Members.Add(existingSoul);
         await _repositoryManager.SpaceRepository.CreateAsync(newSpace);
+
         await _repositoryManager.UnitOfWork.CommitAsync();
     }
 
@@ -87,30 +83,25 @@ public class Soul : BaseEntity
         Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(Email);
         if (existingSoul == null)
         {
-            Name = Email;
-            CreatedBy = Email;
-            CreatedDateUtc = DateTime.UtcNow;
-            await _repositoryManager.SoulRepository.CreateAsync(this);
-        }
-        else
-        {
-            Id = existingSoul.Id;
-            Name = existingSoul.Name;
-            CreatedBy = existingSoul.CreatedBy;
-            CreatedDateUtc = existingSoul.CreatedDateUtc;
-            LastModifiedBy = existingSoul.LastModifiedBy;
-            LastModifiedDateUtc = existingSoul.LastModifiedDateUtc;
+            existingSoul = new()
+            {
+                Name = Email,
+                Email = Email,
+                CreatedBy = Email,
+                CreatedDateUtc = DateTime.UtcNow
+            };
+            await _repositoryManager.SoulRepository.CreateAsync(existingSoul);
         }
 
         // Make sure soul is not a member yet of the target space
-        bool isMemberAlready = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(Id, spaceId);
+        bool isMemberAlready = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, spaceId);
         if (isMemberAlready)
         {
             await _repositoryManager.UnitOfWork.RollbackAsync();
-            throw new SoulMemberAlreadyException(Email, targetSpace.Name);
+            throw new SoulMemberAlreadyException(existingSoul.Email, targetSpace.Name);
         }
 
-        targetSpace.Members.Add(this);
+        targetSpace.Members.Add(existingSoul);
         await _repositoryManager.SpaceRepository.UpdateAsync(targetSpace);
         await _repositoryManager.UnitOfWork.CommitAsync();
     }

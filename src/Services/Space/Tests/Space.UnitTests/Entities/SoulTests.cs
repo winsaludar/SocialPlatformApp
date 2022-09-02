@@ -58,40 +58,15 @@ public class SoulTests
 
         Soul? createdSoul = null;
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync((Soul)null!);
+                .ReturnsAsync((Soul)null!);
         _mockRepo.Setup(x => x.SoulRepository.CreateAsync(It.IsAny<Soul>()))
-            .Callback<Soul>(x => createdSoul = new Soul() { Id = Guid.NewGuid() });
+                .Callback<Soul>(x => createdSoul = new Soul() { Id = Guid.NewGuid(), Email = soul.Email });
 
         await soul.CreateSpaceAsync(newSpace);
 
-        _mockRepo.Verify(x => x.SoulRepository.CreateAsync(soul), Times.Once);
+        _mockRepo.Verify(x => x.SoulRepository.CreateAsync(It.IsAny<Soul>()), Times.Once);
         Assert.NotNull(createdSoul);
         Assert.NotEqual(Guid.Empty, createdSoul?.Id);
-    }
-
-    [Fact]
-    public async Task CreateSpaceAsync_SoulDoesExist_SetExistingDataToCurrentSoul()
-    {
-        Soul currentSoul = new(_mockRepo.Object) { Email = "existing@example.com" };
-        Soul existingSoul = new()
-        {
-            Id = Guid.NewGuid(),
-            Email = "existing@example.com",
-            Name = "existing@example.com",
-            CreatedBy = "existing@example.com",
-            CreatedDateUtc = DateTime.UtcNow
-        };
-        Domain.Entities.Space newSpace = new() { Name = "Test Space" };
-
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(existingSoul);
-
-        await currentSoul.CreateSpaceAsync(newSpace);
-
-        Assert.Equal(existingSoul.Id, currentSoul.Id);
-        Assert.Equal(existingSoul.Name, currentSoul.Name);
-        Assert.Equal(existingSoul.CreatedBy, currentSoul.CreatedBy);
-        Assert.Equal(existingSoul.CreatedDateUtc, currentSoul.CreatedDateUtc);
     }
 
     [Fact]
@@ -179,36 +154,9 @@ public class SoulTests
 
         await soul.JoinSpaceAsync(spaceId);
 
-        _mockRepo.Verify(x => x.SoulRepository.CreateAsync(soul), Times.Once);
+        _mockRepo.Verify(x => x.SoulRepository.CreateAsync(It.IsAny<Soul>()), Times.Once);
         Assert.NotNull(createdSoul);
         Assert.NotEqual(Guid.Empty, createdSoul?.Id);
-    }
-
-    [Fact]
-    public async Task JoinSpaceAsync_SoulDoesExist_SetExistingDataToCurrentSoul()
-    {
-        Soul currentSoul = new(_mockRepo.Object) { Email = "existing@example.com" };
-        Soul existingSoul = new()
-        {
-            Id = Guid.NewGuid(),
-            Email = "existing@example.com",
-            Name = "existing@example.com",
-            CreatedBy = "existing@example.com",
-            CreatedDateUtc = DateTime.UtcNow
-        };
-        Guid spaceId = Guid.NewGuid();
-
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(new Domain.Entities.Space());
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(existingSoul);
-
-        await currentSoul.JoinSpaceAsync(spaceId);
-
-        Assert.Equal(existingSoul.Id, currentSoul.Id);
-        Assert.Equal(existingSoul.Name, currentSoul.Name);
-        Assert.Equal(existingSoul.CreatedBy, currentSoul.CreatedBy);
-        Assert.Equal(existingSoul.CreatedDateUtc, currentSoul.CreatedDateUtc);
     }
 
     [Fact]
