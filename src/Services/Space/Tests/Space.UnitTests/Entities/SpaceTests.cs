@@ -486,7 +486,7 @@ public class SpaceTests
     }
 
     [Fact]
-    public async Task DeleteTopicAsync_TopicSoulIdAndExistingSoulIdDoesNotMatch_ThrowsInvalidSoulException()
+    public async Task DeleteTopicAsync_TopicSoulIdAndExistingSoulIdDoesNotMatch_ThrowsUnauthorizedAccessException()
     {
         Guid topicId = Guid.NewGuid();
         string deletedBy = "author@example.com";
@@ -499,7 +499,39 @@ public class SpaceTests
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul { Id = Guid.NewGuid() });
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => space.DeleteTopicAsync(topicId, deletedBy));
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => space.DeleteTopicAsync(topicId, deletedBy));
+    }
+
+    [Fact]
+    public async Task DeleteTopicAsync_SoulIsAModerator_DeleteTopic()
+    {
+        Guid topicId = Guid.NewGuid();
+        Guid spaceId = Guid.NewGuid();
+        Guid soulId = Guid.NewGuid();
+        string deletedBy = "author@example.com";
+        List<Topic> topics = new()
+        {
+            new Topic(),
+            new Topic(),
+            new Topic()
+        };
+        DomainEntities.Space space = new(_mockRepo.Object, _mockHelper.Object) { Id = spaceId };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(topicId))
+            .ReturnsAsync(new Topic { SoulId = soulId, SpaceId = spaceId });
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space() { Id = spaceId });
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul { Id = Guid.NewGuid() });
+        _mockRepo.Setup(x => x.SoulRepository.IsModeratorOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .ReturnsAsync(true);
+        _mockRepo.Setup(x => x.SpaceRepository.DeleteTopicAsync(It.IsAny<Topic>()))
+            .Callback<Topic>(x => topics.RemoveAt(2));
+
+        await space.DeleteTopicAsync(topicId, deletedBy);
+
+        _mockRepo.Verify(x => x.SpaceRepository.DeleteTopicAsync(It.IsAny<Topic>()), Times.Once);
+        Assert.Equal(2, topics.Count);
     }
 
     [Fact]

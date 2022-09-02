@@ -211,7 +211,12 @@ public class Space : BaseEntity
         }
 
         // Only the author and the moderators of the space can delete the topic
-
+        bool isModerator = await _repositoryManager.SoulRepository.IsModeratorOfSpaceAsync(existingSoul.Id, Id);
+        if (existingTopic.SoulId != existingSoul.Id && !isModerator)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new UnauthorizedAccessException($"'{deletedBy}' is not authorize to delete topic '{existingTopic.Id}'");
+        }
 
         await _repositoryManager.SpaceRepository.DeleteTopicAsync(existingTopic);
         await _repositoryManager.UnitOfWork.CommitAsync();

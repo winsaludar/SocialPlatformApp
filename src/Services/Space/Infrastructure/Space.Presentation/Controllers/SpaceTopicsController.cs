@@ -73,7 +73,7 @@ public class SpaceTopicsController : ControllerBase
         };
         await _serviceManager.SpaceService.UpdateTopicAsync(dto);
 
-        return Ok("Your topic has been updated");
+        return Ok("Topic has been updated");
     }
 
     [HttpDelete]
@@ -93,6 +93,6 @@ public class SpaceTopicsController : ControllerBase
         };
         await _serviceManager.SpaceService.DeleteTopicAsync(dto);
 
-        return Ok("Your topic has beed deleted");
+        return Ok("Topic has been deleted");
     }
 }

@@ -10,5 +10,6 @@ public interface ISoulRepository
     Task UpdateAsync(Soul soul);
 
     Task<bool> IsMemberOfSpaceAsync(Guid soulId, Guid spaceId);
+    Task<bool> IsModeratorOfSpaceAsync(Guid soulId, Guid spaceId);
     Task DeleteSpaceMemberAsync(Guid soulId, Guid spaceId);
 }
