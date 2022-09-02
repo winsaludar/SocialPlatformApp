@@ -149,19 +149,25 @@ public class Space : BaseEntity
             throw new InvalidSpaceIdException(Id);
         }
 
-        // Make sure the modifier is the same as the author
+        // Make sure the modifier exist
         Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(modifiedBy);
-        if (existingSoul == null || existingTopic.SoulId != existingSoul.Id)
+        if (existingSoul == null)
         {
             await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new InvalidSoulException(modifiedBy);
         }
 
-        // TODO: Allow admin of the space to edit the topic
+        // Only the author and the moderators of the space can edit the topic
+        bool isModerator = await _repositoryManager.SoulRepository.IsModeratorOfSpaceAsync(existingSoul.Id, Id);
+        if (existingTopic.SoulId != existingSoul.Id && !isModerator)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new UnauthorizedAccessException($"'{modifiedBy}' is not authorize to edit topic '{existingTopic.Id}'");
+        }
 
         // Make sure soul is still a member
         bool isMember = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, Id);
-        if (!isMember)
+        if (!isMember && !isModerator)
         {
             await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new SoulNotMemberException(modifiedBy, targetSpace.Name);
@@ -202,7 +208,7 @@ public class Space : BaseEntity
             throw new InvalidSpaceIdException(Id);
         }
 
-        // Make sure the deleter is the same as the author
+        // Make sure the deleter exist
         Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(deletedBy);
         if (existingSoul == null)
         {
