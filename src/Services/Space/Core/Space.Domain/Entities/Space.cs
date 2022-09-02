@@ -26,6 +26,7 @@ public class Space : BaseEntity
     public string? Thumbnail { get; set; }
     public IList<Soul> Souls { get; set; } = new List<Soul>();
     public IList<Topic> Topics { get; set; } = new List<Topic>();
+    public IList<Soul> Moderators { get; set; } = new List<Soul>();
 
     public async Task KickSoulAsync(string email)
     {

@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DomainEntities = Space.Domain.Entities;
+using Space.Domain.Entities;
 
 namespace Space.Persistence.Configurations;
 
-public class SpaceConfiguration : IEntityTypeConfiguration<DomainEntities.Space>
+public class SpaceConfiguration : IEntityTypeConfiguration<Domain.Entities.Space>
 {
-    public void Configure(EntityTypeBuilder<DomainEntities.Space> builder)
+    public void Configure(EntityTypeBuilder<Domain.Entities.Space> builder)
     {
-        builder.ToTable(nameof(DomainEntities.Space));
+        builder.ToTable(nameof(Domain.Entities.Space));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
@@ -25,7 +25,12 @@ public class SpaceConfiguration : IEntityTypeConfiguration<DomainEntities.Space>
         // Build many-to-many relationship with Soul
         builder.HasMany(x => x.Souls)
             .WithMany(y => y.Spaces)
-            .UsingEntity<DomainEntities.SpaceSoul>(x => x.ToTable(nameof(DomainEntities.SpaceSoul)));
+            .UsingEntity<SpaceSoul>(x => x.ToTable(nameof(SpaceSoul)));
+
+        // Build many-to-many relationship with Moderator
+        builder.HasMany(x => x.Moderators)
+            .WithMany(y => y.Spaces)
+            .UsingEntity<SpaceModerator>(x => x.ToTable(nameof(SpaceModerator)));
 
         // Build one-to-many relationship with Topic
         builder.HasMany(x => x.Topics)
