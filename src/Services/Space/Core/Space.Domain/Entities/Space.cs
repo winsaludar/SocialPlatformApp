@@ -28,7 +28,7 @@ public class Space : BaseEntity
     public IList<Topic> Topics { get; set; } = new List<Topic>();
     public IList<Soul> Moderators { get; set; } = new List<Soul>();
 
-    public async Task KickSoulAsync(string email)
+    public async Task KickMemberAsync(string email)
     {
         if (_repositoryManager == null)
             throw new NullReferenceException("IRepositoryManager is null");
@@ -204,13 +204,14 @@ public class Space : BaseEntity
 
         // Make sure the deleter is the same as the author
         Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(deletedBy);
-        if (existingSoul == null || existingTopic.SoulId != existingSoul.Id)
+        if (existingSoul == null)
         {
             await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new InvalidSoulException(deletedBy);
         }
 
-        // TODO: Allow admin of the space to delete the topic
+        // Only the author and the moderators of the space can delete the topic
+
 
         await _repositoryManager.SpaceRepository.DeleteTopicAsync(existingTopic);
         await _repositoryManager.UnitOfWork.CommitAsync();
