@@ -25,14 +25,25 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
+    public async Task GetAsync_SpaceIdIsInvalid_ReturnsNotFoundResult()
+    {
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync((SpaceDto)null!);
+
+        var result = await _controller.GetAsync(It.IsAny<Guid>());
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
     public async Task GetAsync_TopicsAreEmpty_ReturnsOkResultWithEmptyData()
     {
-        Guid spaceId = Guid.NewGuid();
-
-        _mockService.Setup(x => x.SpaceService.GetAllTopicsAsync(spaceId))
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync(new SpaceDto());
+        _mockService.Setup(x => x.SpaceService.GetAllTopicsAsync(It.IsAny<Guid>()))
            .ReturnsAsync((IEnumerable<TopicDto>)new List<TopicDto>());
 
-        var result = await _controller.GetAsync(spaceId);
+        var result = await _controller.GetAsync(It.IsAny<Guid>());
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var spaces = Assert.IsType<List<TopicDto>>(okResult.Value);
@@ -42,9 +53,9 @@ public class SpaceTopicsControllerTests
     [Fact]
     public async Task GetAsync_TopicsAreNotEmpty_ReturnsOkResultWithData()
     {
-        Guid spaceId = Guid.NewGuid();
-
-        _mockService.Setup(x => x.SpaceService.GetAllTopicsAsync(spaceId))
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync(new SpaceDto());
+        _mockService.Setup(x => x.SpaceService.GetAllTopicsAsync(It.IsAny<Guid>()))
            .ReturnsAsync((IEnumerable<TopicDto>)new List<TopicDto>
            {
                new TopicDto(),
@@ -52,7 +63,7 @@ public class SpaceTopicsControllerTests
                new TopicDto()
            });
 
-        var result = await _controller.GetAsync(spaceId);
+        var result = await _controller.GetAsync(It.IsAny<Guid>());
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var topics = Assert.IsType<List<TopicDto>>(okResult.Value);
