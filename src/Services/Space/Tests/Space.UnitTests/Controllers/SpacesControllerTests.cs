@@ -248,14 +248,25 @@ public class SpacesControllerTests
     }
 
     [Fact]
+    public async Task GetAllMembersAsync_SpaceIdIsInvalid_ReturnsNotFoundResult()
+    {
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync((SpaceDto)null!);
+
+        var result = await _controller.GetAllMembersAsync(It.IsAny<Guid>());
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
     public async Task GetAllMembersAsync_SoulsAreEmpty_ReturnsOkResultWithEmptyData()
     {
-        Guid spaceId = Guid.NewGuid();
-
-        _mockService.Setup(x => x.SpaceService.GetAllMembersAsync(spaceId))
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync(new SpaceDto());
+        _mockService.Setup(x => x.SpaceService.GetAllMembersAsync(It.IsAny<Guid>()))
            .ReturnsAsync((IEnumerable<SoulDto>)new List<SoulDto>());
 
-        var result = await _controller.GetAllMembersAsync(spaceId);
+        var result = await _controller.GetAllMembersAsync(It.IsAny<Guid>());
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var spaces = Assert.IsType<List<SoulDto>>(okResult.Value);
@@ -265,9 +276,9 @@ public class SpacesControllerTests
     [Fact]
     public async Task GetAllMembersAsync_SoulsAreNotEmpty_ReturnsOkResultWithData()
     {
-        Guid spaceId = Guid.NewGuid();
-
-        _mockService.Setup(x => x.SpaceService.GetAllMembersAsync(spaceId))
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync(new SpaceDto());
+        _mockService.Setup(x => x.SpaceService.GetAllMembersAsync(It.IsAny<Guid>()))
            .ReturnsAsync((IEnumerable<SoulDto>)new List<SoulDto>
            {
                new SoulDto(),
@@ -275,7 +286,7 @@ public class SpacesControllerTests
                new SoulDto()
            });
 
-        var result = await _controller.GetAllMembersAsync(spaceId);
+        var result = await _controller.GetAllMembersAsync(It.IsAny<Guid>());
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var souls = Assert.IsType<List<SoulDto>>(okResult.Value);

@@ -89,8 +89,13 @@ public class SpacesController : ControllerBase
     [HttpGet]
     [Route("{spaceId}/members")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SoulDto>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllMembersAsync(Guid spaceId)
     {
+        SpaceDto? space = await _serviceManager.SpaceService.GetByIdAsync(spaceId);
+        if (space == null)
+            return NotFound(spaceId);
+
         var result = await _serviceManager.SpaceService.GetAllMembersAsync(spaceId);
         return Ok(result);
     }
