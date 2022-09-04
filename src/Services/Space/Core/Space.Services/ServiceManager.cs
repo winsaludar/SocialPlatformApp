@@ -12,7 +12,7 @@ public class ServiceManager : IServiceManager
     public ServiceManager(IRepositoryManager repositoryManager, IHelperManager helperManager)
     {
         _lazySpaceService = new Lazy<ISpaceService>(() => new SpaceService(repositoryManager, helperManager));
-        _lazySoulService = new Lazy<ISoulService>(() => new SoulService(repositoryManager));
+        _lazySoulService = new Lazy<ISoulService>(() => new SoulService(repositoryManager, helperManager));
     }
 
     public ISpaceService SpaceService => _lazySpaceService.Value;

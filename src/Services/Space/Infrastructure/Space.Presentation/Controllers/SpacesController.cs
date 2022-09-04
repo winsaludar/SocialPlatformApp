@@ -25,17 +25,30 @@ public class SpacesController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet]
+    [Route("{slug}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SpaceDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+    public async Task<IActionResult> GetBySlugAsync(string slug)
+    {
+        SpaceDto? result = await _serviceManager.SpaceService.GetBySlugAsync(slug);
+        if (result == null)
+            return NotFound(slug);
+
+        return Ok(result);
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     public async Task<IActionResult> PostAsync([FromBody] CreateSpaceRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized();
+            return Unauthorized("Invalid user");
 
         var dto = request.Adapt<SpaceDto>();
         dto.Creator = User.Identity.Name;
@@ -47,11 +60,11 @@ public class SpacesController : ControllerBase
     [HttpPost]
     [Route("{spaceId}/join")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     public async Task<IActionResult> JoinSpaceAsync(Guid spaceId)
     {
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized();
+            return Unauthorized("Invalid user");
 
         await _serviceManager.SoulService.JoinSpaceAsync(spaceId, User.Identity.Name);
 
@@ -61,11 +74,11 @@ public class SpacesController : ControllerBase
     [HttpPost]
     [Route("{spaceId}/leave")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     public async Task<IActionResult> LeaveSpaceAsync(Guid spaceId)
     {
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized();
+            return Unauthorized("Invalid user");
 
         await _serviceManager.SoulService.LeaveSpaceAsync(spaceId, User.Identity.Name);
 
@@ -75,11 +88,11 @@ public class SpacesController : ControllerBase
     [HttpPost]
     [Route("{spaceId}/kick")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     public async Task<IActionResult> KickMemberAsync(Guid spaceId, [FromBody] KickSoulRequest request)
     {
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized();
+            return Unauthorized("Invalid user");
 
         await _serviceManager.SpaceService.KickMemberAsync(spaceId, User.Identity.Name, request.Email);
 
@@ -89,7 +102,7 @@ public class SpacesController : ControllerBase
     [HttpGet]
     [Route("{spaceId}/members")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SoulDto>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
     public async Task<IActionResult> GetAllMembersAsync(Guid spaceId)
     {
         SpaceDto? space = await _serviceManager.SpaceService.GetByIdAsync(spaceId);

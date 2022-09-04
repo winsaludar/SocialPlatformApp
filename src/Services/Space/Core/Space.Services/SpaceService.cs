@@ -36,6 +36,18 @@ public class SpaceService : ISpaceService
         return space.Adapt<SpaceDto>();
     }
 
+    public async Task<SpaceDto?> GetBySlugAsync(string slug)
+    {
+        if (string.IsNullOrEmpty(slug))
+            return null;
+
+        var space = await _repositoryManager.SpaceRepository.GetBySlugAsync(slug);
+        if (space == null)
+            return null;
+
+        return space.Adapt<SpaceDto>();
+    }
+
     public async Task<IEnumerable<SoulDto>> GetAllMembersAsync(Guid spaceId)
     {
         var space = await _repositoryManager.SpaceRepository.GetByIdAsync(spaceId, true, false);

@@ -50,6 +50,19 @@ public class SpaceRepository : ISpaceRepository
         return await query.FirstOrDefaultAsync(x => x.Id == id);
     }
 
+    public async Task<DomainEntities.Space?> GetBySlugAsync(string slug, bool includeSouls = false, bool includeTopics = false)
+    {
+        IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
+
+        if (includeSouls)
+            query = query.Include(x => x.Members);
+
+        if (includeTopics)
+            query = query.Include(x => x.Topics);
+
+        return await query.FirstOrDefaultAsync(x => x.Slug.ToLower() == slug.ToLower());
+    }
+
     public async Task CreateAsync(DomainEntities.Space newSpace)
     {
         await _dbContext.Spaces.AddAsync(newSpace);

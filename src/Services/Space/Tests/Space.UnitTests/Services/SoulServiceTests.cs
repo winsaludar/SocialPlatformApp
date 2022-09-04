@@ -1,6 +1,7 @@
 ﻿using Moq;
 using Space.Contracts;
 using Space.Domain.Entities;
+using Space.Domain.Helpers;
 using Space.Domain.Repositories;
 using Space.Services;
 using Space.Services.Abstraction;
@@ -10,17 +11,20 @@ namespace Space.UnitTests.Services;
 public class SoulServiceTests
 {
     private readonly Mock<IRepositoryManager> _mockRepo;
+    private readonly Mock<IHelperManager> _mockHelper;
     private readonly ISoulService _soulService;
 
     public SoulServiceTests()
     {
+        _mockRepo = new Mock<IRepositoryManager>();
+        _mockHelper = new Mock<IHelperManager>();
+
         Mock<ISpaceRepository> mockSpaceRepo = new();
         Mock<ISoulRepository> mockSoulRepo = new();
-        _mockRepo = new Mock<IRepositoryManager>();
         _mockRepo.Setup(x => x.SpaceRepository).Returns(mockSpaceRepo.Object);
         _mockRepo.Setup(x => x.SoulRepository).Returns(mockSoulRepo.Object);
 
-        _soulService = new SoulService(_mockRepo.Object);
+        _soulService = new SoulService(_mockRepo.Object, _mockHelper.Object);
     }
 
     [Fact]
