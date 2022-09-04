@@ -11,54 +11,66 @@ public class SpaceRepository : ISpaceRepository
 
     public SpaceRepository(SpaceDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<IEnumerable<DomainEntities.Space>> GetAllAsync(bool includeSouls = false, bool includeTopics = false)
+    public async Task<IEnumerable<DomainEntities.Space>> GetAllAsync(bool includeMembers = false, bool includeTopics = false, bool includeModerators = false)
     {
         IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
 
-        if (includeSouls)
+        if (includeMembers)
             query = query.Include(x => x.Members);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
+
+        if (includeModerators)
+            query = query.Include(x => x.Moderators);
 
         return await query.AsNoTracking().ToListAsync();
     }
 
-    public async Task<DomainEntities.Space?> GetByNameAsync(string name, bool includeSouls = false, bool includeTopics = false)
+    public async Task<DomainEntities.Space?> GetByNameAsync(string name, bool includeMembers = false, bool includeTopics = false, bool includeModerators = false)
     {
         IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
 
-        if (includeSouls)
+        if (includeMembers)
             query = query.Include(x => x.Members);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
+
+        if (includeModerators)
+            query = query.Include(x => x.Moderators);
 
         return await query.FirstOrDefaultAsync(x => x.Name == name);
     }
 
-    public async Task<DomainEntities.Space?> GetByIdAsync(Guid id, bool includeSouls = false, bool includeTopics = false)
+    public async Task<DomainEntities.Space?> GetByIdAsync(Guid id, bool includeMembers = false, bool includeTopics = false, bool includeModerators = false)
     {
         IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
 
-        if (includeSouls)
+        if (includeMembers)
             query = query.Include(x => x.Members);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
+
+        if (includeModerators)
+            query = query.Include(x => x.Moderators);
 
         return await query.FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<DomainEntities.Space?> GetBySlugAsync(string slug, bool includeSouls = false, bool includeTopics = false)
+    public async Task<DomainEntities.Space?> GetBySlugAsync(string slug, bool includeMembers = false, bool includeTopics = false, bool includeModerators = false)
     {
         IQueryable<DomainEntities.Space> query = _dbContext.Spaces.AsQueryable();
 
-        if (includeSouls)
+        if (includeMembers)
             query = query.Include(x => x.Members);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
+
+        if (includeModerators)
+            query = query.Include(x => x.Moderators);
 
         return await query.FirstOrDefaultAsync(x => x.Slug.ToLower() == slug.ToLower());
     }
@@ -72,8 +84,6 @@ public class SpaceRepository : ISpaceRepository
     {
         await Task.Run(() => _dbContext.Spaces.Update(space));
     }
-
-    #region TOPICS
 
     public async Task<Topic?> GetTopicByIdAsync(Guid topicId)
     {
@@ -94,6 +104,4 @@ public class SpaceRepository : ISpaceRepository
     {
         await Task.Run(() => _dbContext.Topics.Remove(topic));
     }
-
-    #endregion
 }

@@ -48,6 +48,22 @@ public class SpaceService : ISpaceService
         return space.Adapt<SpaceDto>();
     }
 
+    public async Task<IEnumerable<SoulDto>> GetAllModeratorsAsync(Guid spaceId)
+    {
+        var space = await _repositoryManager.SpaceRepository.GetByIdAsync(spaceId, false, false, true);
+        if (space == null)
+            return new List<SoulDto>();
+
+        List<SoulDto> result = space.Moderators.Select(x => new SoulDto
+        {
+            Id = x.Id,
+            Username = x.Name,
+            Email = x.Email
+        }).ToList();
+
+        return result;
+    }
+
     public async Task<IEnumerable<SoulDto>> GetAllMembersAsync(Guid spaceId)
     {
         var space = await _repositoryManager.SpaceRepository.GetByIdAsync(spaceId, true, false);
@@ -84,12 +100,6 @@ public class SpaceService : ISpaceService
         return result;
     }
 
-    public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
-    {
-        Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
-        await space.KickMemberAsync(kickedByEmail, memberEmail);
-    }
-
     public async Task CreateTopicAsync(TopicDto dto)
     {
         Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
@@ -106,5 +116,11 @@ public class SpaceService : ISpaceService
     {
         Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
         await space.DeleteTopicAsync(dto.Id, dto.AuthorEmail);
+    }
+
+    public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
+    {
+        Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
+        await space.KickMemberAsync(kickedByEmail, memberEmail);
     }
 }

@@ -32,9 +32,9 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetAllAsync_SpacesAreEmptyFromDatabase_ReturnsEmptySpacesDto()
+    public async Task GetAllAsync_SpacesAreEmpty_ReturnsEmptySpacesDto()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetAllAsync(It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetAllAsync(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((IEnumerable<DomainEntities.Space>)null!);
 
         var result = await _spaceService.GetAllAsync();
@@ -44,9 +44,9 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetAllAsync_SpacesAreNotEmptyFromDatabase_ReturnsNotEmptySpacesDto()
+    public async Task GetAllAsync_SpacesAreNotEmpty_ReturnsNonEmptySpacesDto()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetAllAsync(It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetAllAsync(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new List<DomainEntities.Space>()
             {
                 new DomainEntities.Space { },
@@ -62,9 +62,9 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetByIdAsync_SpaceIdIsInvalid_ReturnsNull()
+    public async Task GetByIdAsync_SpaceIsNull_ReturnsNull()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((DomainEntities.Space)null!);
 
         var result = await _spaceService.GetByIdAsync(It.IsAny<Guid>());
@@ -73,9 +73,9 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetByIdAsync_SpaceIdIsValid_ReturnsSpaceDto()
+    public async Task GetByIdAsync_SpaceIsNotNull_ReturnsSpaceDto()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space());
 
         var result = await _spaceService.GetByIdAsync(It.IsAny<Guid>());
@@ -85,9 +85,9 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetBySlugAsync_SlugIsInvalid_ReturnsNull()
+    public async Task GetBySlugAsync_SpaceIsNull_ReturnsNull()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetBySlugAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetBySlugAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((DomainEntities.Space)null!);
 
         var result = await _spaceService.GetBySlugAsync(It.IsAny<string>());
@@ -96,10 +96,10 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetBySlugAsync_SlugIsValid_ReturnsSpaceDto()
+    public async Task GetBySlugAsync_SpaceIsNotNull_ReturnsSpaceDto()
     {
         string slug = "sample-slug";
-        _mockRepo.Setup(x => x.SpaceRepository.GetBySlugAsync(slug, It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetBySlugAsync(slug, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space());
 
         var result = await _spaceService.GetBySlugAsync(slug);
@@ -109,11 +109,47 @@ public class SpaceServiceTests
     }
 
     [Fact]
+    public async Task GetAllModeratorsAsync_SpaceIsNull_ReturnsEmptySoulsDto()
+    {
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space
+            {
+                Moderators = new List<Soul>()
+            });
+
+        var result = await _spaceService.GetAllModeratorsAsync(It.IsAny<Guid>());
+
+        Assert.IsType<List<SoulDto>>(result);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllModeratorsAsync_SpaceIsNotNull_ReturnsNonEmptySoulsDto()
+    {
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space
+            {
+                Moderators = new List<Soul>
+                {
+                    new Soul(),
+                    new Soul(),
+                    new Soul()
+                }
+            });
+
+        var result = await _spaceService.GetAllModeratorsAsync(It.IsAny<Guid>());
+
+        Assert.IsType<List<SoulDto>>(result);
+        Assert.NotEmpty(result);
+        Assert.Equal(3, result.Count());
+    }
+
+    [Fact]
     public async Task GetAllMembersAsync_SpaceIsNull_ReturnsEmptySoulsDto()
     {
         Guid spaceId = Guid.NewGuid();
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space
             {
                 Members = new List<Soul>()
@@ -126,11 +162,11 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetAllMembersAsync_SpaceIsNotNull_ReturnsNotEmptySoulsDto()
+    public async Task GetAllMembersAsync_SpaceIsNotNull_ReturnsNonEmptySoulsDto()
     {
         Guid spaceId = Guid.NewGuid();
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space
             {
                 Members = new List<Soul>
@@ -153,7 +189,7 @@ public class SpaceServiceTests
     {
         Guid spaceId = Guid.NewGuid();
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((DomainEntities.Space)null!);
 
         var result = await _spaceService.GetAllTopicsAsync(spaceId);
@@ -163,11 +199,11 @@ public class SpaceServiceTests
     }
 
     [Fact]
-    public async Task GetAllTopicsAsync_SpaceIsNotNull_ReturnsNotEmptyTopicsDto()
+    public async Task GetAllTopicsAsync_SpaceIsNotNull_ReturnsNonEmptyTopicsDto()
     {
         Guid spaceId = Guid.NewGuid();
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space
             {
                 Topics = new List<Topic>

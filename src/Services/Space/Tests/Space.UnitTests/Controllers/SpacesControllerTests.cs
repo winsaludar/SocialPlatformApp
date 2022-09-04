@@ -316,4 +316,51 @@ public class SpacesControllerTests
         Assert.NotEmpty(souls);
         Assert.Equal(3, souls.Count());
     }
+
+    [Fact]
+    public async Task GetAllModeratorsAsync_SpaceIdIsInvalid_ReturnsNotFoundResult()
+    {
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync((SpaceDto)null!);
+
+        var result = await _controller.GetAllModeratorsAsync(It.IsAny<Guid>());
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetAllModeratorsAsync_SoulsAreEmpty_ReturnsOkResultWithEmptyData()
+    {
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync(new SpaceDto());
+        _mockService.Setup(x => x.SpaceService.GetAllModeratorsAsync(It.IsAny<Guid>()))
+           .ReturnsAsync((IEnumerable<SoulDto>)new List<SoulDto>());
+
+        var result = await _controller.GetAllModeratorsAsync(It.IsAny<Guid>());
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var spaces = Assert.IsType<List<SoulDto>>(okResult.Value);
+        Assert.Empty(spaces);
+    }
+
+    [Fact]
+    public async Task GetAllModeratorsAsync_SoulsAreNotEmpty_ReturnsOkResultWithData()
+    {
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync(new SpaceDto());
+        _mockService.Setup(x => x.SpaceService.GetAllModeratorsAsync(It.IsAny<Guid>()))
+           .ReturnsAsync((IEnumerable<SoulDto>)new List<SoulDto>
+           {
+               new SoulDto(),
+               new SoulDto(),
+               new SoulDto()
+           });
+
+        var result = await _controller.GetAllModeratorsAsync(It.IsAny<Guid>());
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var souls = Assert.IsType<List<SoulDto>>(okResult.Value);
+        Assert.NotEmpty(souls);
+        Assert.Equal(3, souls.Count());
+    }
 }
