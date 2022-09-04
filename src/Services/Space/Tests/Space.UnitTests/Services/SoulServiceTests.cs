@@ -38,7 +38,7 @@ public class SoulServiceTests
     }
 
     [Fact]
-    public async Task GetAllTopicsAsync_SpaceIsNotNull_ReturnsNotEmptyTopicsDto()
+    public async Task GetAllTopicsAsync_SoulIsNotNull_ReturnsNonEmptyTopicsDto()
     {
         Guid soulId = Guid.NewGuid();
 
@@ -56,6 +56,39 @@ public class SoulServiceTests
         var result = await _soulService.GetAllTopicsAsync(soulId);
 
         Assert.IsType<List<TopicDto>>(result);
+        Assert.NotEmpty(result);
+        Assert.Equal(3, result.Count());
+    }
+
+    [Fact]
+    public async Task GetAllModeratedSpacesAsync_SoulIsNull_ReturnsEmptySpacesDto()
+    {
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync((Soul)null!);
+
+        var result = await _soulService.GetAllModeratedSpacesAsync(It.IsAny<string>());
+
+        Assert.IsType<List<SpaceDto>>(result);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllModeratedSpacesAsync_SoulIsNotNull_ReturnsNonEmptySpacesDto()
+    {
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul
+            {
+                SpacesAsModerator = new List<Domain.Entities.Space>
+                {
+                    new Domain.Entities.Space(),
+                    new Domain.Entities.Space(),
+                    new Domain.Entities.Space()
+                }
+            });
+
+        var result = await _soulService.GetAllModeratedSpacesAsync(It.IsAny<string>());
+
+        Assert.IsType<List<SpaceDto>>(result);
         Assert.NotEmpty(result);
         Assert.Equal(3, result.Count());
     }
