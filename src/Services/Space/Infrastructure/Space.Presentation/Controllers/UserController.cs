@@ -24,7 +24,7 @@ public class UserController : ControllerBase
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized();
 
-        var topics = await _serviceManager.SoulService.GetAllModeratedSpacesAsync(User.Identity.Name);
-        return Ok(topics);
+        var spaces = await _serviceManager.SoulService.GetAllModeratedSpacesAsync(User.Identity.Name);
+        return Ok(spaces);
     }
 }
