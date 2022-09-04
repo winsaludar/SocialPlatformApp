@@ -10,28 +10,34 @@ public class SoulRepository : ISoulRepository
 
     public SoulRepository(SpaceDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<Soul?> GetByEmailAsync(string email, bool includeSpaces = false, bool includeTopics = false)
+    public async Task<Soul?> GetByEmailAsync(string email, bool includeMemberSpaces = false, bool includeTopics = false, bool includeModeratedSpaces = false)
     {
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
-        if (includeSpaces)
+        if (includeMemberSpaces)
             query = query.Include(x => x.SpacesAsMember);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
+
+        if (includeModeratedSpaces)
+            query = query.Include(x => x.SpacesAsModerator);
 
         return await query.FirstOrDefaultAsync(x => x.Email == email);
     }
 
-    public async Task<Soul?> GetByIdAsync(Guid id, bool includeSpaces = false, bool includeTopics = false)
+    public async Task<Soul?> GetByIdAsync(Guid id, bool includeMemberSpaces = false, bool includeTopics = false, bool includeModeratedSpaces = false)
     {
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
-        if (includeSpaces)
+        if (includeModeratedSpaces)
             query = query.Include(x => x.SpacesAsMember);
 
         if (includeTopics)
             query = query.Include(x => x.Topics);
+
+        if (includeModeratedSpaces)
+            query = query.Include(x => x.SpacesAsModerator);
 
         return await query.FirstOrDefaultAsync(x => x.Id == id);
     }

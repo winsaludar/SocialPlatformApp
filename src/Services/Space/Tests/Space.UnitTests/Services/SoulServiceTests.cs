@@ -28,7 +28,7 @@ public class SoulServiceTests
     {
         Guid soulId = Guid.NewGuid();
 
-        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
 
         var result = await _soulService.GetAllTopicsAsync(soulId);
@@ -42,7 +42,7 @@ public class SoulServiceTests
     {
         Guid soulId = Guid.NewGuid();
 
-        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul
             {
                 Topics = new List<Topic>
