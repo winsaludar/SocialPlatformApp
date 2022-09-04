@@ -48,7 +48,6 @@ public class SpaceService : ISpaceService
         return space.Adapt<SpaceDto>();
     }
 
-
     public async Task<IEnumerable<SoulDto>> GetAllModeratorsAsync(Guid spaceId)
     {
         var space = await _repositoryManager.SpaceRepository.GetByIdAsync(spaceId, false, false, true);
@@ -101,7 +100,6 @@ public class SpaceService : ISpaceService
         return result;
     }
 
-
     public async Task CreateTopicAsync(TopicDto dto)
     {
         Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
@@ -119,7 +117,6 @@ public class SpaceService : ISpaceService
         Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
         await space.DeleteTopicAsync(dto.Id, dto.AuthorEmail);
     }
-
 
     public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
     {
