@@ -44,3 +44,5 @@
 /src/Services/Space/Infrastructure/Space.Common/bin/Debug/net6.0
 /src/Services/Space/Infrastructure/Space.Common/obj
 /.vs
+/src/EventBus/EventBus.Core/bin/Debug/net6.0
+/src/EventBus/EventBus.Core/obj
