@@ -4,8 +4,8 @@ namespace Space.Domain.Repositories;
 
 public interface ISoulRepository
 {
-    Task<Soul?> GetByEmailAsync(string email, bool includeSpaces = false, bool includeTopics = false);
-    Task<Soul?> GetByIdAsync(Guid id, bool includeSpaces = false, bool includeTopics = false);
+    Task<Soul?> GetByEmailAsync(string email, bool includeMemberSpaces = false, bool includeTopics = false, bool includeModeratedSpaces = false);
+    Task<Soul?> GetByIdAsync(Guid id, bool includeMemberSpaces = false, bool includeTopics = false, bool includeModeratedSpaces = false);
     Task CreateAsync(Soul newSoul);
     Task UpdateAsync(Soul soul);
 

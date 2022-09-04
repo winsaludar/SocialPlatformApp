@@ -8,4 +8,5 @@ public interface ISoulService
     Task JoinSpaceAsync(Guid spaceId, string email);
     Task LeaveSpaceAsync(Guid spaceId, string email);
     Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid soulId);
+    Task<IEnumerable<SpaceDto>> GetAllModeratedSpacesAsync(string email);
 }
