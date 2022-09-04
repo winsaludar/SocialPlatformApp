@@ -81,7 +81,7 @@ public class SpacesController : ControllerBase
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized();
 
-        await _serviceManager.SpaceService.KickMemberAsync(spaceId, request.Email);
+        await _serviceManager.SpaceService.KickMemberAsync(spaceId, User.Identity.Name, request.Email);
 
         return Ok("Begone! You do not belong here");
     }

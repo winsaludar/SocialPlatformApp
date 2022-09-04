@@ -63,10 +63,10 @@ public class SpaceService : ISpaceService
         return result;
     }
 
-    public async Task KickMemberAsync(Guid spaceId, string email)
+    public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
     {
         Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
-        await space.KickMemberAsync(email);
+        await space.KickMemberAsync(kickedByEmail, memberEmail);
     }
 
     public async Task CreateTopicAsync(TopicDto dto)

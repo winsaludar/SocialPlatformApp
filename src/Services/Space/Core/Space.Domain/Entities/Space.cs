@@ -28,15 +28,16 @@ public class Space : BaseEntity
     public IList<Topic> Topics { get; set; } = new List<Topic>();
     public IList<Soul> Moderators { get; set; } = new List<Soul>();
 
-    public async Task KickMemberAsync(string email)
+    public async Task KickMemberAsync(string kickedByEmail, string memberEmail)
     {
         if (_repositoryManager == null)
             throw new NullReferenceException("IRepositoryManager is null");
 
-        if (string.IsNullOrEmpty(email))
-            throw new InvalidSoulException(email);
+        if (string.IsNullOrEmpty(kickedByEmail))
+            throw new InvalidSoulException(kickedByEmail);
 
-        // TODO: Only the admins of this space can kick a member
+        if (string.IsNullOrEmpty(memberEmail))
+            throw new InvalidSoulException(memberEmail);
 
         await _repositoryManager.UnitOfWork.BeginTransactionAsync();
 
@@ -48,24 +49,40 @@ public class Space : BaseEntity
             throw new InvalidSpaceIdException(Id);
         }
 
-        // Make sure soul email is valid
-        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(email);
-        if (existingSoul == null)
+        // Make sure kickedBy email is valid
+        Soul? kickedBySoul = await _repositoryManager.SoulRepository.GetByEmailAsync(kickedByEmail);
+        if (kickedBySoul == null)
         {
             await _repositoryManager.UnitOfWork.RollbackAsync();
-            throw new InvalidSoulException(email);
+            throw new InvalidSoulException(kickedByEmail);
         }
 
-        // Make sure soul is a member
-        bool isMember = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, Id);
+        // Make sure kickedBy email is a moderator
+        bool isModerator = await _repositoryManager.SoulRepository.IsModeratorOfSpaceAsync(kickedBySoul.Id, targetSpace.Id);
+        if (!isModerator)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new UnauthorizedAccessException($"'{kickedByEmail}' is not authorize to kick a member");
+        }
+
+        // Make sure member email is valid
+        Soul? memberSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(memberEmail);
+        if (memberSoul == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSoulException(memberEmail);
+        }
+
+        // Make sure member email is a member
+        bool isMember = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(memberSoul.Id, Id);
         if (!isMember)
         {
             await _repositoryManager.UnitOfWork.RollbackAsync();
-            throw new SoulNotMemberException(email, targetSpace.Name);
+            throw new SoulNotMemberException(memberEmail, targetSpace.Name);
         }
 
         // Remove soul
-        await _repositoryManager.SoulRepository.DeleteSpaceMemberAsync(existingSoul.Id, Id);
+        await _repositoryManager.SoulRepository.DeleteSpaceMemberAsync(memberSoul.Id, Id);
         await _repositoryManager.UnitOfWork.CommitAsync();
     }
 
