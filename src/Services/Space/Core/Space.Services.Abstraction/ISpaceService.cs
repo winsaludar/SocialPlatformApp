@@ -5,7 +5,7 @@ namespace Space.Services.Abstraction;
 public interface ISpaceService
 {
     Task<IEnumerable<SpaceDto>> GetAllAsync();
-    Task KickMemberAsync(Guid spaceId, string email);
+    Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail);
     Task<IEnumerable<SoulDto>> GetAllMembersAsync(Guid spaceId);
     Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid spaceId);
     Task CreateTopicAsync(TopicDto dto);

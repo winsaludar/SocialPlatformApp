@@ -243,7 +243,7 @@ public class SpacesControllerTests
 
         var result = await _controller.KickMemberAsync(spaceId, request);
 
-        _mockService.Verify(x => x.SpaceService.KickMemberAsync(It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+        _mockService.Verify(x => x.SpaceService.KickMemberAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
 
