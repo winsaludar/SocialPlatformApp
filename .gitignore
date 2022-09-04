@@ -46,3 +46,5 @@
 /.vs
 /src/EventBus/EventBus.Core/bin/Debug/net6.0
 /src/EventBus/EventBus.Core/obj
+/src/EventBus/EventBus.RabbitMQ/bin/Debug/net6.0
+/src/EventBus/EventBus.RabbitMQ/obj
