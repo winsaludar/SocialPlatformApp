@@ -57,6 +57,29 @@ public class SpacesControllerTests
     }
 
     [Fact]
+    public async Task GetBySlugAsync_SlugIsInvalid_ReturnsNotFound()
+    {
+        _mockService.Setup(x => x.SpaceService.GetBySlugAsync(It.IsAny<string>()))
+           .ReturnsAsync((SpaceDto)null!);
+
+        var result = await _controller.GetBySlugAsync(It.IsAny<string>());
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetBySlugAsync_SlugIsValid_ReturnsOkResultWithData()
+    {
+        _mockService.Setup(x => x.SpaceService.GetBySlugAsync(It.IsAny<string>()))
+           .ReturnsAsync(new SpaceDto());
+
+        var result = await _controller.GetBySlugAsync(It.IsAny<string>());
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.IsType<SpaceDto>(okResult.Value);
+    }
+
+    [Fact]
     public async Task PostAsync_ModelStateIsInvalid_ReturnsBadRequest()
     {
         CreateSpaceRequest request = new() { };
