@@ -18,6 +18,7 @@ public class SpaceConfiguration : IEntityTypeConfiguration<Domain.Entities.Space
         builder.Property(x => x.Name).IsRequired().HasMaxLength(200);
         builder.Property(x => x.ShortDescription).IsRequired().HasMaxLength(200);
         builder.Property(x => x.LongDescription).IsRequired();
+        builder.Property(x => x.Slug).IsRequired().HasMaxLength(200);
 
         builder.Property(x => x.CreatedBy).IsRequired().HasMaxLength(36);
         builder.Property(x => x.CreatedDateUtc).IsRequired();

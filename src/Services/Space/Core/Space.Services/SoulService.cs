@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using Space.Contracts;
 using Space.Domain.Entities;
+using Space.Domain.Helpers;
 using Space.Domain.Repositories;
 using Space.Services.Abstraction;
 
@@ -9,15 +10,27 @@ namespace Space.Services;
 public class SoulService : ISoulService
 {
     private readonly IRepositoryManager _repositoryManager;
+    private readonly IHelperManager _helperManager;
 
-    public SoulService(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
+    public SoulService(IRepositoryManager repositoryManager, IHelperManager helperManager)
+    {
+        _repositoryManager = repositoryManager;
+        _helperManager = helperManager;
+    }
 
     public async Task CreateSpaceAsync(SpaceDto dto)
     {
         Soul soul = new(_repositoryManager) { Email = dto.Creator };
-        var space = dto.Adapt<Domain.Entities.Space>();
+        Domain.Entities.Space newSpace = new(_repositoryManager, _helperManager)
+        {
+            Name = dto.Name,
+            Creator = dto.Creator,
+            ShortDescription = dto.ShortDescription,
+            LongDescription = dto.LongDescription,
+            Thumbnail = dto.Thumbnail
+        };
 
-        await soul.CreateSpaceAsync(space);
+        await soul.CreateSpaceAsync(newSpace);
     }
 
     public async Task JoinSpaceAsync(Guid spaceId, string email)

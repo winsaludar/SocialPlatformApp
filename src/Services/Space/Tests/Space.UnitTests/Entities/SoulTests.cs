@@ -100,10 +100,10 @@ public class SoulTests
         await soul.CreateSpaceAsync(newSpace);
 
         _mockRepo.Verify(x => x.SpaceRepository.CreateAsync(It.IsAny<Domain.Entities.Space>()), Times.Once);
-        Assert.Equal(createdSpace?.Name, newSpace.Name);
-        Assert.Equal(createdSpace?.Creator, newSpace.Creator);
-        Assert.Equal(createdSpace?.ShortDescription, newSpace.ShortDescription);
-        Assert.Equal(createdSpace?.LongDescription, newSpace.LongDescription);
+        Assert.Equal(newSpace.Name, createdSpace?.Name);
+        Assert.Equal(newSpace.Creator, createdSpace?.Creator);
+        Assert.Equal(newSpace.ShortDescription, createdSpace?.ShortDescription);
+        Assert.Equal(newSpace.LongDescription, createdSpace?.LongDescription);
         Assert.Equal(1, createdSpace?.Members.Count);
     }
 
