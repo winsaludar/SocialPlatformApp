@@ -108,7 +108,7 @@ public class SpacesControllerTests
 
         var result = await _controller.PostAsync(request);
 
-        Assert.IsType<UnauthorizedResult>(result);
+        Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
     [Fact]
@@ -161,7 +161,7 @@ public class SpacesControllerTests
 
         var result = await _controller.JoinSpaceAsync(spaceId);
 
-        Assert.IsType<UnauthorizedResult>(result);
+        Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
     [Fact]
@@ -201,7 +201,7 @@ public class SpacesControllerTests
 
         var result = await _controller.LeaveSpaceAsync(spaceId);
 
-        Assert.IsType<UnauthorizedResult>(result);
+        Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
     [Fact]
@@ -242,7 +242,7 @@ public class SpacesControllerTests
 
         var result = await _controller.KickMemberAsync(spaceId, request);
 
-        Assert.IsType<UnauthorizedResult>(result);
+        Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
     [Fact]
