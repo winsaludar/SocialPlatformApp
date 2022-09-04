@@ -25,6 +25,19 @@ public class SpacesController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet]
+    [Route("{slug}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SpaceDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetBySlugAsync(string slug)
+    {
+        SpaceDto? result = await _serviceManager.SpaceService.GetBySlugAsync(slug);
+        if (result == null)
+            return NotFound();
+
+        return Ok(result);
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
