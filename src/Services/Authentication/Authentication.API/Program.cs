@@ -5,10 +5,13 @@ using Authentication.Persistence.Models;
 using Authentication.Persistence.Repositories;
 using Authentication.Services;
 using Authentication.Services.Abstraction;
+using EventBus.Core.Abstractions;
+using EventBus.RabbitMQ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using RabbitMQ.Client;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +19,7 @@ AddDatabase(builder);
 AddAuthentication(builder);
 AddMiddlewares(builder);
 AddDependencies(builder);
+AddEventBus(builder);
 
 var app = builder.Build();
 EnableMiddlewares(app);
@@ -78,6 +82,41 @@ void AddDependencies(WebApplicationBuilder builder)
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
     builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
     builder.Services.AddScoped<IServiceManager, ServiceManager>();
+}
+
+void AddEventBus(WebApplicationBuilder builder)
+{
+    builder.Services.AddSingleton<IRabbitMQPersistentConnection>(x =>
+    {
+        var logger = x.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
+
+        var factory = new ConnectionFactory()
+        {
+            HostName = builder.Configuration["EventBus:Hostname"],
+            Port = int.Parse(builder.Configuration["EventBus:Port"]),
+            UserName = builder.Configuration["EventBus:Username"],
+            Password = builder.Configuration["EventBus:Password"],
+        };
+
+        int retryCount = int.Parse(builder.Configuration["EventBus:RetryCount"]);
+
+        return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
+    });
+
+    builder.Services.AddSingleton<IEventBus, EventBusRabbitMQ>(x =>
+    {
+        string subscriptionClientName = builder.Configuration["EventBus:SubscriptionClientName"];
+        var rabbitMQPersistentConnection = x.GetRequiredService<IRabbitMQPersistentConnection>();
+        var logger = x.GetRequiredService<ILogger<EventBusRabbitMQ>>();
+
+        int retryCount = 5;
+        if (!string.IsNullOrEmpty(builder.Configuration["EventBus:RetryCount"]))
+        {
+            retryCount = int.Parse(builder.Configuration["EventBus:RetryCount"]);
+        }
+
+        return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, retryCount);
+    });
 }
 
 void EnableMiddlewares(WebApplication app)

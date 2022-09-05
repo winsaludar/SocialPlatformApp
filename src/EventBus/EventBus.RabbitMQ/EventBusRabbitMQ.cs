@@ -11,7 +11,7 @@ namespace EventBus.RabbitMQ;
 
 public class EventBusRabbitMQ : IEventBus
 {
-    const string BROKER_NAME = "app_event_bus";
+    const string BROKER_NAME = "socialplatformapp.eventbus";
 
     private readonly IRabbitMQPersistentConnection _persistentConnection;
     private readonly ILogger<EventBusRabbitMQ> _logger;

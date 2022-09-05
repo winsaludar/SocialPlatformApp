@@ -48,3 +48,5 @@
 /src/EventBus/EventBus.Core/obj
 /src/EventBus/EventBus.RabbitMQ/bin/Debug/net6.0
 /src/EventBus/EventBus.RabbitMQ/obj
+/src/Services/Authentication/Infrastructure/Authentication.Common/bin/Debug/net6.0
+/src/Services/Authentication/Infrastructure/Authentication.Common/obj
