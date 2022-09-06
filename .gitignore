@@ -44,3 +44,9 @@
 /src/Services/Space/Infrastructure/Space.Common/bin/Debug/net6.0
 /src/Services/Space/Infrastructure/Space.Common/obj
 /.vs
+/src/EventBus/EventBus.Core/bin/Debug/net6.0
+/src/EventBus/EventBus.Core/obj
+/src/EventBus/EventBus.RabbitMQ/bin/Debug/net6.0
+/src/EventBus/EventBus.RabbitMQ/obj
+/src/Services/Authentication/Infrastructure/Authentication.Common/bin/Debug/net6.0
+/src/Services/Authentication/Infrastructure/Authentication.Common/obj

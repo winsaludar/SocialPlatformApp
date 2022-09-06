@@ -19,6 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\EventBus\EventBus.Core\EventBus.Core.csproj" />
+    <ProjectReference Include="..\..\..\EventBus\EventBus.RabbitMQ\EventBus.RabbitMQ.csproj" />
     <ProjectReference Include="..\Core\Authentication.Services\Authentication.Services.csproj" />
     <ProjectReference Include="..\Infrastructure\Authentication.Persistence\Authentication.Persistence.csproj" />
     <ProjectReference Include="..\Infrastructure\Authentication.Presentation\Authentication.Presentation.csproj" />
