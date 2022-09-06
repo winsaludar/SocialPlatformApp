@@ -5,6 +5,7 @@ using Authentication.Persistence.Models;
 using Authentication.Persistence.Repositories;
 using Authentication.Services;
 using Authentication.Services.Abstraction;
+using EventBus.Core;
 using EventBus.Core.Abstractions;
 using EventBus.RabbitMQ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -86,6 +87,8 @@ void AddDependencies(WebApplicationBuilder builder)
 
 void AddEventBus(WebApplicationBuilder builder)
 {
+    builder.Services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
+
     builder.Services.AddSingleton<IRabbitMQPersistentConnection>(x =>
     {
         var logger = x.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
@@ -108,6 +111,8 @@ void AddEventBus(WebApplicationBuilder builder)
         string subscriptionClientName = builder.Configuration["EventBus:SubscriptionClientName"];
         var rabbitMQPersistentConnection = x.GetRequiredService<IRabbitMQPersistentConnection>();
         var logger = x.GetRequiredService<ILogger<EventBusRabbitMQ>>();
+        var serviceScopeFactory = x.GetRequiredService<IServiceScopeFactory>();
+        var subscriptionManager = x.GetRequiredService<IEventBusSubscriptionsManager>();
 
         int retryCount = 5;
         if (!string.IsNullOrEmpty(builder.Configuration["EventBus:RetryCount"]))
@@ -115,7 +120,7 @@ void AddEventBus(WebApplicationBuilder builder)
             retryCount = int.Parse(builder.Configuration["EventBus:RetryCount"]);
         }
 
-        return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, retryCount);
+        return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, serviceScopeFactory, subscriptionManager, subscriptionClientName, retryCount);
     });
 }
 
