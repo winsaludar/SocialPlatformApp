@@ -87,8 +87,6 @@ void AddDependencies(WebApplicationBuilder builder)
 
 void AddEventBus(WebApplicationBuilder builder)
 {
-    builder.Services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
-
     builder.Services.AddSingleton<IRabbitMQPersistentConnection>(x =>
     {
         var logger = x.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
@@ -105,6 +103,8 @@ void AddEventBus(WebApplicationBuilder builder)
 
         return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
     });
+
+    builder.Services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
 
     builder.Services.AddSingleton<IEventBus, EventBusRabbitMQ>(x =>
     {

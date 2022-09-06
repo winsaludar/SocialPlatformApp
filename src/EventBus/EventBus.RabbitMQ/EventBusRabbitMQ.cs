@@ -16,7 +16,7 @@ using static EventBus.Core.InMemoryEventBusSubscriptionsManager;
 
 namespace EventBus.RabbitMQ;
 
-public class EventBusRabbitMQ : IEventBus
+public class EventBusRabbitMQ : IEventBus, IDisposable
 {
     const string BROKER_NAME = "socialplatformapp.eventbus";
 
@@ -24,10 +24,10 @@ public class EventBusRabbitMQ : IEventBus
     private readonly ILogger<EventBusRabbitMQ> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IEventBusSubscriptionsManager _subscriptionsManager;
+    private readonly string? _queueName;
     private readonly int _retryCount;
 
     private IModel _consumerChannel;
-    private string? _queueName;
 
     public EventBusRabbitMQ(
         IRabbitMQPersistentConnection persistentConnection,
@@ -98,19 +98,37 @@ public class EventBusRabbitMQ : IEventBus
         where T : IntegrationEvent
         where TH : IIntegrationEventHandler<T>
     {
-        throw new NotImplementedException();
+        string eventName = _subscriptionsManager.GetEventKey<T>();
+        DoInternalSubscription(eventName);
+
+        _logger.LogInformation("Subscribing to event {EventName} with {EventHandler}", eventName, typeof(TH).GetGenericTypeName());
+
+        _subscriptionsManager.AddSubscription<T, TH>();
+        StartBasicConsume();
     }
 
     public void Unsubscribe<T, TH>()
         where T : IntegrationEvent
         where TH : IIntegrationEventHandler<T>
     {
-        throw new NotImplementedException();
+        string eventName = _subscriptionsManager.GetEventKey<T>();
+
+        _logger.LogInformation("Unsubscribing from event {EventName}", eventName);
+
+        _subscriptionsManager.RemoveSubscription<T, TH>();
     }
 
     public void UnsubscribeDynamic<TH>(string eventName) where TH : IDynamicIntegrationEventHandler
     {
-        throw new NotImplementedException();
+        _subscriptionsManager.RemoveDynamicSubscription<TH>(eventName);
+    }
+
+    public void Dispose()
+    {
+        if (_consumerChannel != null)
+            _consumerChannel.Dispose();
+
+        _subscriptionsManager.Clear();
     }
 
     private IModel CreateConsumerChannel()
