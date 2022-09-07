@@ -20,7 +20,7 @@ AddDatabase(builder);
 AddAuthentication(builder);
 AddMiddlewares(builder);
 AddDependencies(builder);
-AddEventBus(builder);
+RegisterEventBus(builder);
 
 var app = builder.Build();
 EnableMiddlewares(app);
@@ -85,7 +85,7 @@ void AddDependencies(WebApplicationBuilder builder)
     builder.Services.AddScoped<IServiceManager, ServiceManager>();
 }
 
-void AddEventBus(WebApplicationBuilder builder)
+void RegisterEventBus(WebApplicationBuilder builder)
 {
     builder.Services.AddSingleton<IRabbitMQPersistentConnection>(x =>
     {
@@ -94,6 +94,7 @@ void AddEventBus(WebApplicationBuilder builder)
         var factory = new ConnectionFactory()
         {
             HostName = builder.Configuration["EventBus:Hostname"],
+            DispatchConsumersAsync = true,
             Port = int.Parse(builder.Configuration["EventBus:Port"]),
             UserName = builder.Configuration["EventBus:Username"],
             Password = builder.Configuration["EventBus:Password"],

@@ -17,7 +17,7 @@ public class AuthControllerTests
         Mock<IAuthenticationService> mockAuthenticationService = new();
         _mockServiceManager = new Mock<IServiceManager>();
         _mockServiceManager.Setup(x => x.AuthenticationService).Returns(mockAuthenticationService.Object);
-        _controller = new AuthController(_mockServiceManager.Object);
+        _controller = new AuthController(_mockServiceManager.Object, null);
     }
 
     [Fact]
