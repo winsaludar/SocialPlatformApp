@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
         var userDto = request.Adapt<UserDto>();
         await _serviceManager.AuthenticationService.RegisterUserAsync(userDto);
 
-        UserRegisteredSuccessfulIntegrationEvent @event = new(request.Email, request.Email);
+        UserRegisteredSuccessfulIntegrationEvent @event = new(userDto.Email, userDto.Email);
         _eventBus.Publish(@event);
 
         return Ok("User created");
