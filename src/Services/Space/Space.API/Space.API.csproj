@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\..\EventBus\EventBus.RabbitMQ\EventBus.RabbitMQ.csproj" />
     <ProjectReference Include="..\Core\Space.Services\Space.Services.csproj" />
     <ProjectReference Include="..\Infrastructure\Space.Common\Space.Common.csproj" />
+    <ProjectReference Include="..\Infrastructure\Space.IntegrationEvents\Space.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Infrastructure\Space.Persistence\Space.Persistence.csproj" />
     <ProjectReference Include="..\Infrastructure\Space.Presentation\Space.Presentation.csproj" />
   </ItemGroup>

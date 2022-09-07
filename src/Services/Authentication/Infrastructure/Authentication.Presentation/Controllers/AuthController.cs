@@ -1,5 +1,5 @@
-﻿using Authentication.Common.IntegrationEvents.Events;
-using Authentication.Contracts;
+﻿using Authentication.Contracts;
+using Authentication.IntegrationEvents.Events;
 using Authentication.Presentation.Models;
 using Authentication.Services.Abstraction;
 using EventBus.Core.Abstractions;

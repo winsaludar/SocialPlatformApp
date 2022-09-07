@@ -50,3 +50,7 @@
 /src/EventBus/EventBus.RabbitMQ/obj
 /src/Services/Authentication/Infrastructure/Authentication.Common/bin/Debug/net6.0
 /src/Services/Authentication/Infrastructure/Authentication.Common/obj
+/src/Services/Authentication/Infrastructure/Authentication.IntegrationEvents/bin/Debug/net6.0
+/src/Services/Authentication/Infrastructure/Authentication.IntegrationEvents/obj
+/src/Services/Space/Infrastructure/Space.IntegrationEvents/bin/Debug/net6.0
+/src/Services/Space/Infrastructure/Space.IntegrationEvents/obj

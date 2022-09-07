@@ -1,6 +1,6 @@
 ﻿using EventBus.Core.Events;
 
-namespace Space.Common.IntegrationEvents.Events;
+namespace Space.IntegrationEvents.Events;
 
 public record UserRegisteredSuccessfulIntegrationEvent : IntegrationEvent
 {

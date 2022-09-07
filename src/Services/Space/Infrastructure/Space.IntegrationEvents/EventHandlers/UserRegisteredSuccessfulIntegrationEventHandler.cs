@@ -1,7 +1,7 @@
 ﻿using EventBus.Core.Abstractions;
-using Space.Common.IntegrationEvents.Events;
+using Space.IntegrationEvents.Events;
 
-namespace Space.Common.IntegrationEvents.EventHandlers;
+namespace Space.IntegrationEvents.EventHandlers;
 
 public class UserRegisteredSuccessfulIntegrationEventHandler : IIntegrationEventHandler<UserRegisteredSuccessfulIntegrationEvent>
 {
