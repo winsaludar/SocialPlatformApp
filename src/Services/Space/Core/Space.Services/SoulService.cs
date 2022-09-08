@@ -21,7 +21,7 @@ public class SoulService : ISoulService
     public async Task CreateSpaceAsync(SpaceDto dto)
     {
         Soul soul = new(_repositoryManager) { Email = dto.Creator };
-        Domain.Entities.Space newSpace = new(_repositoryManager, _helperManager)
+        Domain.Entities.Space newSpace = new(_helperManager)
         {
             Name = dto.Name,
             Creator = dto.Creator,

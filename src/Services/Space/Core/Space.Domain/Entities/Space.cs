@@ -1,23 +1,15 @@
 ﻿using Space.Domain.Helpers;
-using Space.Domain.Repositories;
 
 namespace Space.Domain.Entities;
 
 public class Space : BaseEntity
 {
-    private readonly IRepositoryManager? _repositoryManager;
     private readonly IHelperManager? _helperManager;
     private string _name = default!;
 
     public Space() { }
 
-    public Space(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
-
-    public Space(IRepositoryManager repositoryManager, IHelperManager helperManager)
-    {
-        _repositoryManager = repositoryManager;
-        _helperManager = helperManager;
-    }
+    public Space(IHelperManager helperManager) => _helperManager = helperManager;
 
     public string Name
     {
