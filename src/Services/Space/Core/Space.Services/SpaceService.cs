@@ -102,25 +102,25 @@ public class SpaceService : ISpaceService
 
     public async Task CreateTopicAsync(TopicDto dto)
     {
-        Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
-        await space.CreateTopicAsync(dto.AuthorEmail, dto.Title, dto.Content);
+        MemberSoul member = new(dto.AuthorEmail, dto.SpaceId, _repositoryManager, _helperManager);
+        await member.CreateTopicAsync(dto.Title, dto.Content);
     }
 
     public async Task UpdateTopicAsync(TopicDto dto)
     {
-        Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
-        await space.UpdateTopicAsync(dto.Id, dto.AuthorEmail, dto.Title, dto.Content);
+        MemberSoul member = new(dto.AuthorEmail, dto.SpaceId, _repositoryManager, _helperManager);
+        await member.UpdateTopicAsync(dto.Id, dto.Title, dto.Content);
     }
 
     public async Task DeleteTopicAsync(TopicDto dto)
     {
-        Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
-        await space.DeleteTopicAsync(dto.Id, dto.AuthorEmail);
+        MemberSoul member = new(dto.AuthorEmail, dto.SpaceId, _repositoryManager, _helperManager);
+        await member.DeleteTopicAsync(dto.Id);
     }
 
     public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
     {
-        Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
-        await space.KickMemberAsync(kickedByEmail, memberEmail);
+        ModeratorSoul moderator = new(kickedByEmail, spaceId, _repositoryManager, _helperManager);
+        await moderator.KickMemberAsync(memberEmail);
     }
 }
