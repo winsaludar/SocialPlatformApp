@@ -19,11 +19,11 @@ public class UserTests
     }
 
     [Fact]
-    public async Task RegisterAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task RegisterAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         User newUser = new() { };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => newUser.RegisterAsync(It.IsAny<string>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => newUser.RegisterAsync(It.IsAny<string>()));
     }
 
     [Theory]
@@ -108,11 +108,11 @@ public class UserTests
     }
 
     [Fact]
-    public async Task LoginAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task LoginAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         User user = new() { };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => user.LoginAsync(It.IsAny<string>()));
+        await Assert.ThrowsAsync<NullReferenceException>(() => user.LoginAsync(It.IsAny<string>()));
     }
 
     [Theory]

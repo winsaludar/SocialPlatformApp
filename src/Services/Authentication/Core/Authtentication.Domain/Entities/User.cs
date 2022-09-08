@@ -20,7 +20,7 @@ public class User
     public async Task RegisterAsync(string password)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (string.IsNullOrEmpty(Email) || !IsEmailValid(Email))
             throw new InvalidEmailException(Email);
@@ -39,7 +39,7 @@ public class User
     public async Task<Token> LoginAsync(string password)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (string.IsNullOrEmpty(Email) || !IsEmailValid(Email))
             throw new InvalidEmailException(Email);

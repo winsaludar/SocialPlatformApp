@@ -18,7 +18,7 @@ public class Token
     public async Task RefreshAsync()
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         var refreshTokenDb = await _repositoryManager.RefreshTokenRepository.GetByOldRefreshTokenAsync(RefreshToken);
         if (refreshTokenDb is null)
