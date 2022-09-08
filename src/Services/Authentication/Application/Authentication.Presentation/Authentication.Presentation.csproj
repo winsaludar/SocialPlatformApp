@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\EventBus\EventBus.Core\EventBus.Core.csproj" />
     <ProjectReference Include="..\..\Core\Authentication.Services.Abstraction\Authentication.Services.Abstraction.csproj" />
+    <ProjectReference Include="..\Authentication.IntegrationEvents\Authentication.IntegrationEvents.csproj" />
   </ItemGroup>
 
 </Project>
