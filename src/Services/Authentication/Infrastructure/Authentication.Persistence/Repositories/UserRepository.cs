@@ -32,7 +32,7 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task RegisterAsync(DomainEntities.User applicationUser, string password)
+    public async Task<Guid> RegisterAsync(DomainEntities.User applicationUser, string password)
     {
         var newUser = applicationUser.Adapt<PersistenceModels.ApplicationUser>();
         newUser.Id = Guid.NewGuid().ToString();
@@ -40,6 +40,8 @@ public class UserRepository : IUserRepository
         newUser.SecurityStamp = Guid.NewGuid().ToString();
 
         await _userManager.CreateAsync(newUser, password);
+
+        return Guid.Parse(newUser.Id);
     }
 
     public async Task<bool> ValidateRegistrationPasswordAsync(string password)

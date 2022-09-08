@@ -4,12 +4,14 @@ namespace Space.IntegrationEvents.Events;
 
 public record UserRegisteredSuccessfulIntegrationEvent : IntegrationEvent
 {
+    public Guid UserId { get; init; }
     public string Username { get; init; }
     public string Email { get; init; }
 
 
-    public UserRegisteredSuccessfulIntegrationEvent(string username, string email)
+    public UserRegisteredSuccessfulIntegrationEvent(Guid userId, string username, string email)
     {
+        UserId = userId;
         Username = username;
         Email = email;
     }
