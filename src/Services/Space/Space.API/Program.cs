@@ -9,6 +9,8 @@ using Space.API.Middlewares;
 using Space.Common.Helpers;
 using Space.Domain.Helpers;
 using Space.Domain.Repositories;
+using Space.IntegrationEvents.EventHandlers;
+using Space.IntegrationEvents.Events;
 using Space.Persistence;
 using Space.Persistence.Repositories;
 using Space.Services;
@@ -21,10 +23,11 @@ AddAuthentication(builder);
 AddAuthorization(builder);
 AddMiddlewares(builder);
 AddDependencies(builder);
-AddEventBus(builder);
+RegisterEventBus(builder);
 
 var app = builder.Build();
 EnableMiddlewares(app);
+ConfigureEventBus(app);
 
 app.Run();
 
@@ -82,7 +85,7 @@ void AddDependencies(WebApplicationBuilder builder)
     builder.Services.AddScoped<IHelperManager, HelperManager>();
 }
 
-void AddEventBus(WebApplicationBuilder builder)
+void RegisterEventBus(WebApplicationBuilder builder)
 {
     builder.Services.AddSingleton<IRabbitMQPersistentConnection>(x =>
     {
@@ -91,6 +94,7 @@ void AddEventBus(WebApplicationBuilder builder)
         var factory = new ConnectionFactory()
         {
             HostName = builder.Configuration["EventBus:Hostname"],
+            DispatchConsumersAsync = true,
             Port = int.Parse(builder.Configuration["EventBus:Port"]),
             UserName = builder.Configuration["EventBus:Username"],
             Password = builder.Configuration["EventBus:Password"],
@@ -119,6 +123,8 @@ void AddEventBus(WebApplicationBuilder builder)
 
         return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, serviceScopeFactory, subscriptionManager, subscriptionClientName, retryCount);
     });
+
+    builder.Services.AddTransient<UserRegisteredSuccessfulIntegrationEventHandler>();
 }
 
 void EnableMiddlewares(WebApplication app)
@@ -140,4 +146,11 @@ void EnableMiddlewares(WebApplication app)
     app.UseAuthorization();
 
     app.MapControllers();
+}
+
+void ConfigureEventBus(WebApplication app)
+{
+    var eventBus = app.Services.GetService<IEventBus>();
+
+    eventBus?.Subscribe<UserRegisteredSuccessfulIntegrationEvent, UserRegisteredSuccessfulIntegrationEventHandler>();
 }

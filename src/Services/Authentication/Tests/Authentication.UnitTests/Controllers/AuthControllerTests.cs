@@ -2,6 +2,7 @@
 using Authentication.Presentation.Controllers;
 using Authentication.Presentation.Models;
 using Authentication.Services.Abstraction;
+using EventBus.Core.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -15,9 +16,11 @@ public class AuthControllerTests
     public AuthControllerTests()
     {
         Mock<IAuthenticationService> mockAuthenticationService = new();
+        Mock<IEventBus> mockEventBus = new();
+
         _mockServiceManager = new Mock<IServiceManager>();
         _mockServiceManager.Setup(x => x.AuthenticationService).Returns(mockAuthenticationService.Object);
-        _controller = new AuthController(_mockServiceManager.Object);
+        _controller = new AuthController(_mockServiceManager.Object, mockEventBus.Object);
     }
 
     [Fact]

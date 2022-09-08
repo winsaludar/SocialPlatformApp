@@ -1,6 +1,8 @@
 ﻿using Authentication.Contracts;
+using Authentication.IntegrationEvents.Events;
 using Authentication.Presentation.Models;
 using Authentication.Services.Abstraction;
+using EventBus.Core.Abstractions;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +14,14 @@ namespace Authentication.Presentation.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IServiceManager _serviceManager;
+    private readonly IEventBus _eventBus;
 
-    public AuthController(IServiceManager serviceManager) => _serviceManager = serviceManager;
+
+    public AuthController(IServiceManager serviceManager, IEventBus eventBus)
+    {
+        _serviceManager = serviceManager;
+        _eventBus = eventBus;
+    }
 
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -25,6 +33,9 @@ public class AuthController : ControllerBase
 
         var userDto = request.Adapt<UserDto>();
         await _serviceManager.AuthenticationService.RegisterUserAsync(userDto);
+
+        UserRegisteredSuccessfulIntegrationEvent @event = new(userDto.Email, userDto.Email);
+        _eventBus.Publish(@event);
 
         return Ok("User created");
     }
