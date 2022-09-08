@@ -19,6 +19,7 @@ public class Space : BaseEntity
         _repositoryManager = repositoryManager;
         _helperManager = helperManager;
     }
+
     public string Name
     {
         get => _name;

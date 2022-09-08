@@ -102,8 +102,8 @@ public class SpaceService : ISpaceService
 
     public async Task CreateTopicAsync(TopicDto dto)
     {
-        Domain.Entities.Space space = new(_repositoryManager, _helperManager) { Id = dto.SpaceId };
-        await space.CreateTopicAsync(dto.AuthorEmail, dto.Title, dto.Content);
+        MemberSoul member = new(dto.AuthorEmail, dto.SpaceId, _repositoryManager, _helperManager);
+        await member.CreateTopicAsync(dto.Title, dto.Content);
     }
 
     public async Task UpdateTopicAsync(TopicDto dto)
