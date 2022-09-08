@@ -37,7 +37,7 @@ public class UserController : ControllerBase
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized();
 
-        var topics = await _serviceManager.SoulService.GetAllTopicsAsync(User.Identity.Name);
+        var topics = await _serviceManager.SoulService.GetAllTopicsByEmailAsync(User.Identity.Name);
         return Ok(topics);
     }
 }

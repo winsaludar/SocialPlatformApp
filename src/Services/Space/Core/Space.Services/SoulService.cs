@@ -45,7 +45,7 @@ public class SoulService : ISoulService
         await soul.LeaveSpaceAsync(spaceId);
     }
 
-    public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid soulId)
+    public async Task<IEnumerable<TopicDto>> GetAllTopicsByIdAsync(Guid soulId)
     {
         var soul = await _repositoryManager.SoulRepository.GetByIdAsync(soulId, false, true);
         if (soul == null)
@@ -61,7 +61,7 @@ public class SoulService : ISoulService
         return result;
     }
 
-    public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync(string email)
+    public async Task<IEnumerable<TopicDto>> GetAllTopicsByEmailAsync(string email)
     {
         var soul = await _repositoryManager.SoulRepository.GetByEmailAsync(email, false, true);
         if (soul == null)

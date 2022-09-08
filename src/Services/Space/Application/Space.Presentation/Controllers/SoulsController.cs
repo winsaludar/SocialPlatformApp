@@ -20,7 +20,7 @@ public class SoulsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TopicDto>))]
     public async Task<IActionResult> GetAllTopicsAsync(Guid soulId)
     {
-        var topics = await _serviceManager.SoulService.GetAllTopicsAsync(soulId);
+        var topics = await _serviceManager.SoulService.GetAllTopicsByIdAsync(soulId);
         return Ok(topics);
     }
 }
