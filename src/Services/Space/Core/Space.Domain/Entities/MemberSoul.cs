@@ -69,13 +69,102 @@ public class MemberSoul : Soul
         await _repositoryManager.UnitOfWork.CommitAsync();
     }
 
-    public async Task UpdateTopicAsync(Guid topicId, string modifiedBy, string updatedTitle, string updatedContent)
+    public async Task UpdateTopicAsync(Guid topicId, string updatedTitle, string updatedContent)
     {
+        if (string.IsNullOrEmpty(Email))
+            throw new InvalidSoulException(Email);
 
+        await _repositoryManager.UnitOfWork.BeginTransactionAsync();
+
+        // Make sure topic id is valid
+        Topic? existingTopic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(topicId);
+        if (existingTopic == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidTopicIdException(topicId);
+        }
+
+        // Make sure space id is valid
+        Space? targetSpace = await _repositoryManager.SpaceRepository.GetByIdAsync(SpaceId);
+        if (targetSpace == null || existingTopic.SpaceId != targetSpace.Id)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSpaceIdException(SpaceId);
+        }
+
+        // Make sure the modifier exist
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(Email);
+        if (existingSoul == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSoulException(Email);
+        }
+
+        // Only the author and the moderators of the space can edit the topic
+        bool isModerator = await _repositoryManager.SoulRepository.IsModeratorOfSpaceAsync(existingSoul.Id, SpaceId);
+        if (existingTopic.SoulId != existingSoul.Id && !isModerator)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new UnauthorizedAccessException($"'{Email}' is not authorize to edit topic '{existingTopic.Id}'");
+        }
+
+        // Make sure soul is still a member
+        bool isMember = await _repositoryManager.SoulRepository.IsMemberOfSpaceAsync(existingSoul.Id, SpaceId);
+        if (!isMember && !isModerator)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new SoulNotMemberException(Email, targetSpace.Name);
+        }
+
+        existingTopic.Title = updatedTitle;
+        existingTopic.Content = updatedContent;
+        existingTopic.LastModifiedBy = Email;
+        existingTopic.LastModifiedDateUtc = DateTime.UtcNow;
+
+        await _repositoryManager.SpaceRepository.UpdateTopicAsync(existingTopic);
+        await _repositoryManager.UnitOfWork.CommitAsync();
     }
 
-    public async Task DeleteTopicAsync(Guid topicId, string deletedBy)
+    public async Task DeleteTopicAsync(Guid topicId)
     {
+        if (string.IsNullOrEmpty(Email))
+            throw new InvalidSoulException(Email);
 
+        await _repositoryManager.UnitOfWork.BeginTransactionAsync();
+
+        // Make sure topic id is valid
+        Topic? existingTopic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(topicId);
+        if (existingTopic == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidTopicIdException(topicId);
+        }
+
+        // Make sure space id is valid
+        Space? targetSpace = await _repositoryManager.SpaceRepository.GetByIdAsync(SpaceId);
+        if (targetSpace == null || existingTopic.SpaceId != targetSpace.Id)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSpaceIdException(SpaceId);
+        }
+
+        // Make sure the deleter exist
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(Email);
+        if (existingSoul == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSoulException(Email);
+        }
+
+        // Only the author and the moderators of the space can delete the topic
+        bool isModerator = await _repositoryManager.SoulRepository.IsModeratorOfSpaceAsync(existingSoul.Id, SpaceId);
+        if (existingTopic.SoulId != existingSoul.Id && !isModerator)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new UnauthorizedAccessException($"'{Email}' is not authorize to delete topic '{existingTopic.Id}'");
+        }
+
+        await _repositoryManager.SpaceRepository.DeleteTopicAsync(existingTopic);
+        await _repositoryManager.UnitOfWork.CommitAsync();
     }
 }
