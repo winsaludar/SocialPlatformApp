@@ -82,4 +82,64 @@ public class UserControllerTests
         Assert.NotEmpty(spaces);
         Assert.Equal(3, spaces.Count());
     }
+
+    [Fact]
+    public async Task GetAllTopicsAsync_TopicsAreEmpty_ReturnsOkResultWithEmptyData()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        _mockService.Setup(x => x.SoulService.GetAllTopicsByEmailAsync(It.IsAny<string>()))
+           .ReturnsAsync((IEnumerable<TopicDto>)new List<TopicDto>());
+
+        var result = await _controller.GetAllTopicsAsync();
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var topics = Assert.IsType<List<TopicDto>>(okResult.Value);
+        Assert.Empty(topics);
+    }
+
+    [Fact]
+    public async Task GetAllTopicsAsync_TopicsAreNotEmpty_ReturnsOkResultWithData()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        _mockService.Setup(x => x.SoulService.GetAllTopicsByEmailAsync(It.IsAny<string>()))
+           .ReturnsAsync((IEnumerable<TopicDto>)new List<TopicDto>
+           {
+               new TopicDto(),
+               new TopicDto(),
+               new TopicDto()
+           });
+
+        var result = await _controller.GetAllTopicsAsync();
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var topics = Assert.IsType<List<TopicDto>>(okResult.Value);
+        Assert.NotEmpty(topics);
+        Assert.Equal(3, topics.Count());
+    }
 }

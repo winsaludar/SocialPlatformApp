@@ -27,4 +27,17 @@ public class UserController : ControllerBase
         var spaces = await _serviceManager.SoulService.GetAllModeratedSpacesAsync(User.Identity.Name);
         return Ok(spaces);
     }
+
+    [HttpGet]
+    [Route("topics")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TopicDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetAllTopicsAsync()
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        var topics = await _serviceManager.SoulService.GetAllTopicsByEmailAsync(User.Identity.Name);
+        return Ok(topics);
+    }
 }

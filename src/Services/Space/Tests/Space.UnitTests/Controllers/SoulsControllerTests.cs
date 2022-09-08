@@ -26,7 +26,7 @@ public class SoulsControllerTests
     {
         Guid soulId = Guid.NewGuid();
 
-        _mockService.Setup(x => x.SoulService.GetAllTopicsAsync(soulId))
+        _mockService.Setup(x => x.SoulService.GetAllTopicsByIdAsync(soulId))
            .ReturnsAsync((IEnumerable<TopicDto>)new List<TopicDto>());
 
         var result = await _controller.GetAllTopicsAsync(soulId);
@@ -41,7 +41,7 @@ public class SoulsControllerTests
     {
         Guid soulId = Guid.NewGuid();
 
-        _mockService.Setup(x => x.SoulService.GetAllTopicsAsync(soulId))
+        _mockService.Setup(x => x.SoulService.GetAllTopicsByIdAsync(soulId))
            .ReturnsAsync((IEnumerable<TopicDto>)new List<TopicDto>
            {
                new TopicDto(),

@@ -28,21 +28,21 @@ public class SoulServiceTests
     }
 
     [Fact]
-    public async Task GetAllTopicsAsync_SoulIsNull_ReturnsEmptyTopicsDto()
+    public async Task GetAllTopicsByIdAsync_SoulIsNull_ReturnsEmptyTopicsDto()
     {
         Guid soulId = Guid.NewGuid();
 
         _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
 
-        var result = await _soulService.GetAllTopicsAsync(soulId);
+        var result = await _soulService.GetAllTopicsByIdAsync(soulId);
 
         Assert.IsType<List<TopicDto>>(result);
         Assert.Empty(result);
     }
 
     [Fact]
-    public async Task GetAllTopicsAsync_SoulIsNotNull_ReturnsNonEmptyTopicsDto()
+    public async Task GetAllTopicsByIdAsync_SoulIsNotNull_ReturnsNonEmptyTopicsDto()
     {
         Guid soulId = Guid.NewGuid();
 
@@ -57,7 +57,44 @@ public class SoulServiceTests
                 }
             });
 
-        var result = await _soulService.GetAllTopicsAsync(soulId);
+        var result = await _soulService.GetAllTopicsByIdAsync(soulId);
+
+        Assert.IsType<List<TopicDto>>(result);
+        Assert.NotEmpty(result);
+        Assert.Equal(3, result.Count());
+    }
+
+    [Fact]
+    public async Task GetAllTopicsByEmailAsync_SoulIsNull_ReturnsEmptyTopicsDto()
+    {
+        string email = "user@example.com";
+
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(email, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync((Soul)null!);
+
+        var result = await _soulService.GetAllTopicsByEmailAsync(email);
+
+        Assert.IsType<List<TopicDto>>(result);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllTopicsByEmailAsync_SoulIsNotNull_ReturnsNonEmptyTopicsDto()
+    {
+        string email = "user@example.com";
+
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(email, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul
+            {
+                Topics = new List<Topic>
+                {
+                    new Topic(),
+                    new Topic(),
+                    new Topic()
+                }
+            });
+
+        var result = await _soulService.GetAllTopicsByEmailAsync(email);
 
         Assert.IsType<List<TopicDto>>(result);
         Assert.NotEmpty(result);
