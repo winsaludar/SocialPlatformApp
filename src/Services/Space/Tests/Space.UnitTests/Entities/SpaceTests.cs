@@ -1,9 +1,6 @@
 ﻿using Moq;
-using Space.Domain.Entities;
-using Space.Domain.Exceptions;
 using Space.Domain.Helpers;
 using Space.Domain.Repositories;
-using DomainEntities = Space.Domain.Entities;
 
 namespace Space.UnitTests.Entities;
 
@@ -28,127 +25,127 @@ public class SpaceTests
         _mockHelper.Setup(x => x.SlugHelper).Returns(_mockSlugHelper.Object);
     }
 
-    [Fact]
-    public async Task KickMemberAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
-    {
-        DomainEntities.Space space = new() { };
+    //[Fact]
+    //public async Task KickMemberAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
+    //{
+    //    DomainEntities.Space space = new() { };
 
-        await Assert.ThrowsAsync<NullReferenceException>(() => space.KickMemberAsync(It.IsAny<string>(), It.IsAny<string>()));
-    }
+    //    await Assert.ThrowsAsync<NullReferenceException>(() => space.KickMemberAsync(It.IsAny<string>(), It.IsAny<string>()));
+    //}
 
-    [Theory]
-    [InlineData("")]
-    [InlineData(null)]
-    public async Task KickMemberAsync_KickedByEmailIsInvalid_ThrowsInvalidSoulException(string kickedByEmail)
-    {
-        DomainEntities.Space space = new(_mockRepo.Object) { };
-        string memberEmail = "member@example.com";
+    //[Theory]
+    //[InlineData("")]
+    //[InlineData(null)]
+    //public async Task KickMemberAsync_KickedByEmailIsInvalid_ThrowsInvalidSoulException(string kickedByEmail)
+    //{
+    //    DomainEntities.Space space = new(_mockRepo.Object) { };
+    //    string memberEmail = "member@example.com";
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
-    }
+    //    await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
+    //}
 
-    [Theory]
-    [InlineData("")]
-    [InlineData(null)]
-    public async Task KickMemberAsync_MemberEmailIsInvalid_ThrowsInvalidSoulException(string memberEmail)
-    {
-        DomainEntities.Space space = new(_mockRepo.Object) { };
-        string kickedByEmail = "moderator@example.com";
+    //[Theory]
+    //[InlineData("")]
+    //[InlineData(null)]
+    //public async Task KickMemberAsync_MemberEmailIsInvalid_ThrowsInvalidSoulException(string memberEmail)
+    //{
+    //    DomainEntities.Space space = new(_mockRepo.Object) { };
+    //    string kickedByEmail = "moderator@example.com";
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
-    }
+    //    await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
+    //}
 
-    [Fact]
-    public async Task KickMemberAsync_SpaceIsInvalid_ThrowsInvalidSpaceIdException()
-    {
-        DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
-        string kickedByEmail = "moderator@example.com";
-        string memberEmail = "member@example.com";
+    //[Fact]
+    //public async Task KickMemberAsync_SpaceIsInvalid_ThrowsInvalidSpaceIdException()
+    //{
+    //    DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
+    //    string kickedByEmail = "moderator@example.com";
+    //    string memberEmail = "member@example.com";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync((DomainEntities.Space)null!);
+    //    _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+    //        .ReturnsAsync((DomainEntities.Space)null!);
 
-        await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
-    }
+    //    await Assert.ThrowsAsync<InvalidSpaceIdException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
+    //}
 
-    [Fact]
-    public async Task KickMemberAsync_KickedByOrMemberSoulDoesNotExist_ThrowsInvalidSoulException()
-    {
-        DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
-        string kickedByEmail = "notexisting@example.com";
-        string memberEmail = "member@example.com";
+    //[Fact]
+    //public async Task KickMemberAsync_KickedByOrMemberSoulDoesNotExist_ThrowsInvalidSoulException()
+    //{
+    //    DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
+    //    string kickedByEmail = "notexisting@example.com";
+    //    string memberEmail = "member@example.com";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(new DomainEntities.Space());
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync((Soul)null!);
+    //    _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+    //        .ReturnsAsync(new DomainEntities.Space());
+    //    _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+    //        .ReturnsAsync((Soul)null!);
 
-        await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
-    }
+    //    await Assert.ThrowsAsync<InvalidSoulException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
+    //}
 
-    public async Task KickMemberAsync_KickedBySoulIsNotAModeratorOfTheSpace_ThrowsUnauthorizedAccessException()
-    {
-        DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
-        string kickedByEmail = "notamoderator@example.com";
-        string memberEmail = "member@example.com";
+    //public async Task KickMemberAsync_KickedBySoulIsNotAModeratorOfTheSpace_ThrowsUnauthorizedAccessException()
+    //{
+    //    DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
+    //    string kickedByEmail = "notamoderator@example.com";
+    //    string memberEmail = "member@example.com";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(new DomainEntities.Space());
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(new Soul());
-        _mockRepo.Setup(x => x.SoulRepository.IsModeratorOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .ReturnsAsync(false);
+    //    _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+    //        .ReturnsAsync(new DomainEntities.Space());
+    //    _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+    //        .ReturnsAsync(new Soul());
+    //    _mockRepo.Setup(x => x.SoulRepository.IsModeratorOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+    //        .ReturnsAsync(false);
 
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
-    }
+    //    await Assert.ThrowsAsync<UnauthorizedAccessException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
+    //}
 
-    [Fact]
-    public async Task KickMemberAsync_MemberSoulIsNotAMemberOfTheSpace_ThrowsSoulNotMemberException()
-    {
-        DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
-        string kickedByEmail = "moderator@example.com";
-        string memberEmail = "notamember@example.com";
+    //[Fact]
+    //public async Task KickMemberAsync_MemberSoulIsNotAMemberOfTheSpace_ThrowsSoulNotMemberException()
+    //{
+    //    DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
+    //    string kickedByEmail = "moderator@example.com";
+    //    string memberEmail = "notamember@example.com";
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(new DomainEntities.Space());
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(new Soul());
-        _mockRepo.Setup(x => x.SoulRepository.IsModeratorOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .ReturnsAsync(true);
-        _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .ReturnsAsync(false);
+    //    _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+    //        .ReturnsAsync(new DomainEntities.Space());
+    //    _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+    //        .ReturnsAsync(new Soul());
+    //    _mockRepo.Setup(x => x.SoulRepository.IsModeratorOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+    //        .ReturnsAsync(true);
+    //    _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+    //        .ReturnsAsync(false);
 
-        await Assert.ThrowsAsync<SoulNotMemberException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
-    }
+    //    await Assert.ThrowsAsync<SoulNotMemberException>(() => space.KickMemberAsync(kickedByEmail, memberEmail));
+    //}
 
-    [Fact]
-    public async Task KickMemberAsync_SoulAndSpaceAreBothValidAndKickedByIsAModeratorAndMemberSoulIsAMember_RemoveToSpace()
-    {
-        DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
-        string kickedByEmail = "moderator@example.com";
-        Soul existingSoul = new()
-        {
-            Id = Guid.NewGuid(),
-            Email = "existingg@example.com",
-            Name = "existing@example.com",
-            CreatedBy = "existing@example.com",
-            CreatedDateUtc = DateTime.UtcNow
-        };
+    //[Fact]
+    //public async Task KickMemberAsync_SoulAndSpaceAreBothValidAndKickedByIsAModeratorAndMemberSoulIsAMember_RemoveToSpace()
+    //{
+    //    DomainEntities.Space space = new(_mockRepo.Object) { Id = Guid.NewGuid() };
+    //    string kickedByEmail = "moderator@example.com";
+    //    Soul existingSoul = new()
+    //    {
+    //        Id = Guid.NewGuid(),
+    //        Email = "existingg@example.com",
+    //        Name = "existing@example.com",
+    //        CreatedBy = "existing@example.com",
+    //        CreatedDateUtc = DateTime.UtcNow
+    //    };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(space);
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
-            .ReturnsAsync(existingSoul);
-        _mockRepo.Setup(x => x.SoulRepository.IsModeratorOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .ReturnsAsync(true);
-        _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .ReturnsAsync(true);
+    //    _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+    //        .ReturnsAsync(space);
+    //    _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+    //        .ReturnsAsync(existingSoul);
+    //    _mockRepo.Setup(x => x.SoulRepository.IsModeratorOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+    //        .ReturnsAsync(true);
+    //    _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+    //        .ReturnsAsync(true);
 
-        await space.KickMemberAsync(kickedByEmail, existingSoul.Email);
+    //    await space.KickMemberAsync(kickedByEmail, existingSoul.Email);
 
-        _mockRepo.Verify(x => x.SoulRepository.DeleteSpaceMemberAsync(existingSoul.Id, space.Id), Times.Once);
-        _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);
-    }
+    //    _mockRepo.Verify(x => x.SoulRepository.DeleteSpaceMemberAsync(existingSoul.Id, space.Id), Times.Once);
+    //    _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);
+    //}
 
     //[Fact]
     //public async Task CreateTopicAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()

@@ -6,8 +6,8 @@ namespace Space.Domain.Entities;
 
 public class MemberSoul : Soul
 {
-    private readonly IRepositoryManager _repositoryManager;
-    private readonly IHelperManager _helperManager;
+    protected readonly IRepositoryManager _repositoryManager;
+    protected readonly IHelperManager _helperManager;
 
     public MemberSoul(string email, Guid spaceId, IRepositoryManager repositoryManager, IHelperManager helperManager)
     {

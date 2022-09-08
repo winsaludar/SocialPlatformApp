@@ -120,7 +120,7 @@ public class SpaceService : ISpaceService
 
     public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
     {
-        Domain.Entities.Space space = new(_repositoryManager) { Id = spaceId };
-        await space.KickMemberAsync(kickedByEmail, memberEmail);
+        ModeratorSoul moderator = new(kickedByEmail, spaceId, _repositoryManager, _helperManager);
+        await moderator.KickMemberAsync(memberEmail);
     }
 }
