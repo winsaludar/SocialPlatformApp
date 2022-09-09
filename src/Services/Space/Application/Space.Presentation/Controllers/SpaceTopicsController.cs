@@ -100,4 +100,32 @@ public class SpaceTopicsController : ControllerBase
 
         return Ok("Topic has been deleted");
     }
+
+    [HttpPost]
+    [Route("{spaceId}/topics/{topicId}/upvote")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpvoteAsync(Guid spaceId, Guid topicId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        await _serviceManager.SpaceService.UpvoteTopicAsync(spaceId, topicId, User.Identity.Name);
+
+        return Ok("Topic has been upvoted");
+    }
+
+    [HttpPost]
+    [Route("{spaceId}/topics/{topicId}/downvote")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DownvoteAsync(Guid spaceId, Guid topicId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        await _serviceManager.SpaceService.DownvoteTopicAsync(spaceId, topicId, User.Identity.Name);
+
+        return Ok("Topic has been downvoted");
+    }
 }

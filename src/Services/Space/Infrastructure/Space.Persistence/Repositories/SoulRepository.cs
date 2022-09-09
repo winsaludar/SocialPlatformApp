@@ -10,7 +10,11 @@ public class SoulRepository : ISoulRepository
 
     public SoulRepository(SpaceDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task<Soul?> GetByEmailAsync(string email, bool includeMemberSpaces = false, bool includeTopics = false, bool includeModeratedSpaces = false)
+    public async Task<Soul?> GetByEmailAsync(
+        string email,
+        bool includeMemberSpaces = false,
+        bool includeTopics = false,
+        bool includeModeratedSpaces = false)
     {
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
@@ -26,7 +30,11 @@ public class SoulRepository : ISoulRepository
         return await query.FirstOrDefaultAsync(x => x.Email == email);
     }
 
-    public async Task<Soul?> GetByIdAsync(Guid id, bool includeMemberSpaces = false, bool includeTopics = false, bool includeModeratedSpaces = false)
+    public async Task<Soul?> GetByIdAsync(
+        Guid id,
+        bool includeMemberSpaces = false,
+        bool includeTopics = false,
+        bool includeModeratedSpaces = false)
     {
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
@@ -80,5 +88,20 @@ public class SoulRepository : ISoulRepository
             _dbContext.SpaceMembers.Attach(spaceMember);
             _dbContext.SpaceMembers.Remove(spaceMember);
         });
+    }
+
+    public async Task<SoulTopicVote?> GetTopicVoteAsync(Guid soulId, Guid topicId)
+    {
+        return await _dbContext.SoulTopicVotes.FirstOrDefaultAsync(x => x.SoulId == soulId && x.TopicId == topicId);
+    }
+
+    public async Task CreateTopicVoteAsync(SoulTopicVote newVote)
+    {
+        await _dbContext.SoulTopicVotes.AddAsync(newVote);
+    }
+
+    public async Task UpdateTopicVoteAsync(SoulTopicVote vote)
+    {
+        await Task.Run(() => _dbContext.SoulTopicVotes.Update(vote));
     }
 }
