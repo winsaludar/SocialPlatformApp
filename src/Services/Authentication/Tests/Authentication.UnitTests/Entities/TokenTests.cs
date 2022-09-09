@@ -19,11 +19,11 @@ public class TokenTests
     }
 
     [Fact]
-    public async Task RefreshAsync_RepositoryManagerIsNull_ThrowsArgumentNullException()
+    public async Task RefreshAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
     {
         Token oldToken = new();
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => oldToken.RefreshAsync());
+        await Assert.ThrowsAsync<NullReferenceException>(() => oldToken.RefreshAsync());
     }
 
     [Fact]

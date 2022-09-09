@@ -32,9 +32,9 @@ public class AuthController : ControllerBase
             return BadRequest("Please provide all the required fields");
 
         var userDto = request.Adapt<UserDto>();
-        await _serviceManager.AuthenticationService.RegisterUserAsync(userDto);
+        Guid newId = await _serviceManager.AuthenticationService.RegisterUserAsync(userDto);
 
-        UserRegisteredSuccessfulIntegrationEvent @event = new(userDto.Email, userDto.Email);
+        UserRegisteredSuccessfulIntegrationEvent @event = new(newId, userDto.Email, userDto.Email);
         _eventBus.Publish(@event);
 
         return Ok("User created");

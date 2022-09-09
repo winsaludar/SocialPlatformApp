@@ -17,9 +17,9 @@ public class UserRegisteredSuccessfulIntegrationEventHandler : IIntegrationEvent
 
         Soul newSoul = new()
         {
-            Name = @event.Email,
+            Name = @event.Username,
             Email = @event.Email,
-            CreatedBy = @event.Email,
+            CreatedBy = @event.UserId.ToString(),
             CreatedDateUtc = DateTime.UtcNow
         };
 

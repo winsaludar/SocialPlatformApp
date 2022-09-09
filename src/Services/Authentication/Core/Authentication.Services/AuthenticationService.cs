@@ -12,7 +12,7 @@ public class AuthenticationService : IAuthenticationService
 
     public AuthenticationService(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
 
-    public async Task RegisterUserAsync(UserDto dto)
+    public async Task<Guid> RegisterUserAsync(UserDto dto)
     {
         User newUser = new(_repositoryManager)
         {
@@ -20,7 +20,7 @@ public class AuthenticationService : IAuthenticationService
             LastName = dto.LastName,
             Email = dto.Email
         };
-        await newUser.RegisterAsync(dto.Password);
+        return await newUser.RegisterAsync(dto.Password);
     }
 
     public async Task<TokenDto> LoginUserAsync(UserDto dto)

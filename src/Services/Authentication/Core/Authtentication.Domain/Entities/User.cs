@@ -17,10 +17,10 @@ public class User
     public string LastName { get; set; } = default!;
     public string Email { get; set; } = default!;
 
-    public async Task RegisterAsync(string password)
+    public async Task<Guid> RegisterAsync(string password)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (string.IsNullOrEmpty(Email) || !IsEmailValid(Email))
             throw new InvalidEmailException(Email);
@@ -33,13 +33,13 @@ public class User
         if (!isPasswordValid)
             throw new InvalidPasswordException();
 
-        await _repositoryManager.UserRepository.RegisterAsync(this, password);
+        return await _repositoryManager.UserRepository.RegisterAsync(this, password);
     }
 
     public async Task<Token> LoginAsync(string password)
     {
         if (_repositoryManager == null)
-            throw new ArgumentNullException("IRepositoryManager is null");
+            throw new NullReferenceException("IRepositoryManager is null");
 
         if (string.IsNullOrEmpty(Email) || !IsEmailValid(Email))
             throw new InvalidEmailException(Email);
