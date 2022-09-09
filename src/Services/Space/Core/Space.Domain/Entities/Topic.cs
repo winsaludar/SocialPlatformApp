@@ -24,6 +24,8 @@ public class Topic : BaseEntity
     public string Slug { get; private set; } = default!;
     public Guid SpaceId { get; set; }
     public Guid SoulId { get; set; }
+    public int Upvotes { get; set; }
+    public int Downvotes { get; set; }
 
     // Navigation Properties
     public Space Space { get; set; } = default!;
