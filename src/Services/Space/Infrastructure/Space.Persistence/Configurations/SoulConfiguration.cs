@@ -22,5 +22,10 @@ public class SoulConfiguration : IEntityTypeConfiguration<Soul>
         builder.HasMany(x => x.Topics)
             .WithOne(y => y.Soul)
             .OnDelete(DeleteBehavior.SetNull);
+
+        // Build many-to-many relationship with Topic as Voter
+        builder.HasMany(x => x.TopicVotes)
+            .WithMany(y => y.SoulVoters)
+            .UsingEntity<SoulTopicVote>(x => x.ToTable(nameof(SoulTopicVote)));
     }
 }

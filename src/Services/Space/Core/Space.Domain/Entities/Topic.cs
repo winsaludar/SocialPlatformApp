@@ -30,4 +30,5 @@ public class Topic : BaseEntity
     // Navigation Properties
     public Space Space { get; set; } = default!;
     public Soul? Soul { get; set; } = default!;
+    public IList<Soul> SoulVoters { get; set; } = new List<Soul>();
 }
