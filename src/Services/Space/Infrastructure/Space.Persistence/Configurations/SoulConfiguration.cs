@@ -21,6 +21,6 @@ public class SoulConfiguration : IEntityTypeConfiguration<Soul>
         // Build one-to-many relationship with Topic
         builder.HasMany(x => x.Topics)
             .WithOne(y => y.Soul)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

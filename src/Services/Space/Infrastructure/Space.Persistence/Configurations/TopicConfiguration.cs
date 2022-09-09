@@ -17,7 +17,7 @@ public class TopicConfiguration : IEntityTypeConfiguration<Topic>
         builder.Property(x => x.Content).IsRequired();
         builder.Property(x => x.Slug).IsRequired().HasMaxLength(200);
         builder.Property(x => x.SpaceId).IsRequired();
-        builder.Property(x => x.SoulId).IsRequired();
+        builder.Property(x => x.SoulId);
 
         builder.Property(x => x.CreatedBy).IsRequired().HasMaxLength(36);
         builder.Property(x => x.CreatedDateUtc).IsRequired();
