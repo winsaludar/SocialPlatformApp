@@ -2,7 +2,7 @@
 
 namespace Space.Presentation.Models;
 
-public class KickSoulRequest
+public class KickSpaceMemberRequest
 {
     [Required]
     [EmailAddress]

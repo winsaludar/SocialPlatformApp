@@ -238,7 +238,7 @@ public class SpacesControllerTests
             HttpContext = new DefaultHttpContext { User = user.Object }
         };
         Guid spaceId = Guid.NewGuid();
-        KickSoulRequest request = new();
+        KickSpaceMemberRequest request = new();
 
         var result = await _controller.KickMemberAsync(spaceId, request);
 
@@ -262,7 +262,7 @@ public class SpacesControllerTests
             HttpContext = new DefaultHttpContext { User = user }
         };
         Guid spaceId = Guid.NewGuid();
-        KickSoulRequest request = new() { Email = "member@example.com" };
+        KickSpaceMemberRequest request = new() { Email = "member@example.com" };
 
         var result = await _controller.KickMemberAsync(spaceId, request);
 
