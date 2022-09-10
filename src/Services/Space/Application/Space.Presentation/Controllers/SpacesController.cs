@@ -89,7 +89,7 @@ public class SpacesController : ControllerBase
     [Route("{spaceId}/kick")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
-    public async Task<IActionResult> KickMemberAsync(Guid spaceId, [FromBody] KickSoulRequest request)
+    public async Task<IActionResult> KickMemberAsync(Guid spaceId, [FromBody] KickSpaceMemberRequest request)
     {
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized("Invalid user");

@@ -194,6 +194,7 @@ public class SpaceServiceTests
 
         var result = await _spaceService.GetAllTopicsAsync(spaceId);
 
+        _mockRepo.Verify(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()), Times.Never());
         Assert.IsType<List<TopicDto>>(result);
         Assert.Empty(result);
     }
@@ -202,6 +203,7 @@ public class SpaceServiceTests
     public async Task GetAllTopicsAsync_SpaceIsNotNull_ReturnsNonEmptyTopicsDto()
     {
         Guid spaceId = Guid.NewGuid();
+        var mockVotesOutput = (0, 0);
 
         _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(spaceId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space
@@ -215,9 +217,12 @@ public class SpaceServiceTests
             });
         _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul { Name = "Member", Email = "member@example.com" });
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(mockVotesOutput);
 
         var result = await _spaceService.GetAllTopicsAsync(spaceId);
 
+        _mockRepo.Verify(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()), Times.AtLeastOnce());
         Assert.IsType<List<TopicDto>>(result);
         Assert.NotEmpty(result);
         Assert.Equal(3, result.Count());

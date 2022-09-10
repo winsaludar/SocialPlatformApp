@@ -19,7 +19,7 @@ public class SpaceTopicsController : ControllerBase
     [HttpGet]
     [Route("{spaceId}/topics")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TopicDto>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Guid))]
     public async Task<IActionResult> GetAsync(Guid spaceId)
     {
         SpaceDto? space = await _serviceManager.SpaceService.GetByIdAsync(spaceId);
@@ -32,16 +32,16 @@ public class SpaceTopicsController : ControllerBase
 
     [HttpPost]
     [Route("{spaceId}/topics")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     public async Task<IActionResult> PostAsync(Guid spaceId, [FromBody] CreateEditSpaceTopicRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized();
+            return Unauthorized("Invalid user");
 
         TopicDto dto = new()
         {
@@ -57,16 +57,16 @@ public class SpaceTopicsController : ControllerBase
 
     [HttpPut]
     [Route("{spaceId}/topics/{topicId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     public async Task<IActionResult> PutAsync(Guid spaceId, Guid topicId, [FromBody] CreateEditSpaceTopicRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized();
+            return Unauthorized("Invalid user");
 
         TopicDto dto = new()
         {
@@ -83,12 +83,12 @@ public class SpaceTopicsController : ControllerBase
 
     [HttpDelete]
     [Route("{spaceId}/topics/{topicId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     public async Task<IActionResult> DeleteAsync(Guid spaceId, Guid topicId)
     {
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized();
+            return Unauthorized("Invalid user");
 
         TopicDto dto = new()
         {
@@ -99,5 +99,47 @@ public class SpaceTopicsController : ControllerBase
         await _serviceManager.SpaceService.DeleteTopicAsync(dto);
 
         return Ok("Topic has been deleted");
+    }
+
+    [HttpPost]
+    [Route("{spaceId}/topics/{topicId}/upvote")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    public async Task<IActionResult> UpvoteAsync(Guid spaceId, Guid topicId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized("Invalid user");
+
+        await _serviceManager.SpaceService.UpvoteTopicAsync(spaceId, topicId, User.Identity.Name);
+
+        return Ok("Topic has been upvoted");
+    }
+
+    [HttpPost]
+    [Route("{spaceId}/topics/{topicId}/downvote")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    public async Task<IActionResult> DownvoteAsync(Guid spaceId, Guid topicId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized("Invalid user");
+
+        await _serviceManager.SpaceService.DownvoteTopicAsync(spaceId, topicId, User.Identity.Name);
+
+        return Ok("Topic has been downvoted");
+    }
+
+    [HttpPost]
+    [Route("{spaceId}/topics/{topicId}/unvote")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    public async Task<IActionResult> UnvoteAsync(Guid spaceId, Guid topicId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized("Invalid user");
+
+        await _serviceManager.SpaceService.UnvoteTopicAsync(spaceId, topicId, User.Identity.Name);
+
+        return Ok("Your vote has been removed");
     }
 }

@@ -100,7 +100,7 @@ public class MemberSoulTests
         _mockSlugHelper.Setup(x => x.CreateSlug(It.IsAny<string>()))
             .Returns("new-title");
         _mockRepo.Setup(x => x.SpaceRepository.CreateTopicAsync(It.IsAny<Topic>()))
-            .Callback<Topic>(x => createdTopic = new Topic(_mockHelper.Object)
+            .Callback<Topic>(x => createdTopic = new Topic(_mockRepo.Object, _mockHelper.Object)
             {
                 Id = Guid.NewGuid(),
                 Title = "New Title",
@@ -247,7 +247,7 @@ public class MemberSoulTests
         _mockRepo.Setup(x => x.SoulRepository.IsModeratorOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(true);
         _mockRepo.Setup(x => x.SpaceRepository.UpdateTopicAsync(It.IsAny<Topic>()))
-            .Callback<Topic>(x => updatedTopic = new Topic(_mockHelper.Object)
+            .Callback<Topic>(x => updatedTopic = new Topic(_mockRepo.Object, _mockHelper.Object)
             {
                 Title = "Updated Topic",
                 Content = "Updated Content"
@@ -280,7 +280,7 @@ public class MemberSoulTests
         _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(true);
         _mockRepo.Setup(x => x.SpaceRepository.UpdateTopicAsync(It.IsAny<Topic>()))
-            .Callback<Topic>(x => updatedTopic = new Topic(_mockHelper.Object)
+            .Callback<Topic>(x => updatedTopic = new Topic(_mockRepo.Object, _mockHelper.Object)
             {
                 Title = "Updated Topic",
                 Content = "Updated Content"

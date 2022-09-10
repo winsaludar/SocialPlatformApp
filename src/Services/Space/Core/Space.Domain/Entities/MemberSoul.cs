@@ -55,7 +55,7 @@ public class MemberSoul : Soul
             throw new SoulNotMemberException(Email, targetSpace.Name);
         }
 
-        Topic newTopic = new(_helperManager)
+        Topic newTopic = new(_repositoryManager, _helperManager)
         {
             Title = title,
             Content = content,

@@ -25,7 +25,7 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task GetAsync_SpaceIdIsInvalid_ReturnsNotFoundResult()
+    public async Task GetAsync_SpaceIdIsInvalid_ReturnsNotFoundObjectResult()
     {
         _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
            .ReturnsAsync((SpaceDto)null!);
@@ -36,7 +36,7 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task GetAsync_TopicsAreEmpty_ReturnsOkResultWithEmptyData()
+    public async Task GetAsync_TopicsAreEmpty_ReturnsOkObjectResultWithEmptyData()
     {
         _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
            .ReturnsAsync(new SpaceDto());
@@ -51,7 +51,7 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task GetAsync_TopicsAreNotEmpty_ReturnsOkResultWithData()
+    public async Task GetAsync_TopicsAreNotEmpty_ReturnsOkObjectResultWithData()
     {
         _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
            .ReturnsAsync(new SpaceDto());
@@ -72,7 +72,7 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task PostAsync_ModelStateIsInvalid_ReturnsBadRequest()
+    public async Task PostAsync_ModelStateIsInvalid_ReturnsBadRequestObjectResult()
     {
         Guid spaceId = Guid.NewGuid();
         CreateEditSpaceTopicRequest request = new() { };
@@ -84,7 +84,7 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task PostAsync_UserIdentityIsNull_ReturnsUnauthorized()
+    public async Task PostAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
     {
         // Setup a null User.Identity
         Mock<ClaimsPrincipal> user = new();
@@ -102,11 +102,11 @@ public class SpaceTopicsControllerTests
 
         var result = await _controller.PostAsync(spaceId, request);
 
-        Assert.IsType<UnauthorizedResult>(result);
+        Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
     [Fact]
-    public async Task PostAsync_RequestIsValid_ReturnsOkResponse()
+    public async Task PostAsync_RequestIsValid_ReturnsOkObjectResult()
     {
         TopicDto? createdTopic = null;
         _mockService.Setup(x => x.SpaceService.CreateTopicAsync(It.IsAny<TopicDto>()))
@@ -142,7 +142,7 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task PutAsync_ModelStateIsInvalid_ReturnsBadRequest()
+    public async Task PutAsync_ModelStateIsInvalid_ReturnsBadRequestObjectResult()
     {
         Guid spaceId = Guid.NewGuid();
         Guid topicId = Guid.NewGuid();
@@ -155,7 +155,7 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task PutAsync_UserIdentityIsNull_ReturnsUnauthorized()
+    public async Task PutAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
     {
         // Setup a null User.Identity
         Mock<ClaimsPrincipal> user = new();
@@ -174,11 +174,11 @@ public class SpaceTopicsControllerTests
 
         var result = await _controller.PutAsync(spaceId, topicId, request);
 
-        Assert.IsType<UnauthorizedResult>(result);
+        Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
     [Fact]
-    public async Task PutAsync_RequestIsValid_ReturnsOkResponse()
+    public async Task PutAsync_RequestIsValid_ReturnsOkObjectResult()
     {
         TopicDto? updatedTopic = null;
         _mockService.Setup(x => x.SpaceService.UpdateTopicAsync(It.IsAny<TopicDto>()))
@@ -215,7 +215,7 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task DeleteAsync_UserIdentityIsNull_ReturnsUnauthorized()
+    public async Task DeleteAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
     {
         // Setup a null User.Identity
         Mock<ClaimsPrincipal> user = new();
@@ -229,11 +229,11 @@ public class SpaceTopicsControllerTests
 
         var result = await _controller.DeleteAsync(spaceId, topicId);
 
-        Assert.IsType<UnauthorizedResult>(result);
+        Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
     [Fact]
-    public async Task DeleteAsync_RequestIsValid_ReturnsOkResponse()
+    public async Task DeleteAsync_RequestIsValid_ReturnsOkObjectResult()
     {
         // Setup User.Identity
         List<Claim> claims = new()
@@ -255,6 +255,138 @@ public class SpaceTopicsControllerTests
         var result = await _controller.DeleteAsync(spaceId, topicId);
 
         _mockService.Verify(x => x.SpaceService.DeleteTopicAsync(It.IsAny<TopicDto>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task UpvoteAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+
+        var result = await _controller.UpvoteAsync(spaceId, topicId);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task UpvoteAsync_RequestIsValid_ReturnsOkObjectResult()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+
+        var result = await _controller.UpvoteAsync(spaceId, topicId);
+
+        _mockService.Verify(x => x.SpaceService.UpvoteTopicAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task DownvoteAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+
+        var result = await _controller.DownvoteAsync(spaceId, topicId);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task DownvoteAsync_RequestIsValid_ReturnsOkObjectResult()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+
+        var result = await _controller.DownvoteAsync(spaceId, topicId);
+
+        _mockService.Verify(x => x.SpaceService.DownvoteTopicAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task UnvoteAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+
+        var result = await _controller.UnvoteAsync(spaceId, topicId);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task UnvoteAsync_RequestIsValid_ReturnsOkObjectResult()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+
+        var result = await _controller.UnvoteAsync(spaceId, topicId);
+
+        _mockService.Verify(x => x.SpaceService.UnvoteTopicAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
 }

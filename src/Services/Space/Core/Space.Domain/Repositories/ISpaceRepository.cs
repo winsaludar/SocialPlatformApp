@@ -15,4 +15,5 @@ public interface ISpaceRepository
     Task CreateTopicAsync(Topic newTopic);
     Task UpdateTopicAsync(Topic topic);
     Task DeleteTopicAsync(Topic topic);
+    Task<(int upvotes, int downvotes)> GetTopicVotesAsync(Guid topicId);
 }

@@ -56,6 +56,8 @@ public class SoulService : ISoulService
         {
             item.AuthorEmail = soul.Email;
             item.AuthorUsername = soul.Name;
+
+            (item.Upvotes, item.Downvotes) = await _repositoryManager.SpaceRepository.GetTopicVotesAsync(item.Id);
         }
 
         return result;
@@ -72,6 +74,8 @@ public class SoulService : ISoulService
         {
             item.AuthorEmail = soul.Email;
             item.AuthorUsername = soul.Name;
+
+            (item.Upvotes, item.Downvotes) = await _repositoryManager.SpaceRepository.GetTopicVotesAsync(item.Id);
         }
 
         return result;

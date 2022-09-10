@@ -8,6 +8,8 @@ public record TopicDto
     public string Slug { get; set; } = default!;
     public string AuthorEmail { get; set; } = default!;
     public string AuthorUsername { get; set; } = default!;
+    public int Upvotes { get; set; }
+    public int Downvotes { get; set; }
     public DateTime CreatedDateUtc { get; set; }
 
     public Guid SpaceId { get; set; } = default!;

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Space.Persistence;
 
@@ -11,9 +12,10 @@ using Space.Persistence;
 namespace Space.Persistence.Migrations
 {
     [DbContext(typeof(SpaceDbContext))]
-    partial class SpaceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220909040539_PreventDeletingTopicWhenAuthorSoulIsDeleted")]
+    partial class PreventDeletingTopicWhenAuthorSoulIsDeleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,27 +61,6 @@ namespace Space.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Soul", (string)null);
-                });
-
-            modelBuilder.Entity("Space.Domain.Entities.SoulTopicVote", b =>
-                {
-                    b.Property<Guid>("SoulId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TopicId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Downvote")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Upvote")
-                        .HasColumnType("int");
-
-                    b.HasKey("SoulId", "TopicId");
-
-                    b.HasIndex("TopicId");
-
-                    b.ToTable("SoulTopicVote", (string)null);
                 });
 
             modelBuilder.Entity("Space.Domain.Entities.Space", b =>
@@ -185,6 +166,9 @@ namespace Space.Persistence.Migrations
                     b.Property<DateTime>("CreatedDateUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Downvotes")
+                        .HasColumnType("int");
+
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -207,6 +191,9 @@ namespace Space.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("Upvotes")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SoulId");
@@ -214,21 +201,6 @@ namespace Space.Persistence.Migrations
                     b.HasIndex("SpaceId");
 
                     b.ToTable("Topic", (string)null);
-                });
-
-            modelBuilder.Entity("Space.Domain.Entities.SoulTopicVote", b =>
-                {
-                    b.HasOne("Space.Domain.Entities.Soul", null)
-                        .WithMany()
-                        .HasForeignKey("SoulId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Space.Domain.Entities.Topic", null)
-                        .WithMany()
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Space.Domain.Entities.SpaceMember", b =>

@@ -16,6 +16,7 @@ public class Soul : BaseEntity
     public IList<Space> SpacesAsMember { get; set; } = new List<Space>();
     public IList<Space> SpacesAsModerator { get; set; } = new List<Space>();
     public IList<Topic> Topics { get; set; } = new List<Topic>();
+    public IList<Topic> TopicVotes { get; set; } = new List<Topic>();
 
     public async Task CreateSpaceAsync(Space newSpace)
     {

@@ -95,6 +95,8 @@ public class SpaceService : ISpaceService
 
             item.AuthorEmail = author.Email;
             item.AuthorUsername = author.Name;
+
+            (item.Upvotes, item.Downvotes) = await _repositoryManager.SpaceRepository.GetTopicVotesAsync(item.Id);
         }
 
         return result;
@@ -116,6 +118,24 @@ public class SpaceService : ISpaceService
     {
         MemberSoul member = new(dto.AuthorEmail, dto.SpaceId, _repositoryManager, _helperManager);
         await member.DeleteTopicAsync(dto.Id);
+    }
+
+    public async Task UpvoteTopicAsync(Guid spaceId, Guid topicId, string voterEmail)
+    {
+        Topic topic = new(_repositoryManager, _helperManager) { Id = topicId, SpaceId = spaceId };
+        await topic.UpvoteAsync(voterEmail);
+    }
+
+    public async Task DownvoteTopicAsync(Guid spaceId, Guid topicId, string voterEmail)
+    {
+        Topic topic = new(_repositoryManager, _helperManager) { Id = topicId, SpaceId = spaceId };
+        await topic.DownvoteAsync(voterEmail);
+    }
+
+    public async Task UnvoteTopicAsync(Guid spaceId, Guid topicId, string voterEmail)
+    {
+        Topic topic = new(_repositoryManager, _helperManager) { Id = topicId, SpaceId = spaceId };
+        await topic.UnvoteAsync(voterEmail);
     }
 
     public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
