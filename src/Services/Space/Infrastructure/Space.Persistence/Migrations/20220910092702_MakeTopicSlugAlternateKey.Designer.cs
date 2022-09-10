@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Space.Persistence;
 
@@ -11,9 +12,10 @@ using Space.Persistence;
 namespace Space.Persistence.Migrations
 {
     [DbContext(typeof(SpaceDbContext))]
-    partial class SpaceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220910092702_MakeTopicSlugAlternateKey")]
+    partial class MakeTopicSlugAlternateKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,45 +23,6 @@ namespace Space.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("Space.Domain.Entities.Comment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<DateTime>("CreatedDateUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModifiedDateUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("SoulId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TopicId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SoulId");
-
-                    b.HasIndex("TopicId");
-
-                    b.ToTable("Comment", (string)null);
-                });
 
             modelBuilder.Entity("Space.Domain.Entities.Soul", b =>
                 {
@@ -257,24 +220,6 @@ namespace Space.Persistence.Migrations
                     b.ToTable("Topic", (string)null);
                 });
 
-            modelBuilder.Entity("Space.Domain.Entities.Comment", b =>
-                {
-                    b.HasOne("Space.Domain.Entities.Soul", "Soul")
-                        .WithMany("Comments")
-                        .HasForeignKey("SoulId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Space.Domain.Entities.Topic", "Topic")
-                        .WithMany("Comments")
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Soul");
-
-                    b.Navigation("Topic");
-                });
-
             modelBuilder.Entity("Space.Domain.Entities.SoulTopicVote", b =>
                 {
                     b.HasOne("Space.Domain.Entities.Soul", null)
@@ -340,19 +285,12 @@ namespace Space.Persistence.Migrations
 
             modelBuilder.Entity("Space.Domain.Entities.Soul", b =>
                 {
-                    b.Navigation("Comments");
-
                     b.Navigation("Topics");
                 });
 
             modelBuilder.Entity("Space.Domain.Entities.Space", b =>
                 {
                     b.Navigation("Topics");
-                });
-
-            modelBuilder.Entity("Space.Domain.Entities.Topic", b =>
-                {
-                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

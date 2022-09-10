@@ -2,11 +2,8 @@
 
 namespace Space.Presentation.Models;
 
-public class CreateEditSpaceTopicRequest
+public class CreateEditCommentRequest
 {
-    [Required]
-    public string Title { get; set; } = default!;
-
     [Required]
     public string Content { get; set; } = default!;
 }

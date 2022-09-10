@@ -25,7 +25,7 @@ public class Topic : BaseEntity
         {
             _title = value;
             if (_helperManager != null)
-                Slug = _helperManager.SlugHelper.CreateSlug(value);
+                Slug = _helperManager.SlugHelper.CreateSlug(value, true);
         }
     }
     public string Content { get; set; } = default!;
@@ -35,6 +35,7 @@ public class Topic : BaseEntity
     public Space Space { get; set; } = default!;
     public Soul? Soul { get; set; } = default!;
     public IList<Soul> SoulVoters { get; set; } = new List<Soul>();
+    public IList<Comment> Comments { get; set; } = new List<Comment>();
 
     public async Task UpvoteAsync(string voterEmail)
     {
@@ -49,6 +50,38 @@ public class Topic : BaseEntity
     public async Task UnvoteAsync(string voterEmail)
     {
         await ProcessVoteAsync(voterEmail, 0, 0);
+    }
+
+    public async Task AddCommentAsync(string authorEmail, Comment comment)
+    {
+        if (_repositoryManager == null)
+            throw new NullReferenceException("IRepositoryManager is null");
+
+        await _repositoryManager.UnitOfWork.BeginTransactionAsync();
+
+        // Make sure topic id is valid
+        Topic? targetTopic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(Id);
+        if (targetTopic == null || targetTopic.SpaceId != SpaceId)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidTopicIdException(Id);
+        }
+
+        // Make sure author email exist
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(authorEmail);
+        if (existingSoul == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSoulException(authorEmail);
+        }
+
+        comment.SoulId = existingSoul.Id;
+        comment.TopicId = targetTopic.Id;
+        comment.CreatedBy = existingSoul.Email;
+        comment.CreatedDateUtc = DateTime.UtcNow;
+
+        await _repositoryManager.SpaceRepository.CreateCommentAsync(comment);
+        await _repositoryManager.UnitOfWork.CommitAsync();
     }
 
     private async Task ProcessVoteAsync(string voterEmail, int upvote, int downvote)

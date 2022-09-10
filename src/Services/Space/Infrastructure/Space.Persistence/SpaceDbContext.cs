@@ -13,6 +13,7 @@ public class SpaceDbContext : DbContext
     public DbSet<SpaceModerator> SpaceModerators { get; set; } = null!;
     public DbSet<Topic> Topics { get; set; } = null!;
     public DbSet<SoulTopicVote> SoulTopicVotes { get; set; } = null!;
+    public DbSet<Comment> Comments { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

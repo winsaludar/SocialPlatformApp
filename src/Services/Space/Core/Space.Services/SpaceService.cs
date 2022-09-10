@@ -102,6 +102,30 @@ public class SpaceService : ISpaceService
         return result;
     }
 
+    public async Task<TopicDto?> GetTopicBySlugAsync(string spaceSlug, string topicSlug)
+    {
+        var topic = await _repositoryManager.SpaceRepository.GetTopicBySlugAsync(topicSlug);
+        if (topic == null)
+            return null;
+
+        var space = await _repositoryManager.SpaceRepository.GetBySlugAsync(spaceSlug);
+        if (space == null || space.Id != topic.SpaceId)
+            return null;
+
+        var result = topic.Adapt<TopicDto>();
+
+        Soul? author = await _repositoryManager.SoulRepository.GetByIdAsync(result.SoulId);
+        if (author != null)
+        {
+            result.AuthorEmail = author.Email;
+            result.AuthorUsername = author.Name;
+        }
+
+        (result.Upvotes, result.Downvotes) = await _repositoryManager.SpaceRepository.GetTopicVotesAsync(result.Id);
+
+        return result;
+    }
+
     public async Task CreateTopicAsync(TopicDto dto)
     {
         MemberSoul member = new(dto.AuthorEmail, dto.SpaceId, _repositoryManager, _helperManager);
@@ -136,6 +160,13 @@ public class SpaceService : ISpaceService
     {
         Topic topic = new(_repositoryManager, _helperManager) { Id = topicId, SpaceId = spaceId };
         await topic.UnvoteAsync(voterEmail);
+    }
+
+    public async Task CreateCommentAsync(CommentDto dto)
+    {
+        Topic topic = new(_repositoryManager, _helperManager) { Id = dto.TopicId, SpaceId = dto.SpaceId };
+        Comment newComment = new() { Content = dto.Content };
+        await topic.AddCommentAsync(dto.AuthorEmail, newComment);
     }
 
     public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)

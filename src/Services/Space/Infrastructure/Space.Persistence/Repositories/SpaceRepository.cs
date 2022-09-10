@@ -90,6 +90,11 @@ public class SpaceRepository : ISpaceRepository
         return await _dbContext.Topics.Where(x => x.Id == topicId).FirstOrDefaultAsync();
     }
 
+    public async Task<Topic?> GetTopicBySlugAsync(string topicSlug)
+    {
+        return await _dbContext.Topics.Where(x => x.Slug == topicSlug).FirstOrDefaultAsync();
+    }
+
     public async Task CreateTopicAsync(Topic newTopic)
     {
         await _dbContext.Topics.AddAsync(newTopic);
@@ -120,5 +125,10 @@ public class SpaceRepository : ISpaceRepository
             return (0, 0);
 
         return (result.Upvotes, result.Downvotes);
+    }
+
+    public async Task CreateCommentAsync(Comment newComment)
+    {
+        await _dbContext.Comments.AddAsync(newComment);
     }
 }

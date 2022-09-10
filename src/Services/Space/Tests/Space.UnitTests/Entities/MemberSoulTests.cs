@@ -97,7 +97,7 @@ public class MemberSoulTests
             .ReturnsAsync(new Soul());
         _mockRepo.Setup(x => x.SoulRepository.IsMemberOfSpaceAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
             .ReturnsAsync(true);
-        _mockSlugHelper.Setup(x => x.CreateSlug(It.IsAny<string>()))
+        _mockSlugHelper.Setup(x => x.CreateSlug(It.IsAny<string>(), It.IsAny<bool>()))
             .Returns("new-title");
         _mockRepo.Setup(x => x.SpaceRepository.CreateTopicAsync(It.IsAny<Topic>()))
             .Callback<Topic>(x => createdTopic = new Topic(_mockRepo.Object, _mockHelper.Object)

@@ -20,7 +20,7 @@ public class SpaceTopicsController : ControllerBase
     [Route("{spaceId}/topics")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TopicDto>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(Guid))]
-    public async Task<IActionResult> GetAsync(Guid spaceId)
+    public async Task<IActionResult> GetAllAsync(Guid spaceId)
     {
         SpaceDto? space = await _serviceManager.SpaceService.GetByIdAsync(spaceId);
         if (space == null)
@@ -30,12 +30,25 @@ public class SpaceTopicsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet]
+    [Route("{spaceSlug}/topics/{topicSlug}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TopicDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+    public async Task<IActionResult> GetBySlugAsync(string spaceSlug, string topicSlug)
+    {
+        TopicDto? topic = await _serviceManager.SpaceService.GetTopicBySlugAsync(spaceSlug, topicSlug);
+        if (topic == null)
+            return NotFound(topicSlug);
+
+        return Ok(topic);
+    }
+
     [HttpPost]
     [Route("{spaceId}/topics")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
-    public async Task<IActionResult> PostAsync(Guid spaceId, [FromBody] CreateEditSpaceTopicRequest request)
+    public async Task<IActionResult> PostAsync(Guid spaceId, [FromBody] CreateEditTopicRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
@@ -60,7 +73,7 @@ public class SpaceTopicsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
-    public async Task<IActionResult> PutAsync(Guid spaceId, Guid topicId, [FromBody] CreateEditSpaceTopicRequest request)
+    public async Task<IActionResult> PutAsync(Guid spaceId, Guid topicId, [FromBody] CreateEditTopicRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
