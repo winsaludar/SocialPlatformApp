@@ -75,7 +75,7 @@ public class SpaceTopicsControllerTests
     public async Task PostAsync_ModelStateIsInvalid_ReturnsBadRequestObjectResult()
     {
         Guid spaceId = Guid.NewGuid();
-        CreateEditSpaceTopicRequest request = new() { };
+        CreateEditTopicRequest request = new() { };
         _controller.ModelState.AddModelError("Title", "Required");
 
         var result = await _controller.PostAsync(spaceId, request);
@@ -94,7 +94,7 @@ public class SpaceTopicsControllerTests
         };
 
         Guid spaceId = Guid.NewGuid();
-        CreateEditSpaceTopicRequest request = new()
+        CreateEditTopicRequest request = new()
         {
             Title = "Fake Title",
             Content = "Fake Content"
@@ -127,7 +127,7 @@ public class SpaceTopicsControllerTests
         };
 
         Guid spaceId = Guid.NewGuid();
-        CreateEditSpaceTopicRequest request = new()
+        CreateEditTopicRequest request = new()
         {
             Title = "Fake Title",
             Content = "Fake Content"
@@ -146,7 +146,7 @@ public class SpaceTopicsControllerTests
     {
         Guid spaceId = Guid.NewGuid();
         Guid topicId = Guid.NewGuid();
-        CreateEditSpaceTopicRequest request = new() { };
+        CreateEditTopicRequest request = new() { };
         _controller.ModelState.AddModelError("Title", "Required");
 
         var result = await _controller.PutAsync(spaceId, topicId, request);
@@ -166,7 +166,7 @@ public class SpaceTopicsControllerTests
 
         Guid spaceId = Guid.NewGuid();
         Guid topicId = Guid.NewGuid();
-        CreateEditSpaceTopicRequest request = new()
+        CreateEditTopicRequest request = new()
         {
             Title = "Updated Title",
             Content = "Updated Content"
@@ -200,7 +200,7 @@ public class SpaceTopicsControllerTests
 
         Guid spaceId = Guid.NewGuid();
         Guid topicId = Guid.NewGuid();
-        CreateEditSpaceTopicRequest request = new()
+        CreateEditTopicRequest request = new()
         {
             Title = "Updated Title",
             Content = "Updated Content"

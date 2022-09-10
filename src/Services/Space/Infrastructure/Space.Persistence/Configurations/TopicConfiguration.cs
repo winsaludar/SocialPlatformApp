@@ -22,5 +22,10 @@ public class TopicConfiguration : IEntityTypeConfiguration<Topic>
 
         builder.Property(x => x.CreatedBy).IsRequired().HasMaxLength(36);
         builder.Property(x => x.CreatedDateUtc).IsRequired();
+
+        // Build one-to-many relationship with Comment
+        builder.HasMany(x => x.Comments)
+            .WithOne(y => y.Topic)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

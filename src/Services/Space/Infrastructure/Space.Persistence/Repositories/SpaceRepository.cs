@@ -126,4 +126,9 @@ public class SpaceRepository : ISpaceRepository
 
         return (result.Upvotes, result.Downvotes);
     }
+
+    public async Task CreateCommentAsync(Comment newComment)
+    {
+        await _dbContext.Comments.AddAsync(newComment);
+    }
 }

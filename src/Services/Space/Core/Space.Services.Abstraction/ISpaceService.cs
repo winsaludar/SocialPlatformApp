@@ -20,5 +20,7 @@ public interface ISpaceService
     Task DownvoteTopicAsync(Guid spaceId, Guid topicId, string voterEmail);
     Task UnvoteTopicAsync(Guid spaceId, Guid topicId, string voterEmail);
 
+    Task CreateCommentAsync(CommentDto dto);
+
     Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail);
 }

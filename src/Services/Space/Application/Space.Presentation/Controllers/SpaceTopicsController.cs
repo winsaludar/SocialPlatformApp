@@ -48,7 +48,7 @@ public class SpaceTopicsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
-    public async Task<IActionResult> PostAsync(Guid spaceId, [FromBody] CreateEditSpaceTopicRequest request)
+    public async Task<IActionResult> PostAsync(Guid spaceId, [FromBody] CreateEditTopicRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
@@ -73,7 +73,7 @@ public class SpaceTopicsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
-    public async Task<IActionResult> PutAsync(Guid spaceId, Guid topicId, [FromBody] CreateEditSpaceTopicRequest request)
+    public async Task<IActionResult> PutAsync(Guid spaceId, Guid topicId, [FromBody] CreateEditTopicRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");

@@ -162,6 +162,13 @@ public class SpaceService : ISpaceService
         await topic.UnvoteAsync(voterEmail);
     }
 
+    public async Task CreateCommentAsync(CommentDto dto)
+    {
+        Topic topic = new(_repositoryManager, _helperManager) { Id = dto.TopicId, SpaceId = dto.SpaceId };
+        Comment newComment = new() { Content = dto.Content };
+        await topic.AddComment(dto.AuthorEmail, newComment);
+    }
+
     public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
     {
         ModeratorSoul moderator = new(kickedByEmail, spaceId, _repositoryManager, _helperManager);
