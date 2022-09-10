@@ -32,8 +32,6 @@ public class Topic : BaseEntity
     public string Slug { get; private set; } = default!;
     public Guid SpaceId { get; set; }
     public Guid? SoulId { get; set; }
-    public int Upvotes { get; set; }
-    public int Downvotes { get; set; }
     public Space Space { get; set; } = default!;
     public Soul? Soul { get; set; } = default!;
     public IList<Soul> SoulVoters { get; set; } = new List<Soul>();
