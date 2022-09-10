@@ -95,6 +95,8 @@ public class SpaceService : ISpaceService
 
             item.AuthorEmail = author.Email;
             item.AuthorUsername = author.Name;
+
+            (item.Upvotes, item.Downvotes) = await _repositoryManager.SpaceRepository.GetTopicVotesAsync(item.Id);
         }
 
         return result;

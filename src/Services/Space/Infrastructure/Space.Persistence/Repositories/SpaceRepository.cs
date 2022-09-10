@@ -104,4 +104,21 @@ public class SpaceRepository : ISpaceRepository
     {
         await Task.Run(() => _dbContext.Topics.Remove(topic));
     }
+
+    public async Task<(int upvotes, int downvotes)> GetTopicVotesAsync(Guid topicId)
+    {
+        var result = await (from vote in _dbContext.SoulTopicVotes
+                            where vote.TopicId == topicId
+                            group vote by vote.TopicId into g
+                            select new
+                            {
+                                Upvotes = g.Sum(x => x.Upvote),
+                                Downvotes = g.Sum(x => x.Downvote)
+                            }).FirstOrDefaultAsync();
+
+        if (result == null)
+            return (0, 0);
+
+        return (result.Upvotes, result.Downvotes);
+    }
 }
