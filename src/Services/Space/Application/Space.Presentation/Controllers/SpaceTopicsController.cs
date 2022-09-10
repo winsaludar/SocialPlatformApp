@@ -128,4 +128,18 @@ public class SpaceTopicsController : ControllerBase
 
         return Ok("Topic has been downvoted");
     }
+
+    [HttpPost]
+    [Route("{spaceId}/topics/{topicId}/unvote")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UnvoteAsync(Guid spaceId, Guid topicId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        await _serviceManager.SpaceService.UnvoteTopicAsync(spaceId, topicId, User.Identity.Name);
+
+        return Ok("Your vote has been removed");
+    }
 }

@@ -46,6 +46,11 @@ public class Topic : BaseEntity
         await ProcessVoteAsync(voterEmail, 0, 1);
     }
 
+    public async Task UnvoteAsync(string voterEmail)
+    {
+        await ProcessVoteAsync(voterEmail, 0, 0);
+    }
+
     private async Task ProcessVoteAsync(string voterEmail, int upvote, int downvote)
     {
         if (_repositoryManager == null)

@@ -130,6 +130,12 @@ public class SpaceService : ISpaceService
         await topic.DownvoteAsync(voterEmail);
     }
 
+    public async Task UnvoteTopicAsync(Guid spaceId, Guid topicId, string voterEmail)
+    {
+        Topic topic = new(_repositoryManager, _helperManager) { Id = topicId, SpaceId = spaceId };
+        await topic.UnvoteAsync(voterEmail);
+    }
+
     public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
     {
         ModeratorSoul moderator = new(kickedByEmail, spaceId, _repositoryManager, _helperManager);
