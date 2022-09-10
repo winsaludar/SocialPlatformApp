@@ -166,7 +166,7 @@ public class SpaceService : ISpaceService
     {
         Topic topic = new(_repositoryManager, _helperManager) { Id = dto.TopicId, SpaceId = dto.SpaceId };
         Comment newComment = new() { Content = dto.Content };
-        await topic.AddComment(dto.AuthorEmail, newComment);
+        await topic.AddCommentAsync(dto.AuthorEmail, newComment);
     }
 
     public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)

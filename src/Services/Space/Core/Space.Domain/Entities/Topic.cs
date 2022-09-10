@@ -52,7 +52,7 @@ public class Topic : BaseEntity
         await ProcessVoteAsync(voterEmail, 0, 0);
     }
 
-    public async Task AddComment(string authorEmail, Comment comment)
+    public async Task AddCommentAsync(string authorEmail, Comment comment)
     {
         if (_repositoryManager == null)
             throw new NullReferenceException("IRepositoryManager is null");
