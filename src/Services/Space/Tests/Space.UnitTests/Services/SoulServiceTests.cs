@@ -37,6 +37,7 @@ public class SoulServiceTests
 
         var result = await _soulService.GetAllTopicsByIdAsync(soulId);
 
+        _mockRepo.Verify(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()), Times.Never());
         Assert.IsType<List<TopicDto>>(result);
         Assert.Empty(result);
     }
@@ -45,6 +46,7 @@ public class SoulServiceTests
     public async Task GetAllTopicsByIdAsync_SoulIsNotNull_ReturnsNonEmptyTopicsDto()
     {
         Guid soulId = Guid.NewGuid();
+        var mockVotesOutput = (0, 0);
 
         _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul
@@ -56,9 +58,12 @@ public class SoulServiceTests
                     new Topic()
                 }
             });
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(mockVotesOutput);
 
         var result = await _soulService.GetAllTopicsByIdAsync(soulId);
 
+        _mockRepo.Verify(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()), Times.AtLeastOnce());
         Assert.IsType<List<TopicDto>>(result);
         Assert.NotEmpty(result);
         Assert.Equal(3, result.Count());
@@ -74,6 +79,7 @@ public class SoulServiceTests
 
         var result = await _soulService.GetAllTopicsByEmailAsync(email);
 
+        _mockRepo.Verify(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()), Times.Never());
         Assert.IsType<List<TopicDto>>(result);
         Assert.Empty(result);
     }
@@ -82,6 +88,7 @@ public class SoulServiceTests
     public async Task GetAllTopicsByEmailAsync_SoulIsNotNull_ReturnsNonEmptyTopicsDto()
     {
         string email = "user@example.com";
+        var mockVotesOutput = (0, 0);
 
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(email, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul
@@ -93,9 +100,12 @@ public class SoulServiceTests
                     new Topic()
                 }
             });
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(mockVotesOutput);
 
         var result = await _soulService.GetAllTopicsByEmailAsync(email);
 
+        _mockRepo.Verify(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()), Times.AtLeastOnce());
         Assert.IsType<List<TopicDto>>(result);
         Assert.NotEmpty(result);
         Assert.Equal(3, result.Count());

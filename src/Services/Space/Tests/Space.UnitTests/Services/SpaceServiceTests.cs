@@ -194,6 +194,7 @@ public class SpaceServiceTests
 
         var result = await _spaceService.GetAllTopicsAsync(spaceId);
 
+        _mockRepo.Verify(x => x.SpaceRepository.GetTopicVotesAsync(It.IsAny<Guid>()), Times.Never());
         Assert.IsType<List<TopicDto>>(result);
         Assert.Empty(result);
     }
