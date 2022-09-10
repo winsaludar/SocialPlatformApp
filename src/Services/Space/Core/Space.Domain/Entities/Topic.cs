@@ -40,6 +40,16 @@ public class Topic : BaseEntity
 
     public async Task UpvoteAsync(string voterEmail)
     {
+        await ProcessVoteAsync(voterEmail, 1, 0);
+    }
+
+    public async Task DownvoteAsync(string voterEmail)
+    {
+        await ProcessVoteAsync(voterEmail, 0, 1);
+    }
+
+    private async Task ProcessVoteAsync(string voterEmail, int upvote, int downvote)
+    {
         if (_repositoryManager == null)
             throw new NullReferenceException("IRepositoryManager is null");
 
@@ -69,23 +79,18 @@ public class Topic : BaseEntity
             {
                 SoulId = existingSoul.Id,
                 TopicId = targetTopic.Id,
-                Upvote = 1,
-                Downvote = 0
+                Upvote = upvote,
+                Downvote = downvote
             };
             await _repositoryManager.SoulRepository.CreateTopicVoteAsync(vote);
         }
         else
         {
-            vote.Downvote = 0;
-            vote.Upvote = 1;
+            vote.Downvote = downvote;
+            vote.Upvote = upvote;
             await _repositoryManager.SoulRepository.UpdateTopicVoteAsync(vote);
         }
 
         await _repositoryManager.UnitOfWork.CommitAsync();
-    }
-
-    public async Task DownvoteAsync(string voterEmail)
-    {
-        // TODO:
     }
 }
