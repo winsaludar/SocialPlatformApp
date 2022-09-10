@@ -25,25 +25,25 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task GetAsync_SpaceIdIsInvalid_ReturnsNotFoundObjectResult()
+    public async Task GetAllAsync_SpaceIdIsInvalid_ReturnsNotFoundObjectResult()
     {
         _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
            .ReturnsAsync((SpaceDto)null!);
 
-        var result = await _controller.GetAsync(It.IsAny<Guid>());
+        var result = await _controller.GetAllAsync(It.IsAny<Guid>());
 
         Assert.IsType<NotFoundObjectResult>(result);
     }
 
     [Fact]
-    public async Task GetAsync_TopicsAreEmpty_ReturnsOkObjectResultWithEmptyData()
+    public async Task GetAllAsync_TopicsAreEmpty_ReturnsOkObjectResultWithEmptyData()
     {
         _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
            .ReturnsAsync(new SpaceDto());
         _mockService.Setup(x => x.SpaceService.GetAllTopicsAsync(It.IsAny<Guid>()))
            .ReturnsAsync((IEnumerable<TopicDto>)new List<TopicDto>());
 
-        var result = await _controller.GetAsync(It.IsAny<Guid>());
+        var result = await _controller.GetAllAsync(It.IsAny<Guid>());
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var spaces = Assert.IsType<List<TopicDto>>(okResult.Value);
@@ -51,7 +51,7 @@ public class SpaceTopicsControllerTests
     }
 
     [Fact]
-    public async Task GetAsync_TopicsAreNotEmpty_ReturnsOkObjectResultWithData()
+    public async Task GetAllAsync_TopicsAreNotEmpty_ReturnsOkObjectResultWithData()
     {
         _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
            .ReturnsAsync(new SpaceDto());
@@ -63,12 +63,36 @@ public class SpaceTopicsControllerTests
                new TopicDto()
            });
 
-        var result = await _controller.GetAsync(It.IsAny<Guid>());
+        var result = await _controller.GetAllAsync(It.IsAny<Guid>());
 
         var okResult = Assert.IsType<OkObjectResult>(result);
         var topics = Assert.IsType<List<TopicDto>>(okResult.Value);
         Assert.NotEmpty(topics);
         Assert.Equal(3, topics.Count());
+    }
+
+    [Fact]
+    public async Task GetBySlugAsync_OneOfTheSlugIsInvalid_ReturnsNotFoundObjectResult()
+    {
+        _mockService.Setup(x => x.SpaceService.GetTopicBySlugAsync(It.IsAny<string>(), It.IsAny<string>()))
+           .ReturnsAsync((TopicDto)null!);
+
+        var result = await _controller.GetBySlugAsync(It.IsAny<string>(), It.IsAny<string>());
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetBySlugAsync_BothSlugsAreValid_ReturnsOkObjectResultWithData()
+    {
+        _mockService.Setup(x => x.SpaceService.GetTopicBySlugAsync(It.IsAny<string>(), It.IsAny<string>()))
+           .ReturnsAsync(new TopicDto());
+
+        var result = await _controller.GetBySlugAsync(It.IsAny<string>(), It.IsAny<string>());
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var topic = Assert.IsType<TopicDto>(okResult.Value);
+        Assert.NotNull(topic);
     }
 
     [Fact]
