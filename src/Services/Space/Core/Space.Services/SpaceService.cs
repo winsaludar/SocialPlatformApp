@@ -102,10 +102,14 @@ public class SpaceService : ISpaceService
         return result;
     }
 
-    public async Task<TopicDto?> GetTopicBySlugAsync(Guid spaceId, string topicSlug)
+    public async Task<TopicDto?> GetTopicBySlugAsync(string spaceSlug, string topicSlug)
     {
         var topic = await _repositoryManager.SpaceRepository.GetTopicBySlugAsync(topicSlug);
-        if (topic == null || topic.SpaceId != spaceId)
+        if (topic == null)
+            return null;
+
+        var space = await _repositoryManager.SpaceRepository.GetBySlugAsync(spaceSlug);
+        if (space == null || space.Id != topic.SpaceId)
             return null;
 
         var result = topic.Adapt<TopicDto>();

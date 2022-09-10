@@ -31,12 +31,12 @@ public class SpaceTopicsController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{spaceId}/topics/{topicSlug}")]
+    [Route("{spaceSlug}/topics/{topicSlug}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TopicDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-    public async Task<IActionResult> GetAsync(Guid spaceId, string topicSlug)
+    public async Task<IActionResult> GetAsync(string spaceSlug, string topicSlug)
     {
-        TopicDto? topic = await _serviceManager.SpaceService.GetTopicBySlugAsync(spaceId, topicSlug);
+        TopicDto? topic = await _serviceManager.SpaceService.GetTopicBySlugAsync(spaceSlug, topicSlug);
         if (topic == null)
             return NotFound(topicSlug);
 
