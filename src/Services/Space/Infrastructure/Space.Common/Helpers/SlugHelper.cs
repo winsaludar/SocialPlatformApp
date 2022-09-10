@@ -1,4 +1,6 @@
-﻿using Space.Domain.Helpers;
+﻿using shortid;
+using shortid.Configuration;
+using Space.Domain.Helpers;
 
 namespace Space.Common.Helpers;
 
@@ -11,8 +13,13 @@ public class SlugHelper : ISlugHelper
         _slugHelper = new Slugify.SlugHelper();
     }
 
-    public string CreateSlug(string text)
+    public string CreateSlug(string text, bool hasUniqueId = false)
     {
-        return _slugHelper.GenerateSlug(text);
+        string slug = _slugHelper.GenerateSlug(text);
+        if (!hasUniqueId)
+            return slug;
+
+        string uniqueId = ShortId.Generate(new GenerationOptions(useNumbers: true, useSpecialCharacters: false));
+        return $"{slug}-{uniqueId}";
     }
 }

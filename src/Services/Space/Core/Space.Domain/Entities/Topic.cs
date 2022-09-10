@@ -25,7 +25,7 @@ public class Topic : BaseEntity
         {
             _title = value;
             if (_helperManager != null)
-                Slug = _helperManager.SlugHelper.CreateSlug(value);
+                Slug = _helperManager.SlugHelper.CreateSlug(value, true);
         }
     }
     public string Content { get; set; } = default!;

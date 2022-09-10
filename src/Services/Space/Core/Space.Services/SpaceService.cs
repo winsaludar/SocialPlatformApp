@@ -102,6 +102,26 @@ public class SpaceService : ISpaceService
         return result;
     }
 
+    public async Task<TopicDto?> GetTopicBySlugAsync(Guid spaceId, string topicSlug)
+    {
+        var topic = await _repositoryManager.SpaceRepository.GetTopicBySlugAsync(topicSlug);
+        if (topic == null || topic.SpaceId != spaceId)
+            return null;
+
+        var result = topic.Adapt<TopicDto>();
+
+        Soul? author = await _repositoryManager.SoulRepository.GetByIdAsync(result.SoulId);
+        if (author != null)
+        {
+            result.AuthorEmail = author.Email;
+            result.AuthorUsername = author.Name;
+        }
+
+        (result.Upvotes, result.Downvotes) = await _repositoryManager.SpaceRepository.GetTopicVotesAsync(result.Id);
+
+        return result;
+    }
+
     public async Task CreateTopicAsync(TopicDto dto)
     {
         MemberSoul member = new(dto.AuthorEmail, dto.SpaceId, _repositoryManager, _helperManager);

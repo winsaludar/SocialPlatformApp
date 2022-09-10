@@ -11,6 +11,7 @@ public class TopicConfiguration : IEntityTypeConfiguration<Topic>
         builder.ToTable(nameof(Topic));
 
         builder.HasKey(x => x.Id);
+        builder.HasAlternateKey(x => x.Slug);
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
         builder.Property(x => x.Title).IsRequired().HasMaxLength(200);

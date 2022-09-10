@@ -2,5 +2,5 @@
 
 public interface ISlugHelper
 {
-    string CreateSlug(string text);
+    string CreateSlug(string text, bool hasUniqueId = false);
 }

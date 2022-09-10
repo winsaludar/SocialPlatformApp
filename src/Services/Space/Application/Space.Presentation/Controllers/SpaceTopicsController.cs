@@ -30,6 +30,19 @@ public class SpaceTopicsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet]
+    [Route("{spaceId}/topics/{topicSlug}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TopicDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+    public async Task<IActionResult> GetAsync(Guid spaceId, string topicSlug)
+    {
+        TopicDto? topic = await _serviceManager.SpaceService.GetTopicBySlugAsync(spaceId, topicSlug);
+        if (topic == null)
+            return NotFound(topicSlug);
+
+        return Ok(topic);
+    }
+
     [HttpPost]
     [Route("{spaceId}/topics")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
