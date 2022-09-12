@@ -102,14 +102,38 @@ public class SpaceService : ISpaceService
         return result;
     }
 
-    public async Task<TopicDto?> GetTopicBySlugAsync(string spaceSlug, string topicSlug)
+    public async Task<TopicDto?> GetTopicByIdAsync(Guid spaceId, Guid topicId)
     {
-        var topic = await _repositoryManager.SpaceRepository.GetTopicBySlugAsync(topicSlug);
-        if (topic == null)
+        var space = await _repositoryManager.SpaceRepository.GetByIdAsync(spaceId);
+        if (space == null)
             return null;
 
+        var topic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(topicId);
+        if (topic == null || topic.SpaceId != space.Id)
+            return null;
+
+        var result = topic.Adapt<TopicDto>();
+
+        Soul? author = await _repositoryManager.SoulRepository.GetByIdAsync(result.SoulId);
+        if (author != null)
+        {
+            result.AuthorEmail = author.Email;
+            result.AuthorUsername = author.Name;
+        }
+
+        (result.Upvotes, result.Downvotes) = await _repositoryManager.SpaceRepository.GetTopicVotesAsync(result.Id);
+
+        return result;
+    }
+
+    public async Task<TopicDto?> GetTopicBySlugAsync(string spaceSlug, string topicSlug)
+    {
         var space = await _repositoryManager.SpaceRepository.GetBySlugAsync(spaceSlug);
-        if (space == null || space.Id != topic.SpaceId)
+        if (space == null)
+            return null;
+
+        var topic = await _repositoryManager.SpaceRepository.GetTopicBySlugAsync(topicSlug);
+        if (topic == null || topic.SpaceId != space.Id)
             return null;
 
         var result = topic.Adapt<TopicDto>();
@@ -160,6 +184,30 @@ public class SpaceService : ISpaceService
     {
         Topic topic = new(_repositoryManager, _helperManager) { Id = topicId, SpaceId = spaceId };
         await topic.UnvoteAsync(voterEmail);
+    }
+
+    public async Task<IEnumerable<CommentDto>> GetAllCommentsAsync(Guid spaceId, Guid topicId)
+    {
+        var space = await _repositoryManager.SpaceRepository.GetByIdAsync(spaceId);
+        if (space == null)
+            return new List<CommentDto>();
+
+        var topic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(topicId, true);
+        if (topic == null || topic.Space.Id != space.Id)
+            return new List<CommentDto>();
+
+        var comments = topic.Comments.Adapt<List<CommentDto>>();
+        foreach (var comment in comments)
+        {
+            Soul? author = await _repositoryManager.SoulRepository.GetByIdAsync(comment.SoulId);
+            if (author != null)
+            {
+                comment.AuthorEmail = author.Email;
+                comment.AuthorUsername = author.Name;
+            }
+        }
+
+        return comments;
     }
 
     public async Task CreateCommentAsync(CommentDto dto)

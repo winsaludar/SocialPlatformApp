@@ -11,8 +11,8 @@ public interface ISpaceRepository
     Task CreateAsync(Entities.Space newSpace);
     Task UpdateAsync(Entities.Space space);
 
-    Task<Topic?> GetTopicByIdAsync(Guid topicId);
-    Task<Topic?> GetTopicBySlugAsync(string topicSlug);
+    Task<Topic?> GetTopicByIdAsync(Guid topicId, bool includeComments = false);
+    Task<Topic?> GetTopicBySlugAsync(string topicSlug, bool includeComments = false);
     Task CreateTopicAsync(Topic newTopic);
     Task UpdateTopicAsync(Topic topic);
     Task DeleteTopicAsync(Topic topic);

@@ -85,14 +85,24 @@ public class SpaceRepository : ISpaceRepository
         await Task.Run(() => _dbContext.Spaces.Update(space));
     }
 
-    public async Task<Topic?> GetTopicByIdAsync(Guid topicId)
+    public async Task<Topic?> GetTopicByIdAsync(Guid topicId, bool includeComments = false)
     {
-        return await _dbContext.Topics.Where(x => x.Id == topicId).FirstOrDefaultAsync();
+        IQueryable<Topic> query = _dbContext.Topics.AsQueryable();
+
+        if (includeComments)
+            query = query.Include(x => x.Comments);
+
+        return await query.FirstOrDefaultAsync(x => x.Id == topicId);
     }
 
-    public async Task<Topic?> GetTopicBySlugAsync(string topicSlug)
+    public async Task<Topic?> GetTopicBySlugAsync(string topicSlug, bool includeComments = false)
     {
-        return await _dbContext.Topics.Where(x => x.Slug == topicSlug).FirstOrDefaultAsync();
+        IQueryable<Topic> query = _dbContext.Topics.AsQueryable();
+
+        if (includeComments)
+            query = query.Include(x => x.Comments);
+
+        return await query.FirstOrDefaultAsync(x => x.Slug == topicSlug);
     }
 
     public async Task CreateTopicAsync(Topic newTopic)

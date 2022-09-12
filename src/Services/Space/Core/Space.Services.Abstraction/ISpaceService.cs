@@ -12,6 +12,7 @@ public interface ISpaceService
     Task<IEnumerable<SoulDto>> GetAllMembersAsync(Guid spaceId);
     Task<IEnumerable<TopicDto>> GetAllTopicsAsync(Guid spaceId);
 
+    Task<TopicDto?> GetTopicByIdAsync(Guid spaceId, Guid topicId);
     Task<TopicDto?> GetTopicBySlugAsync(string spaceSlug, string topicSlug);
     Task CreateTopicAsync(TopicDto dto);
     Task UpdateTopicAsync(TopicDto dto);
@@ -20,6 +21,7 @@ public interface ISpaceService
     Task DownvoteTopicAsync(Guid spaceId, Guid topicId, string voterEmail);
     Task UnvoteTopicAsync(Guid spaceId, Guid topicId, string voterEmail);
 
+    Task<IEnumerable<CommentDto>> GetAllCommentsAsync(Guid spaceId, Guid topicId);
     Task CreateCommentAsync(CommentDto dto);
 
     Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail);
