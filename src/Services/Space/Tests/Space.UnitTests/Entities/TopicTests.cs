@@ -46,7 +46,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task UpvoteAsync_TopicSpaceIdIsDifferent_ThrowsInvalidTopicIdException()
+    public async Task UpvoteAsync_TopicSpaceIdAndSpaceIdDoesNotMatch_ThrowsInvalidTopicIdException()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
@@ -70,7 +70,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task UpvoteAsync_TopicSpaceAndSoulAreAllValidAndNoVoteYet_CreateVote()
+    public async Task UpvoteAsync_AllAreValidAndNoVoteYet_CreateVote()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote? newVote = null;
@@ -94,7 +94,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task UpvoteAsync_TopicSpaceAndSoulAreAllValidAndHasVoteAlready_UpdateVote()
+    public async Task UpvoteAsync_AllAreValidAndHasVoteAlready_UpdateVote()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote vote = new() { Upvote = 0, Downvote = 1 };
@@ -136,7 +136,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task DownvoteAsync_TopicSpaceIdIsDifferent_ThrowsInvalidTopicIdException()
+    public async Task DownvoteAsync_TopicSpaceIdAndSpaceIdDoesNotMatch_ThrowsInvalidTopicIdException()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
@@ -160,7 +160,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task DownvoteAsync_TopicSpaceAndSoulAreAllValidAndNoVoteYet_CreateVote()
+    public async Task DownvoteAsync_AllAreValidAndNoVoteYet_CreateVote()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote? newVote = null;
@@ -184,7 +184,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task DownvoteAsync_TopicSpaceAndSoulAreAllValidAndHasVoteAlready_UpdateVote()
+    public async Task DownvoteAsync_AllAreValidAndHasVoteAlready_UpdateVote()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote vote = new() { Upvote = 1, Downvote = 0 };
@@ -226,7 +226,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task UnvoteAsync_TopicSpaceIdIsDifferent_ThrowsInvalidTopicIdException()
+    public async Task UnvoteAsync_TopicSpaceIdAndSpaceIdDoesNotMatch_ThrowsInvalidTopicIdException()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
@@ -250,7 +250,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task UnvoteAsync_TopicSpaceAndSoulAreAllValidAndNoVoteYet_CreateVote()
+    public async Task UnvoteAsync_AllAreValidAndNoVoteYet_CreateVote()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote? newVote = null;
@@ -274,7 +274,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task UnvoteAsync_TopicSpaceAndSoulAreAllValidAndHasVoteAlready_UpdateVote()
+    public async Task UnvoteAsync_AllAreValidAndHasVoteAlready_UpdateVote()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote vote = new() { Upvote = 1, Downvote = 0 };
@@ -316,7 +316,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task AddCommentAsync_TopicSpaceIdIsDifferent_ThrowsInvalidTopicIdException()
+    public async Task AddCommentAsync_TopicSpaceIdAndSpaceIdDoesNotMatch_ThrowsInvalidTopicIdException()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
@@ -340,7 +340,7 @@ public class TopicTests
     }
 
     [Fact]
-    public async Task AddCommentAsync_TopicSpaceAndSoulAreAllValid_CreateComment()
+    public async Task AddCommentAsync_AllAreValid_CreateComment()
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         Soul author = new() { Id = Guid.NewGuid() };
@@ -361,5 +361,106 @@ public class TopicTests
         Assert.NotNull(createdComment);
         Assert.Equal(topic.Id, createdComment?.TopicId);
         Assert.Equal(author.Id, createdComment?.SoulId);
+    }
+
+    [Fact]
+    public async Task UpdateCommentAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
+    {
+        Topic topic = new();
+
+        await Assert.ThrowsAsync<NullReferenceException>(() => topic.UpdateCommentAsync(It.IsAny<string>(), It.IsAny<Comment>()));
+    }
+
+    [Fact]
+    public async Task UpdateCommentAsync_TopicDoesNotExist_ThrowsInvalidTopicIdException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object);
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync((Topic)null!);
+
+        await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.UpdateCommentAsync(It.IsAny<string>(), It.IsAny<Comment>()));
+    }
+
+    [Fact]
+    public async Task UpdateCommentAsync_TopicSpaceIdAndSpaceIdDoesNotMatch_ThrowsInvalidTopicIdException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Topic() { SpaceId = Guid.NewGuid() });
+
+        await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.UpdateCommentAsync(It.IsAny<string>(), It.IsAny<Comment>()));
+    }
+
+    [Fact]
+    public async Task UpdateCommentAsync_CommentDoesNotExist_ThrowsInvalidCommentIdException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+        Comment comment = new() { Id = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(topic);
+        _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync((Comment)null!);
+
+        await Assert.ThrowsAsync<InvalidCommentIdException>(() => topic.UpdateCommentAsync(It.IsAny<string>(), comment));
+    }
+
+    [Fact]
+    public async Task UpdateCommentAsync_EditorDoesNotExist_ThrowsInvalidSoulException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+        Comment comment = new() { Id = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(topic);
+        _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(comment);
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync((Soul)null!);
+
+        await Assert.ThrowsAsync<InvalidSoulException>(() => topic.UpdateCommentAsync(It.IsAny<string>(), comment));
+    }
+
+    [Fact]
+    public async Task UpdateCommentAsync_CommentAuthorIdAndEditorIdDoesNotMatch_ThrowsInvalidSoulException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+        Comment comment = new() { Id = Guid.NewGuid(), SoulId = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(topic);
+        _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(comment);
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul { Id = Guid.NewGuid() });
+
+        await Assert.ThrowsAsync<InvalidSoulException>(() => topic.UpdateCommentAsync(It.IsAny<string>(), comment));
+    }
+
+    [Fact]
+    public async Task UpdateCommentAsync_AllAreValid_UpdateComment()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+        Soul author = new() { Id = Guid.NewGuid() };
+        Comment comment = new() { TopicId = topic.Id, SoulId = author.Id, Content = "Updated Content" };
+        Comment? updatedComment = null;
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(topic);
+        _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(comment);
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(author);
+        _mockRepo.Setup(x => x.SpaceRepository.UpdateCommentAsync(It.IsAny<Comment>()))
+            .Callback<Comment>(x => updatedComment = comment);
+
+        await topic.UpdateCommentAsync(It.IsAny<string>(), comment);
+
+        _mockRepo.Verify(x => x.SpaceRepository.UpdateCommentAsync(It.IsAny<Comment>()), Times.Once);
+        _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);
+        Assert.NotNull(updatedComment);
+        Assert.Equal(comment.Content, updatedComment?.Content);
     }
 }

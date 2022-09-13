@@ -137,8 +137,18 @@ public class SpaceRepository : ISpaceRepository
         return (result.Upvotes, result.Downvotes);
     }
 
+    public async Task<Comment?> GetCommentByIdAsync(Guid commentId)
+    {
+        return await _dbContext.Comments.FirstOrDefaultAsync(x => x.Id == commentId);
+    }
+
     public async Task CreateCommentAsync(Comment newComment)
     {
         await _dbContext.Comments.AddAsync(newComment);
+    }
+
+    public async Task UpdateCommentAsync(Comment comment)
+    {
+        await Task.Run(() => _dbContext.Comments.Update(comment));
     }
 }

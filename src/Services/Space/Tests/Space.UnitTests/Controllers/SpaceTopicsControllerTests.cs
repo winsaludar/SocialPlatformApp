@@ -234,8 +234,8 @@ public class SpaceTopicsControllerTests
 
         _mockService.Verify(x => x.SpaceService.UpdateTopicAsync(It.IsAny<TopicDto>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
-        Assert.Equal(updatedTopic?.Title, request.Title);
-        Assert.Equal(updatedTopic?.Content, request.Content);
+        Assert.Equal(request.Title, updatedTopic?.Title);
+        Assert.Equal(request.Content, updatedTopic?.Content);
     }
 
     [Fact]
