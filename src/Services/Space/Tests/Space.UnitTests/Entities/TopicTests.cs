@@ -39,7 +39,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object);
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((Topic)null!);
 
         await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.UpvoteAsync(It.IsAny<string>()));
@@ -50,7 +50,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(new Topic() { SpaceId = Guid.NewGuid() });
 
         await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.UpvoteAsync(It.IsAny<string>()));
@@ -61,7 +61,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
@@ -75,7 +75,7 @@ public class TopicTests
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote? newVote = null;
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul());
@@ -99,7 +99,7 @@ public class TopicTests
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote vote = new() { Upvote = 0, Downvote = 1 };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul());
@@ -129,7 +129,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object);
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((Topic)null!);
 
         await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.DownvoteAsync(It.IsAny<string>()));
@@ -140,7 +140,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(new Topic() { SpaceId = Guid.NewGuid() });
 
         await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.DownvoteAsync(It.IsAny<string>()));
@@ -151,7 +151,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
@@ -165,7 +165,7 @@ public class TopicTests
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote? newVote = null;
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul());
@@ -189,7 +189,7 @@ public class TopicTests
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote vote = new() { Upvote = 1, Downvote = 0 };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul());
@@ -219,7 +219,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object);
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((Topic)null!);
 
         await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.UnvoteAsync(It.IsAny<string>()));
@@ -230,7 +230,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(new Topic() { SpaceId = Guid.NewGuid() });
 
         await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.UnvoteAsync(It.IsAny<string>()));
@@ -241,7 +241,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
@@ -255,7 +255,7 @@ public class TopicTests
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote? newVote = null;
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul());
@@ -279,7 +279,7 @@ public class TopicTests
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
         SoulTopicVote vote = new() { Upvote = 1, Downvote = 0 };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul());
@@ -309,7 +309,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object);
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((Topic)null!);
 
         await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.AddCommentAsync(It.IsAny<string>(), It.IsAny<Comment>()));
@@ -320,7 +320,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(new Topic() { SpaceId = Guid.NewGuid() });
 
         await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.AddCommentAsync(It.IsAny<string>(), It.IsAny<Comment>()));
@@ -331,7 +331,7 @@ public class TopicTests
     {
         Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
@@ -347,7 +347,7 @@ public class TopicTests
         Comment newComment = new() { TopicId = topic.Id, SoulId = author.Id };
         Comment? createdComment = null;
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(author);

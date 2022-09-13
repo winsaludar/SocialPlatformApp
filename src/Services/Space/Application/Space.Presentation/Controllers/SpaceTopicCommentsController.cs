@@ -16,6 +16,24 @@ public class SpaceTopicCommentsController : ControllerBase
 
     public SpaceTopicCommentsController(IServiceManager serviceManager) => _serviceManager = serviceManager;
 
+    [HttpGet]
+    [Route("{spaceId}/topics/{topicId}/comments")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+    public async Task<IActionResult> GetAllAsync(Guid spaceId, Guid topicId)
+    {
+        SpaceDto? space = await _serviceManager.SpaceService.GetByIdAsync(spaceId);
+        if (space == null)
+            return NotFound(spaceId);
+
+        TopicDto? topic = await _serviceManager.SpaceService.GetTopicByIdAsync(spaceId, topicId);
+        if (topic == null)
+            return NotFound(topicId);
+
+        var result = await _serviceManager.SpaceService.GetAllCommentsAsync(spaceId, topicId);
+        return Ok(result);
+    }
+
     [HttpPost]
     [Route("{spaceId}/topics/{topicId}/comments")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]

@@ -231,7 +231,7 @@ public class SpaceServiceTests
     [Fact]
     public async Task GetTopicBySlugAsync_TopicIsNull_ReturnsNull()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync((Topic)null!);
 
         var result = await _spaceService.GetTopicBySlugAsync(It.IsAny<string>(), It.IsAny<string>());
@@ -242,7 +242,7 @@ public class SpaceServiceTests
     [Fact]
     public async Task GetTopicBySlugAsync_SpaceIsNull_ReturnsNull()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(new Topic());
         _mockRepo.Setup(x => x.SpaceRepository.GetBySlugAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((DomainEntities.Space)null!);
@@ -255,7 +255,7 @@ public class SpaceServiceTests
     [Fact]
     public async Task GetTopicBySlugAsync_TopicSpaceIdAndSpaceIdDoesNotMatch_ReturnsNull()
     {
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(new Topic { SpaceId = Guid.NewGuid() });
         _mockRepo.Setup(x => x.SpaceRepository.GetBySlugAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space { Id = Guid.NewGuid() });
@@ -271,7 +271,7 @@ public class SpaceServiceTests
         Guid spaceId = Guid.NewGuid();
         var outputVotes = (0, 0);
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(new Topic { SpaceId = spaceId });
         _mockRepo.Setup(x => x.SpaceRepository.GetBySlugAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space { Id = spaceId });
@@ -293,7 +293,7 @@ public class SpaceServiceTests
         Guid spaceId = Guid.NewGuid();
         var outputVotes = (0, 0);
 
-        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>()))
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicBySlugAsync(It.IsAny<string>(), It.IsAny<bool>()))
             .ReturnsAsync(new Topic { SpaceId = spaceId });
         _mockRepo.Setup(x => x.SpaceRepository.GetBySlugAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new DomainEntities.Space { Id = spaceId });
@@ -307,5 +307,118 @@ public class SpaceServiceTests
         Assert.NotNull(result);
         Assert.Null(result?.AuthorEmail);
         Assert.Null(result?.AuthorUsername);
+    }
+
+    [Fact]
+    public async Task GetAllCommentsAsync_SpaceIsNull_ReturnsEmptyCommentsDto()
+    {
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync((DomainEntities.Space)null!);
+
+        var result = await _spaceService.GetAllCommentsAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        Assert.IsType<List<CommentDto>>(result);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllCommentsAsync_TopicIsNull_ReturnsEmptyCommentsDto()
+    {
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space());
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync((Topic)null!);
+
+        var result = await _spaceService.GetAllCommentsAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        Assert.IsType<List<CommentDto>>(result);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllCommentsAsync_SpaceIdAndTopicIdDoesNotMatch_ReturnsEmptyCommentsDto()
+    {
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space { Id = Guid.NewGuid() });
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Topic { SpaceId = Guid.NewGuid() });
+
+        var result = await _spaceService.GetAllCommentsAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        Assert.IsType<List<CommentDto>>(result);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllCommentsAsync_TopicDoesNotContainAnyComment_ReturnsEmptyCommentsDto()
+    {
+        Guid spaceId = Guid.NewGuid();
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space { Id = spaceId });
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Topic { SpaceId = spaceId });
+
+        var result = await _spaceService.GetAllCommentsAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        Assert.IsType<List<CommentDto>>(result);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllCommentsAsync_AuthorIsNull_CommentHasNoEmailAndUsername()
+    {
+        Guid spaceId = Guid.NewGuid();
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space { Id = spaceId });
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Topic
+            {
+                SpaceId = spaceId,
+                Comments = new List<Comment>
+                {
+                    new Comment(),
+                    new Comment(),
+                    new Comment(),
+                }
+            });
+        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync((Soul)null!);
+
+        var result = await _spaceService.GetAllCommentsAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        Assert.IsType<List<CommentDto>>(result);
+        Assert.NotEmpty(result);
+        Assert.Equal(3, result.Count());
+        Assert.Null(result.First()?.AuthorEmail);
+        Assert.Null(result.First()?.AuthorUsername);
+    }
+
+    [Fact]
+    public async Task GetAllCommentsAsync_AuthorIsNotNull_CommentHasEmailAndUsername()
+    {
+        Guid spaceId = Guid.NewGuid();
+        _mockRepo.Setup(x => x.SpaceRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new DomainEntities.Space { Id = spaceId });
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Topic
+            {
+                SpaceId = spaceId,
+                Comments = new List<Comment>
+                {
+                    new Comment(),
+                    new Comment(),
+                    new Comment(),
+                }
+            });
+        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul { Email = "commenter@example.com", Name = "Commenter" });
+
+        var result = await _spaceService.GetAllCommentsAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        Assert.IsType<List<CommentDto>>(result);
+        Assert.NotEmpty(result);
+        Assert.Equal(3, result.Count());
+        Assert.Equal("commenter@example.com", result.First()?.AuthorEmail);
+        Assert.Equal("Commenter", result.First()?.AuthorUsername);
     }
 }
