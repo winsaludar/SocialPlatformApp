@@ -193,7 +193,7 @@ public class SpaceService : ISpaceService
             return new List<CommentDto>();
 
         var topic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(topicId, true);
-        if (topic == null || topic.Space.Id != space.Id)
+        if (topic == null || topic.SpaceId != space.Id)
             return new List<CommentDto>();
 
         var comments = topic.Comments.Adapt<List<CommentDto>>();
