@@ -58,4 +58,30 @@ public class SpaceTopicCommentsController : ControllerBase
 
         return Ok("Your comment has been posted");
     }
+
+    [HttpPut]
+    [Route("{spaceId}/topics/{topicId}/comments/{commentId}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    public async Task<IActionResult> PutAsync(Guid spaceId, Guid topicId, Guid commentId, [FromBody] CreateEditCommentRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Please provide all the required fields");
+
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized("Invalid user");
+
+        CommentDto dto = new()
+        {
+            Id = commentId,
+            SpaceId = spaceId,
+            TopicId = topicId,
+            AuthorEmail = User.Identity.Name,
+            Content = request.Content
+        };
+        await _serviceManager.SpaceService.UpdateCommentAsync(dto);
+
+        return Ok("Your comment has been updated");
+    }
 }

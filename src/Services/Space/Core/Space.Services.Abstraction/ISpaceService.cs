@@ -23,6 +23,7 @@ public interface ISpaceService
 
     Task<IEnumerable<CommentDto>> GetAllCommentsAsync(Guid spaceId, Guid topicId);
     Task CreateCommentAsync(CommentDto dto);
+    Task UpdateCommentAsync(CommentDto dto);
 
     Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail);
 }

@@ -60,8 +60,8 @@ public class Topic : BaseEntity
         await _repositoryManager.UnitOfWork.BeginTransactionAsync();
 
         // Make sure topic id is valid
-        Topic? targetTopic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(Id);
-        if (targetTopic == null || targetTopic.SpaceId != SpaceId)
+        Topic? existingTopic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(Id);
+        if (existingTopic == null || existingTopic.SpaceId != SpaceId)
         {
             await _repositoryManager.UnitOfWork.RollbackAsync();
             throw new InvalidTopicIdException(Id);
@@ -76,11 +76,50 @@ public class Topic : BaseEntity
         }
 
         comment.SoulId = existingSoul.Id;
-        comment.TopicId = targetTopic.Id;
+        comment.TopicId = existingTopic.Id;
         comment.CreatedBy = existingSoul.Email;
         comment.CreatedDateUtc = DateTime.UtcNow;
 
         await _repositoryManager.SpaceRepository.CreateCommentAsync(comment);
+        await _repositoryManager.UnitOfWork.CommitAsync();
+    }
+
+    public async Task UpdateCommentAsync(string authorEmail, Comment comment)
+    {
+        if (_repositoryManager == null)
+            throw new NullReferenceException("IRepositoryManager is null");
+
+        await _repositoryManager.UnitOfWork.BeginTransactionAsync();
+
+        // Make sure topic id is valid
+        Topic? existingTopic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(Id);
+        if (existingTopic == null || existingTopic.SpaceId != SpaceId)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidTopicIdException(Id);
+        }
+
+        // Make sure comment exist
+        Comment? targetComment = await _repositoryManager.SpaceRepository.GetCommentByIdAsync(comment.Id);
+        if (targetComment == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidCommentIdException(comment.Id);
+        }
+
+        // Make sure author email exist
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(authorEmail);
+        if (existingSoul == null || targetComment.SoulId != existingSoul.Id)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSoulException(authorEmail);
+        }
+
+        targetComment.Content = comment.Content;
+        targetComment.LastModifiedBy = existingSoul.Email;
+        targetComment.LastModifiedDateUtc = DateTime.UtcNow;
+
+        await _repositoryManager.SpaceRepository.UpdateCommentAsync(targetComment);
         await _repositoryManager.UnitOfWork.CommitAsync();
     }
 

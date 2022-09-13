@@ -18,5 +18,7 @@ public interface ISpaceRepository
     Task DeleteTopicAsync(Topic topic);
     Task<(int upvotes, int downvotes)> GetTopicVotesAsync(Guid topicId);
 
+    Task<Comment?> GetCommentByIdAsync(Guid commentId);
     Task CreateCommentAsync(Comment newComment);
+    Task UpdateCommentAsync(Comment comment);
 }
