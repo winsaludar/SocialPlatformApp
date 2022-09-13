@@ -151,4 +151,71 @@ public class SpaceTopicCommentsControllerTests
         Assert.IsType<OkObjectResult>(result);
         Assert.Equal(request.Content, createdTopic?.Content);
     }
+
+    [Fact]
+    public async Task PutAsync_ModelStateIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        Guid commentId = Guid.NewGuid();
+        CreateEditCommentRequest request = new() { };
+        _controller.ModelState.AddModelError("Content", "Required");
+
+        var result = await _controller.PutAsync(spaceId, topicId, commentId, request);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task PutAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        Guid commentId = Guid.NewGuid();
+        CreateEditCommentRequest request = new() { Content = "Updated Content" };
+
+        var result = await _controller.PutAsync(spaceId, topicId, commentId, request);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task PutAsync_RequestIsValid_ReturnsOkObjectResult()
+    {
+        CommentDto? updatedComment = null;
+        _mockService.Setup(x => x.SpaceService.UpdateCommentAsync(It.IsAny<CommentDto>()))
+            .Callback<CommentDto>(x => updatedComment = x);
+
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        Guid commentId = Guid.NewGuid();
+        CreateEditCommentRequest request = new() { Content = "Updated Content" };
+
+        var result = await _controller.PutAsync(spaceId, topicId, commentId, request);
+
+        _mockService.Verify(x => x.SpaceService.UpdateCommentAsync(It.IsAny<CommentDto>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(request.Content, updatedComment?.Content);
+    }
 }
