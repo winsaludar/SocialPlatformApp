@@ -25,6 +25,70 @@ public class SpaceTopicCommentsControllerTests
     }
 
     [Fact]
+    public async Task GetAllAsync_SpaceIdIsInvalid_ReturnsNotFoundObjectResult()
+    {
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync((SpaceDto)null!);
+
+        var result = await _controller.GetAllAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_TopicIdIsInvalid_ReturnsNotFoundObjectResult()
+    {
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync(new SpaceDto());
+        _mockService.Setup(x => x.SpaceService.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+           .ReturnsAsync((TopicDto)null!);
+
+        var result = await _controller.GetAllAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_CommentsAreEmpty_ReturnsOkObjectResultWithEmptyData()
+    {
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync(new SpaceDto());
+        _mockService.Setup(x => x.SpaceService.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+           .ReturnsAsync(new TopicDto());
+        _mockService.Setup(x => x.SpaceService.GetAllCommentsAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+           .ReturnsAsync((IEnumerable<CommentDto>)new List<CommentDto>());
+
+        var result = await _controller.GetAllAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var comments = Assert.IsType<List<CommentDto>>(okResult.Value);
+        Assert.Empty(comments);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_CommentsAreNotEmpty_ReturnsOkObjectResultWithData()
+    {
+        _mockService.Setup(x => x.SpaceService.GetByIdAsync(It.IsAny<Guid>()))
+           .ReturnsAsync(new SpaceDto());
+        _mockService.Setup(x => x.SpaceService.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+           .ReturnsAsync(new TopicDto());
+        _mockService.Setup(x => x.SpaceService.GetAllCommentsAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
+           .ReturnsAsync((IEnumerable<CommentDto>)new List<CommentDto>()
+           {
+               new CommentDto(),
+               new CommentDto(),
+               new CommentDto()
+           });
+
+        var result = await _controller.GetAllAsync(It.IsAny<Guid>(), It.IsAny<Guid>());
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var comments = Assert.IsType<List<CommentDto>>(okResult.Value);
+        Assert.NotEmpty(comments);
+        Assert.Equal(3, comments.Count());
+    }
+
+    [Fact]
     public async Task PostAsync_ModelStateIsInvalid_ReturnsBadRequestObjectResult()
     {
         Guid spaceId = Guid.NewGuid();
