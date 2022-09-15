@@ -218,4 +218,50 @@ public class SpaceTopicCommentsControllerTests
         Assert.IsType<OkObjectResult>(result);
         Assert.Equal(request.Content, updatedComment?.Content);
     }
+
+    [Fact]
+    public async Task DeleteAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        Guid commentId = Guid.NewGuid();
+
+        var result = await _controller.DeleteAsync(spaceId, topicId, commentId);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RequestIsValid_ReturnsOkObjectResult()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        Guid spaceId = Guid.NewGuid();
+        Guid topicId = Guid.NewGuid();
+        Guid commentId = Guid.NewGuid();
+
+        var result = await _controller.DeleteAsync(spaceId, topicId, commentId);
+
+        _mockService.Verify(x => x.SpaceService.DeleteCommentAsync(It.IsAny<CommentDto>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
 }
