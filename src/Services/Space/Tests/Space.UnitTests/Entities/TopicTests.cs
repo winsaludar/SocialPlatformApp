@@ -518,7 +518,7 @@ public class TopicTests
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
             .ReturnsAsync(comment);
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
 
         await Assert.ThrowsAsync<InvalidSoulException>(() => topic.DeleteCommentAsync(It.IsAny<string>(), comment));
@@ -534,7 +534,7 @@ public class TopicTests
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
             .ReturnsAsync(comment);
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul { Id = Guid.NewGuid() });
 
         await Assert.ThrowsAsync<InvalidSoulException>(() => topic.DeleteCommentAsync(It.IsAny<string>(), comment));
@@ -557,7 +557,7 @@ public class TopicTests
             .ReturnsAsync(topic);
         _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
             .ReturnsAsync(comment);
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(author);
         _mockRepo.Setup(x => x.SpaceRepository.DeleteCommentAsync(It.IsAny<Comment>()))
             .Callback<Comment>(x => comments.RemoveAt(2));
