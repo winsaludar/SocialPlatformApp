@@ -21,4 +21,5 @@ public interface ISpaceRepository
     Task<Comment?> GetCommentByIdAsync(Guid commentId);
     Task CreateCommentAsync(Comment newComment);
     Task UpdateCommentAsync(Comment comment);
+    Task DeleteCommentAsync(Comment comment);
 }

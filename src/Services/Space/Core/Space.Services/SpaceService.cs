@@ -224,6 +224,13 @@ public class SpaceService : ISpaceService
         await topic.UpdateCommentAsync(dto.AuthorEmail, comment);
     }
 
+    public async Task DeleteCommentAsync(CommentDto dto)
+    {
+        Topic topic = new(_repositoryManager, _helperManager) { Id = dto.TopicId, SpaceId = dto.SpaceId };
+        Comment comment = new() { Id = dto.Id };
+        await topic.DeleteCommentAsync(dto.AuthorEmail, comment);
+    }
+
     public async Task KickMemberAsync(Guid spaceId, string kickedByEmail, string memberEmail)
     {
         ModeratorSoul moderator = new(kickedByEmail, spaceId, _repositoryManager, _helperManager);
