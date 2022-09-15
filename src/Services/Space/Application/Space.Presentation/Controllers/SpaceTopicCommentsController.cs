@@ -84,4 +84,25 @@ public class SpaceTopicCommentsController : ControllerBase
 
         return Ok("Your comment has been updated");
     }
+
+    [HttpDelete]
+    [Route("{spaceId}/topics/{topicId}/comments/{commentId}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    public async Task<IActionResult> DeleteAsync(Guid spaceId, Guid topicId, Guid commentId)
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized("Invalid user");
+
+        CommentDto dto = new()
+        {
+            Id = commentId,
+            SpaceId = spaceId,
+            TopicId = topicId,
+            AuthorEmail = User.Identity.Name
+        };
+        await _serviceManager.SpaceService.DeleteCommentAsync(dto);
+
+        return Ok("You comment has been deleted");
+    }
 }

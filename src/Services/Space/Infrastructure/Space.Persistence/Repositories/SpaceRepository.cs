@@ -151,4 +151,9 @@ public class SpaceRepository : ISpaceRepository
     {
         await Task.Run(() => _dbContext.Comments.Update(comment));
     }
+
+    public async Task DeleteCommentAsync(Comment comment)
+    {
+        await Task.Run(() => _dbContext.Comments.Remove(comment));
+    }
 }

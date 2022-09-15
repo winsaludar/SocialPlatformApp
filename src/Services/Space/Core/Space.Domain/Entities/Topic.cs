@@ -123,6 +123,41 @@ public class Topic : BaseEntity
         await _repositoryManager.UnitOfWork.CommitAsync();
     }
 
+    public async Task DeleteCommentAsync(string authorEmail, Comment comment)
+    {
+        if (_repositoryManager == null)
+            throw new NullReferenceException("IRepositoryManager is null");
+
+        await _repositoryManager.UnitOfWork.BeginTransactionAsync();
+
+        // Make sure topic id is valid
+        Topic? existingTopic = await _repositoryManager.SpaceRepository.GetTopicByIdAsync(Id);
+        if (existingTopic == null || existingTopic.SpaceId != SpaceId)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidTopicIdException(Id);
+        }
+
+        // Make sure comment exist
+        Comment? targetComment = await _repositoryManager.SpaceRepository.GetCommentByIdAsync(comment.Id);
+        if (targetComment == null)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidCommentIdException(comment.Id);
+        }
+
+        // Make sure author email exist
+        Soul? existingSoul = await _repositoryManager.SoulRepository.GetByEmailAsync(authorEmail);
+        if (existingSoul == null || targetComment.SoulId != existingSoul.Id)
+        {
+            await _repositoryManager.UnitOfWork.RollbackAsync();
+            throw new InvalidSoulException(authorEmail);
+        }
+
+        await _repositoryManager.SpaceRepository.DeleteCommentAsync(targetComment);
+        await _repositoryManager.UnitOfWork.CommitAsync();
+    }
+
     private async Task ProcessVoteAsync(string voterEmail, int upvote, int downvote)
     {
         if (_repositoryManager == null)
