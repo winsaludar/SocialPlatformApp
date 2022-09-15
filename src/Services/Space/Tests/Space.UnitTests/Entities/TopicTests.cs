@@ -463,4 +463,109 @@ public class TopicTests
         Assert.NotNull(updatedComment);
         Assert.Equal(comment.Content, updatedComment?.Content);
     }
+
+    [Fact]
+    public async Task DeleteCommentAsync_RepositoryManagerIsNull_ThrowsNullReferenceException()
+    {
+        Topic topic = new();
+
+        await Assert.ThrowsAsync<NullReferenceException>(() => topic.DeleteCommentAsync(It.IsAny<string>(), It.IsAny<Comment>()));
+    }
+
+    [Fact]
+    public async Task DeleteCommentAsync_TopicDoesNotExist_ThrowsInvalidTopicIdException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object);
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync((Topic)null!);
+
+        await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.DeleteCommentAsync(It.IsAny<string>(), It.IsAny<Comment>()));
+    }
+
+    [Fact]
+    public async Task DeleteCommentAsync_TopicSpaceIdAndSpaceIdDoesNotMatch_ThrowsInvalidTopicIdException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Topic() { SpaceId = Guid.NewGuid() });
+
+        await Assert.ThrowsAsync<InvalidTopicIdException>(() => topic.DeleteCommentAsync(It.IsAny<string>(), It.IsAny<Comment>()));
+    }
+
+    [Fact]
+    public async Task DeleteCommentAsync_CommentDoesNotExist_ThrowsInvalidCommentIdException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+        Comment comment = new() { Id = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(topic);
+        _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync((Comment)null!);
+
+        await Assert.ThrowsAsync<InvalidCommentIdException>(() => topic.DeleteCommentAsync(It.IsAny<string>(), comment));
+    }
+
+    [Fact]
+    public async Task DeleteCommentAsync_DeleterDoesNotExist_ThrowsInvalidSoulException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+        Comment comment = new() { Id = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(topic);
+        _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(comment);
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync((Soul)null!);
+
+        await Assert.ThrowsAsync<InvalidSoulException>(() => topic.DeleteCommentAsync(It.IsAny<string>(), comment));
+    }
+
+    [Fact]
+    public async Task DeleteCommentAsync_CommentAuthorIdAndDeleterIdDoesNotMatch_ThrowsInvalidSoulException()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+        Comment comment = new() { Id = Guid.NewGuid(), SoulId = Guid.NewGuid() };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(topic);
+        _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(comment);
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul { Id = Guid.NewGuid() });
+
+        await Assert.ThrowsAsync<InvalidSoulException>(() => topic.DeleteCommentAsync(It.IsAny<string>(), comment));
+    }
+
+    [Fact]
+    public async Task DeleteCommentAsync_AllAreValid_DeleteComment()
+    {
+        Topic topic = new(_mockRepo.Object, _mockHelper.Object) { Id = Guid.NewGuid(), SpaceId = Guid.NewGuid() };
+        Soul author = new() { Id = Guid.NewGuid() };
+        Comment comment = new() { Id = Guid.NewGuid(), TopicId = topic.Id, SoulId = author.Id };
+        List<Comment> comments = new()
+        {
+            new Comment(),
+            new Comment(),
+            new Comment()
+        };
+
+        _mockRepo.Setup(x => x.SpaceRepository.GetTopicByIdAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+            .ReturnsAsync(topic);
+        _mockRepo.Setup(x => x.SpaceRepository.GetCommentByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(comment);
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(author);
+        _mockRepo.Setup(x => x.SpaceRepository.DeleteCommentAsync(It.IsAny<Comment>()))
+            .Callback<Comment>(x => comments.RemoveAt(2));
+
+        await topic.DeleteCommentAsync(It.IsAny<string>(), comment);
+
+        _mockRepo.Verify(x => x.SpaceRepository.DeleteCommentAsync(It.IsAny<Comment>()), Times.Once);
+        _mockRepo.Verify(x => x.UnitOfWork.CommitAsync(), Times.Once);
+        Assert.Equal(2, comments.Count);
+    }
 }
