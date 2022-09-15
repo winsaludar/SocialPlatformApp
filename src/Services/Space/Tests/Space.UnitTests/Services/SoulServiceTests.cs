@@ -112,6 +112,39 @@ public class SoulServiceTests
     }
 
     [Fact]
+    public async Task GetAllCommentsByEmailAsync_SoulIsNull_ReturnsEmptyCommentsDto()
+    {
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync((Soul)null!);
+
+        var result = await _soulService.GetAllCommentsByEmailAsync(It.IsAny<string>());
+
+        Assert.IsType<List<CommentDto>>(result);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllCommentsByEmailAsync_SoulIsNotNull_ReturnsNonEmptyCommentsDto()
+    {
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Soul
+            {
+                Comments = new List<Comment>
+                {
+                    new Comment(),
+                    new Comment(),
+                    new Comment()
+                }
+            });
+
+        var result = await _soulService.GetAllCommentsByEmailAsync(It.IsAny<string>());
+
+        Assert.IsType<List<CommentDto>>(result);
+        Assert.NotEmpty(result);
+        Assert.Equal(3, result.Count());
+    }
+
+    [Fact]
     public async Task GetAllModeratedSpacesAsync_SoulIsNull_ReturnsEmptySpacesDto()
     {
         _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
