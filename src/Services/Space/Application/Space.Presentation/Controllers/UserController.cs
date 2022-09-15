@@ -24,7 +24,7 @@ public class UserController : ControllerBase
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized();
 
-        var spaces = await _serviceManager.SoulService.GetAllModeratedSpacesAsync(User.Identity.Name);
+        var spaces = await _serviceManager.SoulService.GetAllModeratedSpacesByEmailAsync(User.Identity.Name);
         return Ok(spaces);
     }
 
@@ -38,6 +38,19 @@ public class UserController : ControllerBase
             return Unauthorized();
 
         var topics = await _serviceManager.SoulService.GetAllTopicsByEmailAsync(User.Identity.Name);
+        return Ok(topics);
+    }
+
+    [HttpGet]
+    [Route("comments")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TopicDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetAllCommentsAsync()
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized();
+
+        var topics = await _serviceManager.SoulService.GetAllCommentsByEmailAsync(User.Identity.Name);
         return Ok(topics);
     }
 }

@@ -14,7 +14,8 @@ public class SoulRepository : ISoulRepository
         string email,
         bool includeMemberSpaces = false,
         bool includeTopics = false,
-        bool includeModeratedSpaces = false)
+        bool includeModeratedSpaces = false,
+        bool includeComments = false)
     {
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
@@ -27,6 +28,9 @@ public class SoulRepository : ISoulRepository
         if (includeModeratedSpaces)
             query = query.Include(x => x.SpacesAsModerator);
 
+        if (includeComments)
+            query = query.Include(x => x.Comments);
+
         return await query.FirstOrDefaultAsync(x => x.Email == email);
     }
 
@@ -34,7 +38,8 @@ public class SoulRepository : ISoulRepository
         Guid id,
         bool includeMemberSpaces = false,
         bool includeTopics = false,
-        bool includeModeratedSpaces = false)
+        bool includeModeratedSpaces = false,
+        bool includeComments = false)
     {
         IQueryable<Soul> query = _dbContext.Souls.AsQueryable();
 
@@ -46,6 +51,9 @@ public class SoulRepository : ISoulRepository
 
         if (includeModeratedSpaces)
             query = query.Include(x => x.SpacesAsModerator);
+
+        if (includeComments)
+            query = query.Include(x => x.Comments);
 
         return await query.FirstOrDefaultAsync(x => x.Id == id);
     }

@@ -32,7 +32,7 @@ public class SoulServiceTests
     {
         Guid soulId = Guid.NewGuid();
 
-        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
 
         var result = await _soulService.GetAllTopicsByIdAsync(soulId);
@@ -48,7 +48,7 @@ public class SoulServiceTests
         Guid soulId = Guid.NewGuid();
         var mockVotesOutput = (0, 0);
 
-        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByIdAsync(soulId, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul
             {
                 Topics = new List<Topic>
@@ -74,7 +74,7 @@ public class SoulServiceTests
     {
         string email = "user@example.com";
 
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(email, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(email, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
 
         var result = await _soulService.GetAllTopicsByEmailAsync(email);
@@ -90,7 +90,7 @@ public class SoulServiceTests
         string email = "user@example.com";
         var mockVotesOutput = (0, 0);
 
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(email, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(email, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul
             {
                 Topics = new List<Topic>
@@ -114,10 +114,10 @@ public class SoulServiceTests
     [Fact]
     public async Task GetAllModeratedSpacesAsync_SoulIsNull_ReturnsEmptySpacesDto()
     {
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync((Soul)null!);
 
-        var result = await _soulService.GetAllModeratedSpacesAsync(It.IsAny<string>());
+        var result = await _soulService.GetAllModeratedSpacesByEmailAsync(It.IsAny<string>());
 
         Assert.IsType<List<SpaceDto>>(result);
         Assert.Empty(result);
@@ -126,7 +126,7 @@ public class SoulServiceTests
     [Fact]
     public async Task GetAllModeratedSpacesAsync_SoulIsNotNull_ReturnsNonEmptySpacesDto()
     {
-        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
+        _mockRepo.Setup(x => x.SoulRepository.GetByEmailAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .ReturnsAsync(new Soul
             {
                 SpacesAsModerator = new List<Domain.Entities.Space>
@@ -137,7 +137,7 @@ public class SoulServiceTests
                 }
             });
 
-        var result = await _soulService.GetAllModeratedSpacesAsync(It.IsAny<string>());
+        var result = await _soulService.GetAllModeratedSpacesByEmailAsync(It.IsAny<string>());
 
         Assert.IsType<List<SpaceDto>>(result);
         Assert.NotEmpty(result);

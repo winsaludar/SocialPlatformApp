@@ -40,7 +40,7 @@ public class UserControllerTests
             HttpContext = new DefaultHttpContext { User = user }
         };
 
-        _mockService.Setup(x => x.SoulService.GetAllModeratedSpacesAsync(It.IsAny<string>()))
+        _mockService.Setup(x => x.SoulService.GetAllModeratedSpacesByEmailAsync(It.IsAny<string>()))
            .ReturnsAsync((IEnumerable<SpaceDto>)new List<SpaceDto>());
 
         var result = await _controller.GetAllModeratedSpacesAsync();
@@ -67,7 +67,7 @@ public class UserControllerTests
             HttpContext = new DefaultHttpContext { User = user }
         };
 
-        _mockService.Setup(x => x.SoulService.GetAllModeratedSpacesAsync(It.IsAny<string>()))
+        _mockService.Setup(x => x.SoulService.GetAllModeratedSpacesByEmailAsync(It.IsAny<string>()))
            .ReturnsAsync((IEnumerable<SpaceDto>)new List<SpaceDto>
            {
                new SpaceDto(),

@@ -47,7 +47,7 @@ public class SoulService : ISoulService
 
     public async Task<IEnumerable<TopicDto>> GetAllTopicsByIdAsync(Guid soulId)
     {
-        var soul = await _repositoryManager.SoulRepository.GetByIdAsync(soulId, false, true);
+        var soul = await _repositoryManager.SoulRepository.GetByIdAsync(soulId, includeTopics: true);
         if (soul == null)
             return new List<TopicDto>();
 
@@ -65,7 +65,7 @@ public class SoulService : ISoulService
 
     public async Task<IEnumerable<TopicDto>> GetAllTopicsByEmailAsync(string email)
     {
-        var soul = await _repositoryManager.SoulRepository.GetByEmailAsync(email, false, true);
+        var soul = await _repositoryManager.SoulRepository.GetByEmailAsync(email, includeTopics: true);
         if (soul == null)
             return new List<TopicDto>();
 
@@ -81,9 +81,25 @@ public class SoulService : ISoulService
         return result;
     }
 
-    public async Task<IEnumerable<SpaceDto>> GetAllModeratedSpacesAsync(string email)
+    public async Task<IEnumerable<CommentDto>> GetAllCommentsByEmailAsync(string email)
     {
-        var soul = await _repositoryManager.SoulRepository.GetByEmailAsync(email, false, false, true);
+        var soul = await _repositoryManager.SoulRepository.GetByEmailAsync(email, includeComments: true);
+        if (soul == null)
+            return new List<CommentDto>();
+
+        var result = soul.Comments.Adapt<List<CommentDto>>();
+        foreach (var item in result)
+        {
+            item.AuthorEmail = soul.Email;
+            item.AuthorUsername = soul.Name;
+        }
+
+        return result;
+    }
+
+    public async Task<IEnumerable<SpaceDto>> GetAllModeratedSpacesByEmailAsync(string email)
+    {
+        var soul = await _repositoryManager.SoulRepository.GetByEmailAsync(email, includeModeratedSpaces: true);
         if (soul == null)
             return new List<SpaceDto>();
 
