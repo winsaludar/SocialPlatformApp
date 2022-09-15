@@ -9,5 +9,6 @@ public interface ISoulService
     Task LeaveSpaceAsync(Guid spaceId, string email);
     Task<IEnumerable<TopicDto>> GetAllTopicsByIdAsync(Guid soulId);
     Task<IEnumerable<TopicDto>> GetAllTopicsByEmailAsync(string email);
-    Task<IEnumerable<SpaceDto>> GetAllModeratedSpacesAsync(string email);
+    Task<IEnumerable<CommentDto>> GetAllCommentsByEmailAsync(string email);
+    Task<IEnumerable<SpaceDto>> GetAllModeratedSpacesByEmailAsync(string email);
 }

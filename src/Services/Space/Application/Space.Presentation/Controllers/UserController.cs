@@ -22,9 +22,9 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetAllModeratedSpacesAsync()
     {
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized();
+            return Unauthorized("Invalid user");
 
-        var spaces = await _serviceManager.SoulService.GetAllModeratedSpacesAsync(User.Identity.Name);
+        var spaces = await _serviceManager.SoulService.GetAllModeratedSpacesByEmailAsync(User.Identity.Name);
         return Ok(spaces);
     }
 
@@ -35,9 +35,22 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetAllTopicsAsync()
     {
         if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized();
+            return Unauthorized("Invalid user");
 
         var topics = await _serviceManager.SoulService.GetAllTopicsByEmailAsync(User.Identity.Name);
+        return Ok(topics);
+    }
+
+    [HttpGet]
+    [Route("comments")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TopicDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetAllCommentsAsync()
+    {
+        if (User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized("Invalid user");
+
+        var topics = await _serviceManager.SoulService.GetAllCommentsByEmailAsync(User.Identity.Name);
         return Ok(topics);
     }
 }

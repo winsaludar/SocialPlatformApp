@@ -8,12 +8,14 @@ public interface ISoulRepository
         string email,
         bool includeMemberSpaces = false,
         bool includeTopics = false,
-        bool includeModeratedSpaces = false);
+        bool includeModeratedSpaces = false,
+        bool includeComments = false);
     Task<Soul?> GetByIdAsync(
         Guid id,
         bool includeMemberSpaces = false,
         bool includeTopics = false,
-        bool includeModeratedSpaces = false);
+        bool includeModeratedSpaces = false,
+        bool includeComments = false);
     Task CreateAsync(Soul newSoul);
     Task UpdateAsync(Soul soul);
     Task<bool> IsMemberOfSpaceAsync(Guid soulId, Guid spaceId);

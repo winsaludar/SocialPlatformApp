@@ -24,6 +24,21 @@ public class UserControllerTests
     }
 
     [Fact]
+    public async Task GetAllModeratedSpacesAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+
+        var result = await _controller.GetAllModeratedSpacesAsync();
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
     public async Task GetAllModeratedSpacesAsync_SpacesAreEmpty_ReturnsOkResultWithEmptyData()
     {
         // Setup User.Identity
@@ -40,7 +55,7 @@ public class UserControllerTests
             HttpContext = new DefaultHttpContext { User = user }
         };
 
-        _mockService.Setup(x => x.SoulService.GetAllModeratedSpacesAsync(It.IsAny<string>()))
+        _mockService.Setup(x => x.SoulService.GetAllModeratedSpacesByEmailAsync(It.IsAny<string>()))
            .ReturnsAsync((IEnumerable<SpaceDto>)new List<SpaceDto>());
 
         var result = await _controller.GetAllModeratedSpacesAsync();
@@ -67,7 +82,7 @@ public class UserControllerTests
             HttpContext = new DefaultHttpContext { User = user }
         };
 
-        _mockService.Setup(x => x.SoulService.GetAllModeratedSpacesAsync(It.IsAny<string>()))
+        _mockService.Setup(x => x.SoulService.GetAllModeratedSpacesByEmailAsync(It.IsAny<string>()))
            .ReturnsAsync((IEnumerable<SpaceDto>)new List<SpaceDto>
            {
                new SpaceDto(),
@@ -81,6 +96,21 @@ public class UserControllerTests
         var spaces = Assert.IsType<List<SpaceDto>>(okResult.Value);
         Assert.NotEmpty(spaces);
         Assert.Equal(3, spaces.Count());
+    }
+
+    [Fact]
+    public async Task GetAllTopicsAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+
+        var result = await _controller.GetAllTopicsAsync();
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
     [Fact]
@@ -141,5 +171,80 @@ public class UserControllerTests
         var topics = Assert.IsType<List<TopicDto>>(okResult.Value);
         Assert.NotEmpty(topics);
         Assert.Equal(3, topics.Count());
+    }
+
+    [Fact]
+    public async Task GetAllCommentsAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+
+        var result = await _controller.GetAllCommentsAsync();
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetAllCommentsAsync_CommentsAreEmpty_ReturnsOkResultWithEmptyData()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        _mockService.Setup(x => x.SoulService.GetAllCommentsByEmailAsync(It.IsAny<string>()))
+           .ReturnsAsync((IEnumerable<CommentDto>)new List<CommentDto>());
+
+        var result = await _controller.GetAllCommentsAsync();
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var comments = Assert.IsType<List<CommentDto>>(okResult.Value);
+        Assert.Empty(comments);
+    }
+
+    [Fact]
+    public async Task GetAllCommentsAsync_CommentsAreNotEmpty_ReturnsOkResultWithData()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+
+        _mockService.Setup(x => x.SoulService.GetAllCommentsByEmailAsync(It.IsAny<string>()))
+           .ReturnsAsync((IEnumerable<CommentDto>)new List<CommentDto>
+           {
+               new CommentDto(),
+               new CommentDto(),
+               new CommentDto()
+           });
+
+        var result = await _controller.GetAllCommentsAsync();
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var comments = Assert.IsType<List<CommentDto>>(okResult.Value);
+        Assert.NotEmpty(comments);
+        Assert.Equal(3, comments.Count());
     }
 }
