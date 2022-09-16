@@ -65,3 +65,5 @@
 /src/Services/Chat/Core/Chat.Services.Abstraction/obj
 /src/Services/Chat/Core/Chat.Services/bin/Debug/net6.0
 /src/Services/Chat/Core/Chat.Services/obj
+/src/Services/Chat/Infrastructure/Chat.Persistence/bin/Debug/net6.0
+/src/Services/Chat/Infrastructure/Chat.Persistence/obj
