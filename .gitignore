@@ -62,3 +62,6 @@
 /src/Services/Space/Application/Space.IntegrationEvents/obj
 /src/Services/Space/Application/Space.Presentation/bin/Debug/net6.0
 /src/Services/Space/Application/Space.Presentation/obj
+/src/Services/Chat/Chat.API/bin/Debug/net6.0
+/src/Services/Chat/Chat.API/obj
+/src/Services/Chat/Chat.API/appsettings.Development.json
