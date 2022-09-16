@@ -67,3 +67,7 @@
 /src/Services/Chat/Core/Chat.Services/obj
 /src/Services/Chat/Infrastructure/Chat.Persistence/bin/Debug/net6.0
 /src/Services/Chat/Infrastructure/Chat.Persistence/obj
+/src/Services/Chat/Application/Chat.IntegrationEvents/bin/Debug/net6.0
+/src/Services/Chat/Application/Chat.IntegrationEvents/obj
+/src/Services/Chat/Application/Chat.Presentation/bin/Debug/net6.0
+/src/Services/Chat/Application/Chat.Presentation/obj

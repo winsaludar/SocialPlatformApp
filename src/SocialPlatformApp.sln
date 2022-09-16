@@ -93,6 +93,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Services", "Services\C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Persistence", "Services\Chat\Infrastructure\Chat.Persistence\Chat.Persistence.csproj", "{AAEA5C94-3257-438E-898B-E2246B064FD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Presentation", "Services\Chat\Application\Chat.Presentation\Chat.Presentation.csproj", "{15FEB111-1B61-42B3-9060-FB6DF7453720}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.IntegrationEvents", "Services\Chat\Application\Chat.IntegrationEvents\Chat.IntegrationEvents.csproj", "{653DD26C-525B-40B9-BF0C-8751C08670D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -207,6 +211,14 @@ Global
 		{AAEA5C94-3257-438E-898B-E2246B064FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAEA5C94-3257-438E-898B-E2246B064FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAEA5C94-3257-438E-898B-E2246B064FD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15FEB111-1B61-42B3-9060-FB6DF7453720}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15FEB111-1B61-42B3-9060-FB6DF7453720}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15FEB111-1B61-42B3-9060-FB6DF7453720}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15FEB111-1B61-42B3-9060-FB6DF7453720}.Release|Any CPU.Build.0 = Release|Any CPU
+		{653DD26C-525B-40B9-BF0C-8751C08670D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{653DD26C-525B-40B9-BF0C-8751C08670D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{653DD26C-525B-40B9-BF0C-8751C08670D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{653DD26C-525B-40B9-BF0C-8751C08670D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -256,6 +268,8 @@ Global
 		{6F532BED-11E0-4F5E-80E3-8DF0B5743B63} = {9D15CE00-7201-4C58-98B1-8E4B97D88E83}
 		{417377DF-CDA4-410F-8375-5E6C355B5D35} = {9D15CE00-7201-4C58-98B1-8E4B97D88E83}
 		{AAEA5C94-3257-438E-898B-E2246B064FD4} = {A600A6AB-57CA-45B5-8718-A38AFCA45960}
+		{15FEB111-1B61-42B3-9060-FB6DF7453720} = {76F660B6-BFFE-40FB-A40F-BEF460A28FEA}
+		{653DD26C-525B-40B9-BF0C-8751C08670D7} = {76F660B6-BFFE-40FB-A40F-BEF460A28FEA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DDC09963-D1D6-41FD-8109-7391429CB4C6}
