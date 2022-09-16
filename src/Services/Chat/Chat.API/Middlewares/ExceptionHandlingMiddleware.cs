@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Chat.Domain.Exceptions;
+using System.Text.Json;
 
 namespace Chat.API.Middlewares;
 
@@ -26,9 +27,9 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
         httpContext.Response.ContentType = "application/json";
         httpContext.Response.StatusCode = exception switch
         {
-            //BadRequestException => StatusCodes.Status400BadRequest,
+            BadRequestException => StatusCodes.Status400BadRequest,
             UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-            //NotFoundException => StatusCodes.Status404NotFound,
+            NotFoundException => StatusCodes.Status404NotFound,
             _ => StatusCodes.Status500InternalServerError
         };
 

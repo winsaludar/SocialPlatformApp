@@ -1,12 +1,5 @@
-﻿/src/.vs
-/SocialPlatformApp/.vs
-/SocialPlatformApp/Authentication.Contracts/obj
-/SocialPlatformApp/Authentication.Persistence/obj
-/SocialPlatformApp/Authentication.Presentation/obj
-/SocialPlatformApp/Authentication.Services/obj
-/SocialPlatformApp/Authentication.Services.Abstraction/obj
-/SocialPlatformApp/Authentication.UnitTests/obj
-/SocialPlatformApp/Authtentication.Domain/obj
+﻿/.vs
+/src/.vs
 /src/Services/Authentication/Authentication.API/bin/Debug/net6.0
 /src/Services/Authentication/Authentication.API/obj
 /src/Services/Authentication/Core/Authentication.Contracts/bin/Debug/net6.0
@@ -43,7 +36,6 @@
 /src/Services/Space/Tests/Space.UnitTests/obj
 /src/Services/Space/Infrastructure/Space.Common/bin/Debug/net6.0
 /src/Services/Space/Infrastructure/Space.Common/obj
-/.vs
 /src/EventBus/EventBus.Core/bin/Debug/net6.0
 /src/EventBus/EventBus.Core/obj
 /src/EventBus/EventBus.RabbitMQ/bin/Debug/net6.0
@@ -65,3 +57,11 @@
 /src/Services/Chat/Chat.API/bin/Debug/net6.0
 /src/Services/Chat/Chat.API/obj
 /src/Services/Chat/Chat.API/appsettings.Development.json
+/src/Services/Chat/Core/Chat.Domain/obj
+/src/Services/Chat/Core/Chat.Contracts/bin/Debug/net6.0
+/src/Services/Chat/Core/Chat.Contracts/obj
+/src/Services/Chat/Core/Chat.Domain/bin/Debug/net6.0
+/src/Services/Chat/Core/Chat.Services.Abstraction/bin/Debug/net6.0
+/src/Services/Chat/Core/Chat.Services.Abstraction/obj
+/src/Services/Chat/Core/Chat.Services/bin/Debug/net6.0
+/src/Services/Chat/Core/Chat.Services/obj
