@@ -73,3 +73,5 @@
 /src/Services/Chat/Application/Chat.Presentation/obj
 /src/Services/Chat/Application/Chat.Events/bin/Debug/net6.0
 /src/Services/Chat/Application/Chat.Events/obj
+/src/Services/Chat/Application/Chat.CQRS/bin/Debug/net6.0
+/src/Services/Chat/Application/Chat.CQRS/obj
