@@ -71,3 +71,5 @@
 /src/Services/Chat/Application/Chat.IntegrationEvents/obj
 /src/Services/Chat/Application/Chat.Presentation/bin/Debug/net6.0
 /src/Services/Chat/Application/Chat.Presentation/obj
+/src/Services/Chat/Application/Chat.Events/bin/Debug/net6.0
+/src/Services/Chat/Application/Chat.Events/obj

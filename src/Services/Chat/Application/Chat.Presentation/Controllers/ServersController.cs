@@ -1,4 +1,6 @@
-﻿using Chat.Presentation.Models;
+﻿using Chat.Events.Commands;
+using Chat.Presentation.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +12,10 @@ namespace Chat.Presentation.Controllers;
 [Authorize]
 public class ServersController : ControllerBase
 {
+    private readonly IMediator _mediator;
+
+    public ServersController(IMediator mediator) => _mediator = mediator;
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
@@ -18,6 +24,7 @@ public class ServersController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        return Ok("Created");
+        var response = await _mediator.Send(new CreateServerCommand());
+        return Ok(response);
     }
 }

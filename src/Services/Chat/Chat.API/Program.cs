@@ -1,13 +1,13 @@
 using Chat.API.Middlewares;
 using Chat.Domain.Repositories;
+using Chat.Events.Commands;
 using Chat.IntegrationEvents.EventHandlers;
 using Chat.IntegrationEvents.Events;
 using Chat.Persistence.Repositories;
-using Chat.Services;
-using Chat.Services.Abstraction;
 using EventBus.Core;
 using EventBus.Core.Abstractions;
 using EventBus.RabbitMQ;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
@@ -74,9 +74,9 @@ void AddMiddlewares(WebApplicationBuilder builder)
 
 void AddDependencies(WebApplicationBuilder builder)
 {
+    builder.Services.AddMediatR(typeof(CreateServerCommand)); // We only need one class from the Chat.Events assembly
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
     builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
-    builder.Services.AddScoped<IServiceManager, ServiceManager>();
 }
 
 void RegisterEventBus(WebApplicationBuilder builder)
