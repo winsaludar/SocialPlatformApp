@@ -14,10 +14,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\EventBus\EventBus.RabbitMQ\EventBus.RabbitMQ.csproj" />
-    <ProjectReference Include="..\Application\Chat.IntegrationEvents\Chat.IntegrationEvents.csproj" />
-    <ProjectReference Include="..\Application\Chat.Presentation\Chat.Presentation.csproj" />
-    <ProjectReference Include="..\Core\Chat.Domain\Chat.Domain.csproj" />
-    <ProjectReference Include="..\Infrastructure\Chat.Persistence\Chat.Persistence.csproj" />
+    <ProjectReference Include="..\Chat.Application\Chat.Application.csproj" />
+    <ProjectReference Include="..\Chat.Domain\Chat.Domain.csproj" />
+    <ProjectReference Include="..\Chat.Infrastructure\Chat.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
