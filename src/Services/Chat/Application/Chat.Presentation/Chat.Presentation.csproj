@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Chat.CQRS\Chat.Events.csproj" />
+    <ProjectReference Include="..\Chat.Events\Chat.Events.csproj" />
   </ItemGroup>
 
 </Project>

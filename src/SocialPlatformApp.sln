@@ -93,7 +93,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Presentation", "Servic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.IntegrationEvents", "Services\Chat\Application\Chat.IntegrationEvents\Chat.IntegrationEvents.csproj", "{653DD26C-525B-40B9-BF0C-8751C08670D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Events", "Services\Chat\Application\Chat.CQRS\Chat.Events.csproj", "{B78CC704-9A0C-47EB-AD05-49E5780804EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Events", "Services\Chat\Application\Chat.Events\Chat.Events.csproj", "{D8D7D000-9BBF-42EB-807D-6BFB0E86D403}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -209,10 +209,10 @@ Global
 		{653DD26C-525B-40B9-BF0C-8751C08670D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{653DD26C-525B-40B9-BF0C-8751C08670D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{653DD26C-525B-40B9-BF0C-8751C08670D7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B78CC704-9A0C-47EB-AD05-49E5780804EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B78CC704-9A0C-47EB-AD05-49E5780804EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B78CC704-9A0C-47EB-AD05-49E5780804EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B78CC704-9A0C-47EB-AD05-49E5780804EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8D7D000-9BBF-42EB-807D-6BFB0E86D403}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8D7D000-9BBF-42EB-807D-6BFB0E86D403}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8D7D000-9BBF-42EB-807D-6BFB0E86D403}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8D7D000-9BBF-42EB-807D-6BFB0E86D403}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -262,7 +262,7 @@ Global
 		{AAEA5C94-3257-438E-898B-E2246B064FD4} = {A600A6AB-57CA-45B5-8718-A38AFCA45960}
 		{15FEB111-1B61-42B3-9060-FB6DF7453720} = {76F660B6-BFFE-40FB-A40F-BEF460A28FEA}
 		{653DD26C-525B-40B9-BF0C-8751C08670D7} = {76F660B6-BFFE-40FB-A40F-BEF460A28FEA}
-		{B78CC704-9A0C-47EB-AD05-49E5780804EC} = {76F660B6-BFFE-40FB-A40F-BEF460A28FEA}
+		{D8D7D000-9BBF-42EB-807D-6BFB0E86D403} = {76F660B6-BFFE-40FB-A40F-BEF460A28FEA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DDC09963-D1D6-41FD-8109-7391429CB4C6}
