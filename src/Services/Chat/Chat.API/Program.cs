@@ -1,13 +1,14 @@
 using Chat.API.Middlewares;
-using Chat.Domain.Repositories;
-using Chat.IntegrationEvents.EventHandlers;
-using Chat.IntegrationEvents.Events;
-using Chat.Persistence.Repositories;
-using Chat.Services;
-using Chat.Services.Abstraction;
+using Chat.Application.Commands;
+using Chat.Application.Validators;
+using Chat.Domain.SeedWork;
+using Chat.Infrastructure;
+using Chat.Infrastructure.Repositories;
 using EventBus.Core;
 using EventBus.Core.Abstractions;
 using EventBus.RabbitMQ;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
@@ -30,6 +31,7 @@ app.Run();
 
 void AddDatabase(WebApplicationBuilder builder)
 {
+    builder.Services.Configure<ChatDbSettings>(builder.Configuration.GetSection(nameof(ChatDbSettings)));
 }
 
 void AddAuthentication(WebApplicationBuilder builder)
@@ -74,9 +76,12 @@ void AddMiddlewares(WebApplicationBuilder builder)
 
 void AddDependencies(WebApplicationBuilder builder)
 {
+    builder.Services.AddMediatR(typeof(CreateServerCommand)); // We only need one class from the Chat.Application assembly
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
+    builder.Services.AddScoped<IValidator<CreateServerCommand>, CreateServerCommandValidator>();
+
     builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
-    builder.Services.AddScoped<IServiceManager, ServiceManager>();
 }
 
 void RegisterEventBus(WebApplicationBuilder builder)
@@ -118,7 +123,7 @@ void RegisterEventBus(WebApplicationBuilder builder)
         return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, serviceScopeFactory, subscriptionManager, subscriptionClientName, retryCount);
     });
 
-    builder.Services.AddTransient<UserRegisteredSuccessfulIntegrationEventHandler>();
+    //builder.Services.AddTransient<UserRegisteredSuccessfulIntegrationEventHandler>();
 }
 
 void EnableMiddlewares(WebApplication app)
@@ -147,5 +152,5 @@ void ConfigureEventBus(WebApplication app)
 {
     var eventBus = app.Services.GetService<IEventBus>();
 
-    eventBus?.Subscribe<UserRegisteredSuccessfulIntegrationEvent, UserRegisteredSuccessfulIntegrationEventHandler>();
+    //eventBus?.Subscribe<UserRegisteredSuccessfulIntegrationEvent, UserRegisteredSuccessfulIntegrationEventHandler>();
 }
