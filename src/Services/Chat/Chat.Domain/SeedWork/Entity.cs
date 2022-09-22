@@ -7,7 +7,7 @@ public abstract class Entity
     private int? _requestedHashCode;
     private readonly List<INotification> _domainEvents = new();
 
-    public virtual Guid Id { get; } = Guid.NewGuid();
+    public virtual Guid Id { get; protected set; } = Guid.NewGuid();
     public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
 
     public void AddDomainEvent(INotification eventItem)

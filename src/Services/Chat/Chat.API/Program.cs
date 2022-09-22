@@ -1,11 +1,13 @@
 using Chat.API.Middlewares;
 using Chat.Application.Commands;
+using Chat.Application.Validators;
 using Chat.Domain.SeedWork;
 using Chat.Infrastructure;
 using Chat.Infrastructure.Repositories;
 using EventBus.Core;
 using EventBus.Core.Abstractions;
 using EventBus.RabbitMQ;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -76,6 +78,8 @@ void AddDependencies(WebApplicationBuilder builder)
 {
     builder.Services.AddMediatR(typeof(CreateServerCommand)); // We only need one class from the Chat.Application assembly
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
+    builder.Services.AddScoped<IValidator<CreateServerCommand>, CreateServerCommandValidator>();
 
     builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 }

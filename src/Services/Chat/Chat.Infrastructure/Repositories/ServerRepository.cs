@@ -16,6 +16,17 @@ public class ServerRepository : IServerRepository
         _serversCollection = mongoDatabase.GetCollection<ServerDbModel>(chatDbSettings.Value.ServersCollectionName);
     }
 
+    public async Task<Server?> GetByNameAsync(string name)
+    {
+        var result = await _serversCollection.Find(x => x.Name == name).FirstOrDefaultAsync();
+        if (result == null)
+            return null;
+
+        Server server = new(result.Name, result.ShortDescription, result.LongDescription, result.Thumbnail);
+        server.SetId(Guid.Parse(result.Guid));
+        return server;
+    }
+
     public async Task AddAsync(Server newServer)
     {
         ServerDbModel model = new()
