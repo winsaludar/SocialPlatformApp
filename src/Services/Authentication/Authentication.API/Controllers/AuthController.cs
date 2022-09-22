@@ -1,13 +1,12 @@
-﻿using Authentication.Contracts;
-using Authentication.IntegrationEvents.Events;
-using Authentication.Presentation.Models;
+﻿using Authentication.API.IntegrationEvents.Events;
+using Authentication.API.Models;
+using Authentication.Contracts;
 using Authentication.Services.Abstraction;
 using EventBus.Core.Abstractions;
 using Mapster;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Authentication.Presentation.Controllers;
+namespace Authentication.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

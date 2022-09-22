@@ -1,6 +1,6 @@
 ﻿using EventBus.Core.Events;
 
-namespace Authentication.IntegrationEvents.Events;
+namespace Authentication.API.IntegrationEvents.Events;
 
 public record UserRegisteredSuccessfulIntegrationEvent : IntegrationEvent
 {

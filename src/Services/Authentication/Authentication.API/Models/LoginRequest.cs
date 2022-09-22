@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Authentication.Presentation.Models;
+namespace Authentication.API.Models;
 
 public class LoginRequest
 {
@@ -11,3 +11,4 @@ public class LoginRequest
     [Required]
     public string Password { get; set; } = default!;
 }
+

@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Application\Authentication.Presentation\Authentication.Presentation.csproj" />
+    <ProjectReference Include="..\..\Authentication.API\Authentication.API.csproj" />
     <ProjectReference Include="..\..\Core\Authentication.Services\Authentication.Services.csproj" />
     <ProjectReference Include="..\..\Core\Authtentication.Domain\Authentication.Domain.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Authentication.Persistence\Authentication.Persistence.csproj" />

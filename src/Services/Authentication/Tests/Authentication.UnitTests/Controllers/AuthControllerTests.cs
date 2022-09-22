@@ -1,6 +1,6 @@
-﻿using Authentication.Contracts;
-using Authentication.Presentation.Controllers;
-using Authentication.Presentation.Models;
+﻿using Authentication.API.Controllers;
+using Authentication.API.Models;
+using Authentication.Contracts;
 using Authentication.Services.Abstraction;
 using EventBus.Core.Abstractions;
 using Microsoft.AspNetCore.Mvc;
