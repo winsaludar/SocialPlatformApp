@@ -1,5 +1,8 @@
 using Chat.API.Middlewares;
 using Chat.Application.Commands;
+using Chat.Domain.SeedWork;
+using Chat.Infrastructure;
+using Chat.Infrastructure.Repositories;
 using EventBus.Core;
 using EventBus.Core.Abstractions;
 using EventBus.RabbitMQ;
@@ -26,6 +29,7 @@ app.Run();
 
 void AddDatabase(WebApplicationBuilder builder)
 {
+    builder.Services.Configure<ChatDbSettings>(builder.Configuration.GetSection(nameof(ChatDbSettings)));
 }
 
 void AddAuthentication(WebApplicationBuilder builder)
@@ -72,7 +76,8 @@ void AddDependencies(WebApplicationBuilder builder)
 {
     builder.Services.AddMediatR(typeof(CreateServerCommand)); // We only need one class from the Chat.Application assembly
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
-    //builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+
+    builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 }
 
 void RegisterEventBus(WebApplicationBuilder builder)

@@ -23,7 +23,7 @@ public class ServersController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest("Please provide all the required fields");
 
-        var result = await _mediator.Send(new CreateServerCommand());
+        var result = await _mediator.Send(new CreateServerCommand(request.Name, request.ShortDescription, request.LongDescription, request.Thumbnail));
 
         return Ok(result);
     }
