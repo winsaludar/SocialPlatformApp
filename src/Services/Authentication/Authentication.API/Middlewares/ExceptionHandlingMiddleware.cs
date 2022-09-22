@@ -1,4 +1,4 @@
-﻿using Authentication.Domain.Exceptions;
+﻿using Authentication.Core.Exceptions;
 using System.Text.Json;
 
 namespace Authentication.API.Middlewares;

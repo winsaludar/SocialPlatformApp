@@ -1,7 +1,7 @@
 ﻿using Authentication.API.Controllers;
 using Authentication.API.Models;
-using Authentication.Contracts;
-using Authentication.Services.Abstraction;
+using Authentication.Core.Contracts;
+using Authentication.Core.DTOs;
 using EventBus.Core.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;

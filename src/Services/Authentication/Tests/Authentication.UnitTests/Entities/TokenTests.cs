@@ -1,6 +1,6 @@
-﻿using Authentication.Domain.Entities;
-using Authentication.Domain.Exceptions;
-using Authentication.Domain.Repositories;
+﻿using Authentication.Core.Contracts;
+using Authentication.Core.Exceptions;
+using Authentication.Core.Models;
 using Moq;
 
 namespace Authentication.UnitTests.Entities;

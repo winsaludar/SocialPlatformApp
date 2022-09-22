@@ -1,10 +1,9 @@
 using Authentication.API.Middlewares;
-using Authentication.Domain.Repositories;
-using Authentication.Persistence;
-using Authentication.Persistence.Models;
-using Authentication.Persistence.Repositories;
-using Authentication.Services;
-using Authentication.Services.Abstraction;
+using Authentication.Core.Contracts;
+using Authentication.Core.Services;
+using Authentication.Infrastructure;
+using Authentication.Infrastructure.Models;
+using Authentication.Infrastructure.Repositories;
 using EventBus.Core;
 using EventBus.Core.Abstractions;
 using EventBus.RabbitMQ;

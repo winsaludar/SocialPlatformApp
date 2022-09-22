@@ -9,25 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{72
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Authentication", "Authentication", "{4795EF70-A513-4F8E-A6B1-E70AC5023E4B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{53AA7764-70CB-4BEC-8A03-CE729DE70DE2}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{8127199A-ADBB-44E7-9F56-9DBD4766F629}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A6814B8B-FBA5-487D-BA1F-8FA5063C4791}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.API", "Services\Authentication\Authentication.API\Authentication.API.csproj", "{B49DF2E4-CA74-4BAC-9DC8-66E8614B3002}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.UnitTests", "Services\Authentication\Tests\Authentication.UnitTests\Authentication.UnitTests.csproj", "{15C7B924-302B-4315-BDB5-FE75306331D0}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.Persistence", "Services\Authentication\Infrastructure\Authentication.Persistence\Authentication.Persistence.csproj", "{69B7BA73-09A9-42A7-A4CF-CA8BC7ADDE2F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.Domain", "Services\Authentication\Core\Authtentication.Domain\Authentication.Domain.csproj", "{C6CCC5E3-3AE5-4016-A2AF-BD3B96D8537C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.Contracts", "Services\Authentication\Core\Authentication.Contracts\Authentication.Contracts.csproj", "{362937B3-B43A-4BEA-BCB6-A1354E002953}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.Services.Abstraction", "Services\Authentication\Core\Authentication.Services.Abstraction\Authentication.Services.Abstraction.csproj", "{5B687D89-5986-4D79-9E80-A3F011823D1F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.Services", "Services\Authentication\Core\Authentication.Services\Authentication.Services.csproj", "{4D461029-01CE-4719-B20D-98B3443F4017}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Space", "Space", "{E65C1D53-9284-4A10-A31E-5E21248D8D5A}"
 EndProject
@@ -79,9 +65,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Application", "Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.UnitTests", "Services\Chat\Tests\Chat.UnitTests\Chat.UnitTests.csproj", "{5CB92BD5-CD32-469A-99B5-12BC636111F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authentication.Core", "Services\Authentication\Authentication.Core\Authentication.Core.csproj", "{0650B718-A3F5-4713-A49F-A5B996ACB8C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.Core", "Services\Authentication\Authentication.Core\Authentication.Core.csproj", "{0650B718-A3F5-4713-A49F-A5B996ACB8C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authentication.Infrastructure", "Services\Authentication\Authentication.Infrastructure\Authentication.Infrastructure.csproj", "{5492F996-BE8D-43AF-9F99-72AF9D66AD29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authentication.Infrastructure", "Services\Authentication\Authentication.Infrastructure\Authentication.Infrastructure.csproj", "{5492F996-BE8D-43AF-9F99-72AF9D66AD29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,26 +83,6 @@ Global
 		{15C7B924-302B-4315-BDB5-FE75306331D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15C7B924-302B-4315-BDB5-FE75306331D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15C7B924-302B-4315-BDB5-FE75306331D0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69B7BA73-09A9-42A7-A4CF-CA8BC7ADDE2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69B7BA73-09A9-42A7-A4CF-CA8BC7ADDE2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69B7BA73-09A9-42A7-A4CF-CA8BC7ADDE2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69B7BA73-09A9-42A7-A4CF-CA8BC7ADDE2F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C6CCC5E3-3AE5-4016-A2AF-BD3B96D8537C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C6CCC5E3-3AE5-4016-A2AF-BD3B96D8537C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C6CCC5E3-3AE5-4016-A2AF-BD3B96D8537C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C6CCC5E3-3AE5-4016-A2AF-BD3B96D8537C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{362937B3-B43A-4BEA-BCB6-A1354E002953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{362937B3-B43A-4BEA-BCB6-A1354E002953}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{362937B3-B43A-4BEA-BCB6-A1354E002953}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{362937B3-B43A-4BEA-BCB6-A1354E002953}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B687D89-5986-4D79-9E80-A3F011823D1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B687D89-5986-4D79-9E80-A3F011823D1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B687D89-5986-4D79-9E80-A3F011823D1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B687D89-5986-4D79-9E80-A3F011823D1F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D461029-01CE-4719-B20D-98B3443F4017}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D461029-01CE-4719-B20D-98B3443F4017}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D461029-01CE-4719-B20D-98B3443F4017}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D461029-01CE-4719-B20D-98B3443F4017}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E1830FFC-B49B-42FC-91BA-8B19F1FABE4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E1830FFC-B49B-42FC-91BA-8B19F1FABE4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1830FFC-B49B-42FC-91BA-8B19F1FABE4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -200,16 +166,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{724AA4EA-F843-4470-965E-4985208B5290} = {4548B9DD-68AB-40A0-93C6-C5566FCD8C00}
 		{4795EF70-A513-4F8E-A6B1-E70AC5023E4B} = {724AA4EA-F843-4470-965E-4985208B5290}
-		{53AA7764-70CB-4BEC-8A03-CE729DE70DE2} = {4795EF70-A513-4F8E-A6B1-E70AC5023E4B}
-		{8127199A-ADBB-44E7-9F56-9DBD4766F629} = {4795EF70-A513-4F8E-A6B1-E70AC5023E4B}
 		{A6814B8B-FBA5-487D-BA1F-8FA5063C4791} = {4795EF70-A513-4F8E-A6B1-E70AC5023E4B}
 		{B49DF2E4-CA74-4BAC-9DC8-66E8614B3002} = {4795EF70-A513-4F8E-A6B1-E70AC5023E4B}
 		{15C7B924-302B-4315-BDB5-FE75306331D0} = {A6814B8B-FBA5-487D-BA1F-8FA5063C4791}
-		{69B7BA73-09A9-42A7-A4CF-CA8BC7ADDE2F} = {8127199A-ADBB-44E7-9F56-9DBD4766F629}
-		{C6CCC5E3-3AE5-4016-A2AF-BD3B96D8537C} = {53AA7764-70CB-4BEC-8A03-CE729DE70DE2}
-		{362937B3-B43A-4BEA-BCB6-A1354E002953} = {53AA7764-70CB-4BEC-8A03-CE729DE70DE2}
-		{5B687D89-5986-4D79-9E80-A3F011823D1F} = {53AA7764-70CB-4BEC-8A03-CE729DE70DE2}
-		{4D461029-01CE-4719-B20D-98B3443F4017} = {53AA7764-70CB-4BEC-8A03-CE729DE70DE2}
 		{E65C1D53-9284-4A10-A31E-5E21248D8D5A} = {724AA4EA-F843-4470-965E-4985208B5290}
 		{E1830FFC-B49B-42FC-91BA-8B19F1FABE4F} = {E65C1D53-9284-4A10-A31E-5E21248D8D5A}
 		{6B1255E3-12D5-4496-BE12-178C03D7C2A9} = {E65C1D53-9284-4A10-A31E-5E21248D8D5A}
