@@ -4,18 +4,18 @@ using MediatR;
 
 namespace Chat.Application.Commands;
 
-public class CreateServerCommandHandler : IRequestHandler<CreateServerCommand, string>
+public class CreateServerCommandHandler : IRequestHandler<CreateServerCommand, Guid>
 {
     private readonly IRepositoryManager _repositoryManager;
 
     public CreateServerCommandHandler(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
 
-    public async Task<string> Handle(CreateServerCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreateServerCommand request, CancellationToken cancellationToken)
     {
         Server newServer = new(request.Name, request.ShortDescription, request.LongDescription, request.Thumbnail);
-        await _repositoryManager.ServerRepository.AddAsync(newServer);
+        Guid serverGuid = await _repositoryManager.ServerRepository.AddAsync(newServer);
 
-        return newServer.Id.ToString();
+        return serverGuid;
     }
 }
 

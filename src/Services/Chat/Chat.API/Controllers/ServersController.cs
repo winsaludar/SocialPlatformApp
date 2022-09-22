@@ -25,17 +25,17 @@ public class ServersController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-    public async Task<IActionResult> PostAsync([FromBody] CreateServerCommand request)
+    public async Task<IActionResult> PostAsync([FromBody] CreateServerCommand command)
     {
-        ValidationResult validationResult = await _createServerValidator.ValidateAsync(request);
+        ValidationResult validationResult = await _createServerValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
             validationResult.AddToModelState(ModelState);
             return BadRequest(ModelState);
         }
 
-        var result = await _mediator.Send(request);
+        var result = await _mediator.Send(command);
 
-        return Ok(result);
+        return Ok(result.ToString());
     }
 }

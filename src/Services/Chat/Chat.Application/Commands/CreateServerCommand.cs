@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Chat.Application.Commands;
 
 [DataContract]
-public record CreateServerCommand : IRequest<string>
+public record CreateServerCommand : IRequest<Guid>
 {
     public CreateServerCommand(string name, string shortDescription, string longDescription, string? thumbnail)
     {

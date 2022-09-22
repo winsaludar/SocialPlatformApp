@@ -27,17 +27,20 @@ public class ServerRepository : IServerRepository
         return server;
     }
 
-    public async Task AddAsync(Server newServer)
+    public async Task<Guid> AddAsync(Server newServer)
     {
+        Guid guid = Guid.NewGuid();
+
         ServerDbModel model = new()
         {
-            Guid = newServer.Id.ToString(),
+            Guid = guid.ToString(),
             Name = newServer.Name,
             ShortDescription = newServer.ShortDescription,
             LongDescription = newServer.LongDescription,
             Thumbnail = newServer.Thumbnail
         };
-
         await _serversCollection.InsertOneAsync(model);
+
+        return guid;
     }
 }
