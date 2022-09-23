@@ -83,3 +83,7 @@
 /src/Services/Chat/Chat.Infrastructure/obj
 /src/Services/Chat/Tests/Chat.UnitTests/bin/Debug/net6.0
 /src/Services/Chat/Tests/Chat.UnitTests/obj
+/src/Services/Authentication/Authentication.Core/bin/Debug/net6.0
+/src/Services/Authentication/Authentication.Core/obj
+/src/Services/Authentication/Authentication.Infrastructure/bin/Debug/net6.0
+/src/Services/Authentication/Authentication.Infrastructure/obj
