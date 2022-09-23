@@ -4,13 +4,13 @@ namespace Authentication.Core.Services;
 
 public class ServiceManager : IServiceManager
 {
-    private readonly Lazy<IAuthenticationService> _lazyAuthenticationService;
+    private readonly Lazy<IAuthService> _lazyAuthenticationService;
 
     public ServiceManager(IRepositoryManager repositoryManager)
     {
-        _lazyAuthenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(repositoryManager));
+        _lazyAuthenticationService = new Lazy<IAuthService>(() => new AuthService(repositoryManager));
     }
 
-    public IAuthenticationService AuthenticationService => _lazyAuthenticationService.Value;
+    public IAuthService AuthenticationService => _lazyAuthenticationService.Value;
 }
 

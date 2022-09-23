@@ -50,34 +50,15 @@ public class TokenRepository : ITokenRepository
 
         // Refresh existing token when requested
         if (rToken != null)
-        {
-            return new Token
-            {
-                Value = jwtToken,
-                RefreshToken = rToken.Token,
-                ExpiresAt = token.ValidTo
-            };
-        }
+            return new Token(jwtToken, rToken.Token, token.ValidTo);
 
         // Create refresh token when login
         _ = int.TryParse(_configuration["JWT:RefreshTokenExpirationInMonths"], out int refreshTokenExpiration);
-        RefreshToken refreshToken = new()
-        {
-            JwtId = token.Id,
-            IsRevoked = false,
-            UserId = user.Id.ToString(),
-            DateAdded = DateTime.UtcNow,
-            DateExpire = DateTime.UtcNow.AddMonths(refreshTokenExpiration),
-            Token = $"{Guid.NewGuid()}-{Guid.NewGuid()}"
-        };
+        string rtToken = $"{Guid.NewGuid()}-{Guid.NewGuid()}";
+        RefreshToken refreshToken = new(rtToken, token.Id, false, user.Id.ToString(), DateTime.UtcNow, DateTime.UtcNow.AddMonths(refreshTokenExpiration), null);
         await _refreshTokenRepository.CreateAsync(refreshToken);
 
-        return new Token
-        {
-            Value = jwtToken,
-            RefreshToken = refreshToken.Token,
-            ExpiresAt = token.ValidTo
-        };
+        return new Token(jwtToken, refreshToken.Token, token.ValidTo);
     }
 
     public async Task<Token> RefreshJwtAsync(Token oldToken, User user, RefreshToken refreshToken)

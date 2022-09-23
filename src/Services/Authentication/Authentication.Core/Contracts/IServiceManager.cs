@@ -2,5 +2,5 @@
 
 public interface IServiceManager
 {
-    IAuthenticationService AuthenticationService { get; }
+    IAuthService AuthenticationService { get; }
 }
