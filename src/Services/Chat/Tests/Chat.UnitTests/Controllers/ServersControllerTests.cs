@@ -5,8 +5,10 @@ using Chat.Application.Queries;
 using Chat.Application.Validators;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Security.Claims;
 
 namespace Chat.UnitTests.Controllers;
 
@@ -87,9 +89,24 @@ public class ServersControllerTests
     }
 
     [Fact]
+    public async Task PostAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+        CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "Thumbnail") { };
+
+        // Act
+        var result = await _controller.PostAsync(command);
+
+        // Assert
+        Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
     public async Task PostAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
     {
         // Arrange
+        SetUpFakeUserIdentity();
         CreateServerCommand command = new("", "Short Description", "Long Description", "Thumbnail") { };
         _createServerCommandValidator.RuleFor(x => x.Name).Must(name => false);
 
@@ -106,6 +123,7 @@ public class ServersControllerTests
     public async Task PostAsync_ValidationResultIsValid_ReturnsOkObjectResult()
     {
         // Arrange
+        SetUpFakeUserIdentity();
         CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "Thumbnail") { };
         _createServerCommandValidator.RuleFor(x => x.Name).Must(name => true);
         _mockMediator.Setup(x => x.Send(command, It.IsAny<CancellationToken>()))
@@ -117,5 +135,32 @@ public class ServersControllerTests
         // Assert
         _mockMediator.Verify(x => x.Send(command, It.IsAny<CancellationToken>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
+    }
+
+    private void SetUpNullUserIdentity()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+    }
+
+    private void SetUpFakeUserIdentity()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
     }
 }

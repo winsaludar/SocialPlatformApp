@@ -20,7 +20,7 @@ public class GetServersQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_RepositoryReturnsEmptyResult_ReturnEmptyData()
+    public async Task Handle_RepositoryReturnsEmptyResult_ReturnsEmptyData()
     {
         // Arrange
         GetServersQuery query = new(1, 10, "");
@@ -36,7 +36,7 @@ public class GetServersQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_RepositoryReturnsNonEmptyResult_ReturnNonEmptyData()
+    public async Task Handle_RepositoryReturnsNonEmptyResult_ReturnsNonEmptyData()
     {
         // Arrange
         GetServersQuery query = new(1, 10, "");

@@ -14,7 +14,7 @@ public class GetServersQueryValidatorTests
     }
 
     [Fact]
-    public async Task Page_IsLessThan1_ReturnAnError()
+    public async Task Page_IsLessThan1_ReturnsAnError()
     {
         // Arrange
         GetServersQuery query = new(0, 10, "");
@@ -28,7 +28,7 @@ public class GetServersQueryValidatorTests
     }
 
     [Fact]
-    public async Task Size_IsLessThan1_ReturnAnError()
+    public async Task Size_IsLessThan1_ReturnsAnError()
     {
         // Arrange
         GetServersQuery query = new(1, 0, "");
@@ -42,7 +42,7 @@ public class GetServersQueryValidatorTests
     }
 
     [Fact]
-    public async Task Size_IsGreaterThan100_ReturnAnError()
+    public async Task Size_IsGreaterThan100_ReturnsAnError()
     {
         // Arrange
         GetServersQuery query = new(1, 101, "");
