@@ -1,6 +1,8 @@
 ﻿using Chat.API.Extensions;
 using Chat.Application.Commands;
-using FluentValidation;
+using Chat.Application.DTOs;
+using Chat.Application.Queries;
+using Chat.Application.Validators;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -14,12 +16,29 @@ namespace Chat.API.Controllers;
 public class ServersController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly IValidator<CreateServerCommand> _createServerValidator;
+    private readonly IValidatorManager _validatorManager;
 
-    public ServersController(IMediator mediator, IValidator<CreateServerCommand> createServerValidator)
+    public ServersController(IMediator mediator, IValidatorManager validatorManager)
     {
         _mediator = mediator;
-        _createServerValidator = createServerValidator;
+        _validatorManager = validatorManager;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ServerDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    public async Task<IActionResult> GetAllAsync(int page = 1, int size = 10, string? name = null)
+    {
+        GetServersQuery query = new(page, size, name);
+        ValidationResult validationResult = await _validatorManager.GetServersQueryValidator.ValidateAsync(query);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
+
+        var result = await _mediator.Send(query);
+        return Ok(result);
     }
 
     [HttpPost]
@@ -27,7 +46,7 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     public async Task<IActionResult> PostAsync([FromBody] CreateServerCommand command)
     {
-        ValidationResult validationResult = await _createServerValidator.ValidateAsync(command);
+        ValidationResult validationResult = await _validatorManager.CreateServerCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
             validationResult.AddToModelState(ModelState);
