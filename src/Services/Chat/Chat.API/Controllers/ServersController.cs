@@ -1,5 +1,7 @@
 ﻿using Chat.API.Extensions;
 using Chat.Application.Commands;
+using Chat.Application.DTOs;
+using Chat.Application.Queries;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
@@ -20,6 +22,14 @@ public class ServersController : ControllerBase
     {
         _mediator = mediator;
         _createServerValidator = createServerValidator;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ServerDto>))]
+    public async Task<IActionResult> GetAsync()
+    {
+        var result = await _mediator.Send(new GetServersQuery());
+        return Ok(result);
     }
 
     [HttpPost]

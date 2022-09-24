@@ -76,7 +76,7 @@ void AddMiddlewares(WebApplicationBuilder builder)
 
 void AddDependencies(WebApplicationBuilder builder)
 {
-    builder.Services.AddMediatR(typeof(CreateServerCommand)); // We only need one class from the Chat.Application assembly
+    builder.Services.AddMediatR(typeof(Chat.Application.AssemblyReference));
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
     builder.Services.AddScoped<IValidator<CreateServerCommand>, CreateServerCommandValidator>();
