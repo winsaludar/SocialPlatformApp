@@ -1,5 +1,6 @@
 ﻿using Chat.API.Controllers;
 using Chat.Application.Commands;
+using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
 using FluentValidation;
@@ -27,6 +28,62 @@ public class ServersControllerTests
         mockValidatorManager.Setup(x => x.GetServersQueryValidator).Returns(_getServersQueryValidator);
 
         _controller = new ServersController(_mockMediator.Object, mockValidatorManager.Object);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        GetServersQuery query = new(0, 10, "");
+        _getServersQueryValidator.RuleFor(x => x.Page).Must(page => false);
+
+        // Act
+        var result = await _controller.GetAllAsync(0, 10, "");
+
+        // Assert
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("Page", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ResultIsEmpty_ReturnsOkObjectResultWithEmptyData()
+    {
+        // Arrange
+        GetServersQuery query = new(1, 10, "");
+        _mockMediator.Setup(x => x.Send(query, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<ServerDto>());
+
+        // Act
+        var result = await _controller.GetAllAsync(1, 10, "");
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var servers = Assert.IsAssignableFrom<IEnumerable<ServerDto>>(okResult.Value);
+        Assert.Empty(servers);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ResultIsNotEmpty_ReturnsOkObjectResultWithData()
+    {
+        // Arrange
+        GetServersQuery query = new(1, 10, "");
+        _mockMediator.Setup(x => x.Send(query, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ServerDto>()
+            {
+                new ServerDto(),
+                new ServerDto(),
+                new ServerDto()
+            });
+
+        // Act
+        var result = await _controller.GetAllAsync(1, 10, "");
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var servers = Assert.IsAssignableFrom<IEnumerable<ServerDto>>(okResult.Value);
+        Assert.NotEmpty(servers);
+        Assert.Equal(3, servers.Count());
     }
 
     [Fact]

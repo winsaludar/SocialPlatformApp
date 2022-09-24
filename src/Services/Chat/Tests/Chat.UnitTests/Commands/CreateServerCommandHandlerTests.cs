@@ -19,7 +19,7 @@ public class CreateServerCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ServerCreated_ReturnsServerGuid()
+    public async Task Handle_ServerCreated_ReturnServerGuid()
     {
         // Arrange
         CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "Thumbnail");
