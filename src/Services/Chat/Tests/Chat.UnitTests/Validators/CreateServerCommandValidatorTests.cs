@@ -55,8 +55,9 @@ public class CreateServerCommandValidatorTests
         // Arrange
         string name = "Existing Name";
         CreateServerCommand command = new(name, "Short Description", "Long Description", "Thumbnail");
+        string creator = "creator@example.com";
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByNameAsync(It.IsAny<string>()))
-            .ReturnsAsync(new Server(command.Name, command.ShortDescription, command.LongDescription, command.Thumbnail));
+            .ReturnsAsync(new Server(command.Name, command.ShortDescription, command.LongDescription, creator, command.Thumbnail));
 
         // Act & Assert
         await Assert.ThrowsAsync<ServerNameAlreadyExistException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
