@@ -21,7 +21,7 @@ public class CreateServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task Name_IsEmpty_ReturnAnError()
+    public async Task Name_IsEmpty_ReturnsError()
     {
         // Arrange
         CreateServerCommand command = new("", "Short Description", "Long Description", "Thumbnail");
@@ -35,7 +35,7 @@ public class CreateServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task Name_ExceedsMaximumCharacterLength_ReturnAnError()
+    public async Task Name_ExceedsMaximumCharacterLength_ReturnsAnError()
     {
         // Arrange
         string name = "This is a long server name that exceeds 50 characters in length 1234567890.";
@@ -55,15 +55,16 @@ public class CreateServerCommandValidatorTests
         // Arrange
         string name = "Existing Name";
         CreateServerCommand command = new(name, "Short Description", "Long Description", "Thumbnail");
+        string creator = "creator@example.com";
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByNameAsync(It.IsAny<string>()))
-            .ReturnsAsync(new Server(command.Name, command.ShortDescription, command.LongDescription, command.Thumbnail));
+            .ReturnsAsync(new Server(command.Name, command.ShortDescription, command.LongDescription, creator, command.Thumbnail));
 
         // Act & Assert
-        await Assert.ThrowsAsync<NameAlreadyInUseException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+        await Assert.ThrowsAsync<ServerNameAlreadyExistException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
     }
 
     [Fact]
-    public async Task ShortDescription_IsEmpty_ReturnAnError()
+    public async Task ShortDescription_IsEmpty_ReturnsAnError()
     {
         // Arrange
         CreateServerCommand command = new("Name", "", "Long Description", "Thumbnail");
@@ -77,7 +78,7 @@ public class CreateServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task ShortDescription_ExceedsMaximumCharacterLength_ReturnAnError()
+    public async Task ShortDescription_ExceedsMaximumCharacterLength_ReturnsAnError()
     {
         // Arrange
         string shortDescription = @"This is a long server short description that exceeds 200 characters in length 1234567890. 
@@ -94,7 +95,7 @@ public class CreateServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task LongDescription_IsEmpty_ReturnAnError()
+    public async Task LongDescription_IsEmpty_ReturnsAnError()
     {
         // Arrange
         CreateServerCommand command = new("Name", "Short Description", "", "Thumbnail");

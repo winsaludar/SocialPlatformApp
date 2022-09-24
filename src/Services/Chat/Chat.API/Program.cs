@@ -1,4 +1,5 @@
 using Chat.API.Middlewares;
+using Chat.Application.IntegrationEvents;
 using Chat.Application.Validators;
 using Chat.Domain.SeedWork;
 using Chat.Infrastructure;
@@ -121,7 +122,7 @@ void RegisterEventBus(WebApplicationBuilder builder)
         return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, serviceScopeFactory, subscriptionManager, subscriptionClientName, retryCount);
     });
 
-    //builder.Services.AddTransient<UserRegisteredSuccessfulIntegrationEventHandler>();
+    builder.Services.AddTransient<UserRegisteredSuccessfulIntegrationEventHandler>();
 }
 
 void EnableMiddlewares(WebApplication app)
@@ -150,5 +151,5 @@ void ConfigureEventBus(WebApplication app)
 {
     var eventBus = app.Services.GetService<IEventBus>();
 
-    //eventBus?.Subscribe<UserRegisteredSuccessfulIntegrationEvent, UserRegisteredSuccessfulIntegrationEventHandler>();
+    eventBus?.Subscribe<UserRegisteredSuccessfulIntegrationEvent, UserRegisteredSuccessfulIntegrationEventHandler>();
 }

@@ -39,7 +39,7 @@ public class ServerRepository : IServerRepository
         result.ForEach(x =>
         {
             Server server = new(x.Name, x.ShortDescription, x.LongDescription, x.Thumbnail);
-            server.SetId(Guid.Parse(x.Guid));
+            server.SetId(Guid.Parse(x.Id));
             servers.Add(server);
         });
 
@@ -48,29 +48,32 @@ public class ServerRepository : IServerRepository
 
     public async Task<Server?> GetByNameAsync(string name)
     {
-        var result = await _serversCollection.Find(x => x.Name == name).FirstOrDefaultAsync();
+        var result = await _serversCollection.Find(x => x.Name.ToLower() == name.ToLower()).FirstOrDefaultAsync();
         if (result == null)
             return null;
 
         Server server = new(result.Name, result.ShortDescription, result.LongDescription, result.Thumbnail);
-        server.SetId(Guid.Parse(result.Guid));
+        server.SetId(Guid.Parse(result.Id));
         return server;
     }
 
     public async Task<Guid> AddAsync(Server newServer)
     {
-        Guid guid = Guid.NewGuid();
+        Guid newId = Guid.NewGuid();
 
         ServerDbModel model = new()
         {
-            Guid = guid.ToString(),
+            Id = newId.ToString(),
             Name = newServer.Name,
             ShortDescription = newServer.ShortDescription,
             LongDescription = newServer.LongDescription,
-            Thumbnail = newServer.Thumbnail
+            CreatorEmail = newServer.CreatorEmail,
+            Thumbnail = newServer.Thumbnail,
+            CreatedById = newServer.CreatedById.ToString(),
+            DateCreated = DateTime.UtcNow
         };
         await _serversCollection.InsertOneAsync(model);
 
-        return guid;
+        return newId;
     }
 }

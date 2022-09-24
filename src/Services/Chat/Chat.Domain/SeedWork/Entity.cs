@@ -8,27 +8,29 @@ public abstract class Entity
     private readonly List<INotification> _domainEvents = new();
 
     public virtual Guid Id { get; protected set; }
+    public virtual Guid CreatedById { get; protected set; }
+    public virtual DateTime DateCreated { get; protected set; }
+    public virtual Guid? LastModifiedById { get; protected set; }
+    public virtual DateTime DateLastModified { get; protected set; }
     public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
 
-    public void AddDomainEvent(INotification eventItem)
-    {
-        _domainEvents.Add(eventItem);
-    }
+    public void SetId(Guid id) => Id = id;
 
-    public void RemoveDomainEvent(INotification eventItem)
-    {
-        _domainEvents.Remove(eventItem);
-    }
+    public void SetCreatedById(Guid id) => CreatedById = id;
 
-    public void ClearDomainEvents()
-    {
-        _domainEvents.Clear();
-    }
+    public void SetDateCreated(DateTime dt) => DateCreated = dt;
 
-    public bool IsTransient()
-    {
-        return Id == default;
-    }
+    public void SetLastModifiedById(Guid id) => LastModifiedById = id;
+
+    public void SetDateLastModified(DateTime dt) => DateLastModified = dt;
+
+    public void AddDomainEvent(INotification eventItem) => _domainEvents.Add(eventItem);
+
+    public void RemoveDomainEvent(INotification eventItem) => _domainEvents.Remove(eventItem);
+
+    public void ClearDomainEvents() => _domainEvents.Clear();
+
+    public bool IsTransient() => Id == default;
 
     public override bool Equals(object? obj)
     {
@@ -67,8 +69,5 @@ public abstract class Entity
             return left.Equals(right);
     }
 
-    public static bool operator !=(Entity left, Entity right)
-    {
-        return !(left == right);
-    }
+    public static bool operator !=(Entity left, Entity right) => !(left == right);
 }
