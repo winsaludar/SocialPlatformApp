@@ -13,7 +13,9 @@ public class GetServersQueryHandler : IRequestHandler<GetServersQuery, IEnumerab
 
     public async Task<IEnumerable<ServerDto>> Handle(GetServersQuery request, CancellationToken cancellationToken)
     {
-        var result = await _repositoryManager.ServerRepository.GetAllAsync();
+        int skip = (request.Page - 1) * request.Size;
+
+        var result = await _repositoryManager.ServerRepository.GetAllAsync(skip, request.Size);
         if (!result.Any())
             return Enumerable.Empty<ServerDto>();
 

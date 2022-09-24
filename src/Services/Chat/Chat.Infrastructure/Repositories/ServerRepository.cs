@@ -16,9 +16,17 @@ public class ServerRepository : IServerRepository
         _serversCollection = mongoDatabase.GetCollection<ServerDbModel>(chatDbSettings.Value.ServersCollectionName);
     }
 
-    public async Task<IEnumerable<Server>> GetAllAsync()
+    public async Task<IEnumerable<Server>> GetAllAsync(int? skip = null, int? limit = null)
     {
-        var result = await _serversCollection.Find(_ => true).ToListAsync();
+        var query = _serversCollection.Find(_ => true);
+
+        if (limit.HasValue)
+            query = query.Limit(limit.Value);
+
+        if (skip.HasValue)
+            query = query.Skip(skip.Value);
+
+        var result = await query.ToListAsync();
         if (result == null || !result.Any())
             return Enumerable.Empty<Server>();
 
