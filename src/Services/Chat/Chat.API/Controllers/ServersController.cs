@@ -27,7 +27,7 @@ public class ServersController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ServerDto>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-    public async Task<IActionResult> GetAllAsync(int page = 1, int size = 10, string? name = null)
+    public async Task<IActionResult> GetAllServersAsync(int page = 1, int size = 10, string? name = null)
     {
         GetServersQuery query = new(page, size, name);
         ValidationResult validationResult = await _validatorManager.GetServersQueryValidator.ValidateAsync(query);
@@ -44,7 +44,7 @@ public class ServersController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-    public async Task<IActionResult> PostAsync([FromBody] CreateServerCommand command)
+    public async Task<IActionResult> CreateServerAsync([FromBody] CreateServerCommand command)
     {
         if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized("User is invalid");
@@ -62,4 +62,6 @@ public class ServersController : ControllerBase
 
         return Ok(result.ToString());
     }
+
+
 }
