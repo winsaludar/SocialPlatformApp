@@ -27,9 +27,9 @@ public class ServersController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ServerDto>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-    public async Task<IActionResult> GetAsync(int page = 1, int size = 10)
+    public async Task<IActionResult> GetAsync(int page = 1, int size = 10, string? name = null)
     {
-        GetServersQuery query = new(page, size);
+        GetServersQuery query = new(page, size, name);
         ValidationResult validationResult = await _validatorManager.GetServersQueryValidator.ValidateAsync(query);
         if (!validationResult.IsValid)
         {

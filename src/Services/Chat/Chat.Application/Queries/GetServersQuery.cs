@@ -7,10 +7,11 @@ namespace Chat.Application.Queries;
 [DataContract]
 public record GetServersQuery : IRequest<IEnumerable<ServerDto>>
 {
-    public GetServersQuery(int page, int size)
+    public GetServersQuery(int page, int size, string? name)
     {
         Page = page;
         Size = size;
+        Name = name;
     }
 
     [DataMember]
@@ -18,4 +19,7 @@ public record GetServersQuery : IRequest<IEnumerable<ServerDto>>
 
     [DataMember]
     public int Size { get; private set; }
+
+    [DataMember]
+    public string? Name { get; private set; }
 }
