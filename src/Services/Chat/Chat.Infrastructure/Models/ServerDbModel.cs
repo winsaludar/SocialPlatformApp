@@ -3,15 +3,8 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Chat.Infrastructure.Models;
 
-public record ServerDbModel
+public class ServerDbModel : BaseDbModel
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? Id { get; set; }
-
-    [BsonElement("guid")]
-    public string Guid { get; set; } = default!;
-
     [BsonElement("name")]
     public string Name { get; set; } = default!;
 

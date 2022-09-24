@@ -39,7 +39,7 @@ public class ServerRepository : IServerRepository
         result.ForEach(x =>
         {
             Server server = new(x.Name, x.ShortDescription, x.LongDescription, x.Thumbnail);
-            server.SetId(Guid.Parse(x.Guid));
+            server.SetId(Guid.Parse(x.Id));
             servers.Add(server);
         });
 
@@ -53,17 +53,17 @@ public class ServerRepository : IServerRepository
             return null;
 
         Server server = new(result.Name, result.ShortDescription, result.LongDescription, result.Thumbnail);
-        server.SetId(Guid.Parse(result.Guid));
+        server.SetId(Guid.Parse(result.Id));
         return server;
     }
 
     public async Task<Guid> AddAsync(Server newServer)
     {
-        Guid guid = Guid.NewGuid();
+        Guid newId = Guid.NewGuid();
 
         ServerDbModel model = new()
         {
-            Guid = guid.ToString(),
+            Id = newId.ToString(),
             Name = newServer.Name,
             ShortDescription = newServer.ShortDescription,
             LongDescription = newServer.LongDescription,
@@ -71,6 +71,6 @@ public class ServerRepository : IServerRepository
         };
         await _serversCollection.InsertOneAsync(model);
 
-        return guid;
+        return newId;
     }
 }

@@ -16,9 +16,4 @@ public class Server : Entity, IAggregateRoot
     public string ShortDescription { get; private set; }
     public string LongDescription { get; private set; }
     public string? Thumbnail { get; private set; }
-
-    public void SetId(Guid id)
-    {
-        Id = id;
-    }
 }
