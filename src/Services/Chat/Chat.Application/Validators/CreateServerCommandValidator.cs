@@ -28,6 +28,6 @@ public class CreateServerCommandValidator : AbstractValidator<CreateServerComman
         if (result is null)
             return true;
 
-        throw new NameAlreadyInUseException(name);
+        throw new ServerNameAlreadyExistException(name);
     }
 }

@@ -59,7 +59,7 @@ public class CreateServerCommandValidatorTests
             .ReturnsAsync(new Server(command.Name, command.ShortDescription, command.LongDescription, command.Thumbnail));
 
         // Act & Assert
-        await Assert.ThrowsAsync<NameAlreadyInUseException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+        await Assert.ThrowsAsync<ServerNameAlreadyExistException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
     }
 
     [Fact]

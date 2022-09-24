@@ -20,7 +20,7 @@ public abstract class Entity
 
     public void SetDateCreated(DateTime dt) => DateCreated = dt;
 
-    public void SetLastModifiedBy(Guid id) => LastModifiedById = id;
+    public void SetLastModifiedById(Guid id) => LastModifiedById = id;
 
     public void SetDateLastModified(DateTime dt) => DateLastModified = dt;
 

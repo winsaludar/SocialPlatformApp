@@ -48,7 +48,7 @@ public class ServerRepository : IServerRepository
 
     public async Task<Server?> GetByNameAsync(string name)
     {
-        var result = await _serversCollection.Find(x => x.Name == name).FirstOrDefaultAsync();
+        var result = await _serversCollection.Find(x => x.Name.ToLower() == name.ToLower()).FirstOrDefaultAsync();
         if (result == null)
             return null;
 

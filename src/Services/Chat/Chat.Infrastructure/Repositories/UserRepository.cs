@@ -16,6 +16,42 @@ public class UserRepository : IUserRepository
         _usersCollection = mongoDatabase.GetCollection<UserDbModel>(chatDbSettings.Value.UsersCollectionName);
     }
 
+    public async Task<User?> GetByUsernameAsync(string username)
+    {
+        var result = await _usersCollection.Find(x => x.Username.ToLower() == username.ToLower()).FirstOrDefaultAsync();
+        if (result == null)
+            return null;
+
+        User user = new(Guid.Parse(result.AuthId), result.Username, result.Email);
+        user.SetId(Guid.Parse(result.Id));
+        user.SetCreatedById(Guid.Parse(result.CreatedById));
+        user.SetDateCreated(result.DateCreated);
+        if (!string.IsNullOrEmpty(result.LastModifiedById))
+            user.SetLastModifiedById(Guid.Parse(result.LastModifiedById));
+        if (result.DateLastModified.HasValue)
+            user.SetDateLastModified(result.DateLastModified.Value);
+
+        return user;
+    }
+
+    public async Task<User?> GetByEmailAsync(string email)
+    {
+        var result = await _usersCollection.Find(x => x.Email.ToLower() == email.ToLower()).FirstOrDefaultAsync();
+        if (result == null)
+            return null;
+
+        User user = new(Guid.Parse(result.AuthId), result.Username, result.Email);
+        user.SetId(Guid.Parse(result.Id));
+        user.SetCreatedById(Guid.Parse(result.CreatedById));
+        user.SetDateCreated(result.DateCreated);
+        if (!string.IsNullOrEmpty(result.LastModifiedById))
+            user.SetLastModifiedById(Guid.Parse(result.LastModifiedById));
+        if (result.DateLastModified.HasValue)
+            user.SetDateLastModified(result.DateLastModified.Value);
+
+        return user;
+    }
+
     public async Task<Guid> AddAsync(User newUser)
     {
         Guid newId = Guid.NewGuid();
