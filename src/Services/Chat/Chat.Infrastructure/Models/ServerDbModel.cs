@@ -14,6 +14,9 @@ public class ServerDbModel : BaseDbModel
     [BsonElement("longDescription")]
     public string LongDescription { get; set; } = default!;
 
+    [BsonElement("creatorEmail")]
+    public string CreatorEmail { get; set; } = default!;
+
     [BsonElement("thumbnail")]
     public string? Thumbnail { get; set; }
 }

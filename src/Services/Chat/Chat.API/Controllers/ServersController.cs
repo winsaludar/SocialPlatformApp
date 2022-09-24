@@ -46,6 +46,11 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     public async Task<IActionResult> PostAsync([FromBody] CreateServerCommand command)
     {
+        if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized("User is invalid");
+
+        command.SetCreatorEmail(User.Identity.Name);
+
         ValidationResult validationResult = await _validatorManager.CreateServerCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {

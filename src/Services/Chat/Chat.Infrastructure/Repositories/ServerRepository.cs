@@ -67,7 +67,10 @@ public class ServerRepository : IServerRepository
             Name = newServer.Name,
             ShortDescription = newServer.ShortDescription,
             LongDescription = newServer.LongDescription,
-            Thumbnail = newServer.Thumbnail
+            CreatorEmail = newServer.CreatorEmail,
+            Thumbnail = newServer.Thumbnail,
+            CreatedById = newServer.CreatedById.ToString(),
+            DateCreated = DateTime.UtcNow
         };
         await _serversCollection.InsertOneAsync(model);
 
