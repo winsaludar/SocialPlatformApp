@@ -4,13 +4,15 @@ using System.Runtime.Serialization;
 namespace Chat.Application.Commands;
 
 [DataContract]
-public record CreateServerCommand : IRequest<Guid>
+public record UpdateServerCommand : IRequest<bool>
 {
-    public CreateServerCommand(string name, string shortDescription, string longDescription, string? thumbnail = "")
+    public UpdateServerCommand(Guid targetServerId, string name, string shortDescription, string longDescription, string editorEmail, string? thumbnail = "")
     {
+        TargetServerId = targetServerId;
         Name = name;
         ShortDescription = shortDescription;
         LongDescription = longDescription;
+        EditorEmail = editorEmail;
         Thumbnail = thumbnail;
     }
 
@@ -24,11 +26,11 @@ public record CreateServerCommand : IRequest<Guid>
     public string LongDescription { get; private set; }
 
     [DataMember]
-    public string? CreatorEmail { get; private set; }
+    public string EditorEmail { get; private set; }
 
     [DataMember]
     public string? Thumbnail { get; private set; }
 
-    public void SetCreatorEmail(string email) => CreatorEmail = email;
+    [DataMember]
+    public Guid TargetServerId { get; private set; }
 }
-
