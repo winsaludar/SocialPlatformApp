@@ -89,7 +89,7 @@ public class ServerRepository : IServerRepository
         return server;
     }
 
-    public async Task<Guid> AddAsync(Server newServer)
+    public async Task<Guid> CreateAsync(Server newServer)
     {
         Guid newId = Guid.NewGuid();
 
@@ -121,5 +121,10 @@ public class ServerRepository : IServerRepository
             .Set(x => x.DateLastModified, DateTime.UtcNow);
 
         await _serversCollection.UpdateOneAsync(filter, data);
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        await _serversCollection.DeleteOneAsync(x => x.Id.ToLower() == id.ToString().ToLower());
     }
 }

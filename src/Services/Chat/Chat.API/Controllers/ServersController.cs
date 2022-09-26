@@ -86,4 +86,27 @@ public class ServersController : ControllerBase
 
         return Ok("Server updated");
     }
+
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [Route("{serverId}")]
+    public async Task<IActionResult> DeleteServerAsync(Guid serverId)
+    {
+        if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+            return Unauthorized("User is invalid");
+
+        DeleteServerCommand command = new(serverId, User.Identity.Name);
+        ValidationResult validationResult = await _validatorManager.DeleteServerCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
+
+        await _mediator.Send(command);
+
+        return Ok("Server deleted");
+    }
 }

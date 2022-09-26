@@ -57,7 +57,7 @@ public class UpdateServerCommandValidator : AbstractValidator<UpdateServerComman
             throw new ServerNotFoundException(targetServerId.ToString());
 
         if (result.CreatorEmail.ToLower() != editorEmail.ToLower())
-            throw new UnauthorizedServerEditor(editorEmail);
+            throw new UnauthorizedServerEditorException(editorEmail);
 
         return true;
     }
