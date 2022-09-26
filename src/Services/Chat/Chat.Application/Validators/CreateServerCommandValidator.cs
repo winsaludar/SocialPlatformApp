@@ -20,6 +20,7 @@ public class CreateServerCommandValidator : AbstractValidator<CreateServerComman
 
         RuleFor(x => x.ShortDescription).NotEmpty().MaximumLength(200);
         RuleFor(x => x.LongDescription).NotEmpty();
+        RuleFor(x => x.CreatorEmail).NotEmpty().EmailAddress();
     }
 
     private async Task<bool> BeNotExistingName(string name, CancellationToken cancellationToken)
