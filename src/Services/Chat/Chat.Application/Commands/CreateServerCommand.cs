@@ -6,11 +6,12 @@ namespace Chat.Application.Commands;
 [DataContract]
 public record CreateServerCommand : IRequest<Guid>
 {
-    public CreateServerCommand(string name, string shortDescription, string longDescription, string? thumbnail = "")
+    public CreateServerCommand(string name, string shortDescription, string longDescription, string creatorEmail, string? thumbnail = "")
     {
         Name = name;
         ShortDescription = shortDescription;
         LongDescription = longDescription;
+        CreatorEmail = creatorEmail;
         Thumbnail = thumbnail;
     }
 
@@ -24,7 +25,7 @@ public record CreateServerCommand : IRequest<Guid>
     public string LongDescription { get; private set; }
 
     [DataMember]
-    public string? CreatorEmail { get; private set; }
+    public string CreatorEmail { get; private set; }
 
     [DataMember]
     public string? Thumbnail { get; private set; }

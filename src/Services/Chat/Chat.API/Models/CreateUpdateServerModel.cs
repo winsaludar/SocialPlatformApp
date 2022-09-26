@@ -1,6 +1,6 @@
 ﻿namespace Chat.API.Models;
 
-public record UpdateServerModel
+public record CreateUpdateServerModel
 {
     public string Name { get; set; } = default!;
     public string ShortDescription { get; set; } = default!;

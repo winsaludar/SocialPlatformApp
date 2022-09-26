@@ -101,13 +101,19 @@ public class ServersControllerTests
     {
         // Arrange
         SetUpNullUserIdentity();
-        CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "Thumbnail") { };
+        CreateUpdateServerModel model = new()
+        {
+            Name = "Server Name",
+            ShortDescription = "Short Description",
+            LongDescription = "Long Description",
+            Thumbnail = ""
+        };
 
         // Act
-        var result = await _controller.CreateServerAsync(command);
+        var result = await _controller.CreateServerAsync(model);
 
         // Assert
-        _mockMediator.Verify(x => x.Send(command, It.IsAny<CancellationToken>()), Times.Never);
+        _mockMediator.Verify(x => x.Send(It.IsAny<CreateServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
@@ -116,14 +122,20 @@ public class ServersControllerTests
     {
         // Arrange
         SetUpFakeUserIdentity();
-        CreateServerCommand command = new("", "Short Description", "Long Description", "Thumbnail") { };
+        CreateUpdateServerModel model = new()
+        {
+            Name = "Server Name",
+            ShortDescription = "Short Description",
+            LongDescription = "Long Description",
+            Thumbnail = ""
+        };
         _createServerCommandValidator.RuleFor(x => x.Name).Must(name => false);
 
         // Act
-        var result = await _controller.CreateServerAsync(command);
+        var result = await _controller.CreateServerAsync(model);
 
         // Assert
-        _mockMediator.Verify(x => x.Send(command, It.IsAny<CancellationToken>()), Times.Never);
+        _mockMediator.Verify(x => x.Send(It.IsAny<CreateServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         var badResult = Assert.IsType<BadRequestObjectResult>(result);
         var errors = Assert.IsType<SerializableError>(badResult.Value);
         Assert.Equal("Name", errors.FirstOrDefault().Key);
@@ -134,16 +146,22 @@ public class ServersControllerTests
     {
         // Arrange
         SetUpFakeUserIdentity();
-        CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "Thumbnail") { };
+        CreateUpdateServerModel model = new()
+        {
+            Name = "Server Name",
+            ShortDescription = "Short Description",
+            LongDescription = "Long Description",
+            Thumbnail = ""
+        };
         _createServerCommandValidator.RuleFor(x => x.Name).Must(name => true);
-        _mockMediator.Setup(x => x.Send(command, It.IsAny<CancellationToken>()))
+        _mockMediator.Setup(x => x.Send(It.IsAny<CreateServerCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(It.IsAny<Guid>());
 
         // Act
-        var result = await _controller.CreateServerAsync(command);
+        var result = await _controller.CreateServerAsync(model);
 
         // Assert
-        _mockMediator.Verify(x => x.Send(command, It.IsAny<CancellationToken>()), Times.Once);
+        _mockMediator.Verify(x => x.Send(It.IsAny<CreateServerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
 
@@ -153,7 +171,7 @@ public class ServersControllerTests
         // Arrange
         SetUpNullUserIdentity();
         Guid serverId = Guid.NewGuid();
-        UpdateServerModel model = new()
+        CreateUpdateServerModel model = new()
         {
             Name = "Server Name",
             ShortDescription = "Updated Short Description",
@@ -175,7 +193,7 @@ public class ServersControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
-        UpdateServerModel model = new()
+        CreateUpdateServerModel model = new()
         {
             Name = "",
             ShortDescription = "Updated Short Description",
@@ -200,7 +218,7 @@ public class ServersControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
-        UpdateServerModel model = new()
+        CreateUpdateServerModel model = new()
         {
             Name = "Updated Name",
             ShortDescription = "Updated Short Description",

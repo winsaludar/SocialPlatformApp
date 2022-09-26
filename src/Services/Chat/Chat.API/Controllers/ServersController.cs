@@ -4,7 +4,6 @@ using Chat.Application.Commands;
 using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
-using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -47,13 +46,12 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(object))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
-    public async Task<IActionResult> CreateServerAsync([FromBody] CreateServerCommand command)
+    public async Task<IActionResult> CreateServerAsync([FromBody] CreateUpdateServerModel request)
     {
         if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized("User is invalid");
 
-        command.SetCreatorEmail(User.Identity.Name);
-
+        CreateServerCommand command = new(request.Name, request.ShortDescription, request.LongDescription, User.Identity.Name, request.Thumbnail);
         ValidationResult validationResult = await _validatorManager.CreateServerCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
@@ -71,7 +69,7 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     [Route("{serverId}")]
-    public async Task<IActionResult> UpdateServerAsync(Guid serverId, [FromBody] UpdateServerModel request)
+    public async Task<IActionResult> UpdateServerAsync(Guid serverId, [FromBody] CreateUpdateServerModel request)
     {
         if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
             return Unauthorized("User is invalid");
