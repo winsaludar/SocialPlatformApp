@@ -29,7 +29,5 @@ public record CreateServerCommand : IRequest<Guid>
 
     [DataMember]
     public string? Thumbnail { get; private set; }
-
-    public void SetCreatorEmail(string email) => CreatorEmail = email;
 }
 

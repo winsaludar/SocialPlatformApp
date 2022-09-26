@@ -107,4 +107,32 @@ public class CreateServerCommandValidatorTests
         Assert.NotEmpty(result.Errors);
         Assert.True(result.Errors?.Any(x => x.PropertyName == "LongDescription"));
     }
+
+    [Fact]
+    public async Task CreatorEmail_IsEmpty_ReturnsAnError()
+    {
+        // Arrange
+        CreateServerCommand command = new("Name", "Short Description", "Long Description", "", "Thumbnail");
+
+        // Act
+        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
+
+        // Assert
+        Assert.NotEmpty(result.Errors);
+        Assert.True(result.Errors?.Any(x => x.PropertyName == "CreatorEmail"));
+    }
+
+    [Fact]
+    public async Task CreatorEmail_IsNotValidEmailAddress_ReturnsAnError()
+    {
+        // Arrange
+        CreateServerCommand command = new("Name", "Short Description", "Long Description", "notvalidemail", "Thumbnail");
+
+        // Act
+        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
+
+        // Assert
+        Assert.NotEmpty(result.Errors);
+        Assert.True(result.Errors?.Any(x => x.PropertyName == "CreatorEmail"));
+    }
 }
