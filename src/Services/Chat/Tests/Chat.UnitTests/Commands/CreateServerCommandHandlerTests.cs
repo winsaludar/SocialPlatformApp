@@ -26,7 +26,7 @@ public class CreateServerCommandHandlerTests
     {
         // Arrange
         CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "creator@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.AddAsync(It.IsAny<Server>()))
+        _mockRepositoryManager.Setup(x => x.ServerRepository.CreateAsync(It.IsAny<Server>()))
             .ReturnsAsync(Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.UserRepository.GetByEmailAsync(It.IsAny<string>()))
             .ReturnsAsync(new User(Guid.NewGuid(), "user", "user@example.com"));
@@ -35,7 +35,7 @@ public class CreateServerCommandHandlerTests
         var result = await _createServerCommandHandler.Handle(command, It.IsAny<CancellationToken>());
 
         // Assert
-        _mockRepositoryManager.Verify(x => x.ServerRepository.AddAsync(It.IsAny<Server>()), Times.Once);
+        _mockRepositoryManager.Verify(x => x.ServerRepository.CreateAsync(It.IsAny<Server>()), Times.Once);
         Assert.NotEqual(Guid.Empty, result);
     }
 }

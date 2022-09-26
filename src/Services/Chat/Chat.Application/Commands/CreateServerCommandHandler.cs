@@ -16,7 +16,7 @@ public class CreateServerCommandHandler : IRequestHandler<CreateServerCommand, G
         Guid creatorId = await GetCreatorId(request.CreatorEmail);
         newServer.SetCreatedById(creatorId);
 
-        var newId = await _repositoryManager.ServerRepository.AddAsync(newServer);
+        var newId = await _repositoryManager.ServerRepository.CreateAsync(newServer);
 
         return newId;
     }

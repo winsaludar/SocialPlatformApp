@@ -10,4 +10,5 @@ public interface IValidatorManager
     public AbstractValidator<CreateUserCommand> CreateUserCommandValidator { get; }
     public AbstractValidator<GetServersQuery> GetServersQueryValidator { get; }
     public AbstractValidator<UpdateServerCommand> UpdateServerCommandValidator { get; }
+    public AbstractValidator<DeleteServerCommand> DeleteServerCommandValidator { get; }
 }

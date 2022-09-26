@@ -187,6 +187,6 @@ public class UpdateServerCommandValidatorTests
             .ReturnsAsync(new Server(command.Name, command.ShortDescription, command.LongDescription, "creator@example.com", command.Thumbnail));
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedServerEditor>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+        await Assert.ThrowsAsync<UnauthorizedServerEditorException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
     }
 }
