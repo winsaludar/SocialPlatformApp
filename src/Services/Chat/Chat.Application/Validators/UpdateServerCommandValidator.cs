@@ -25,7 +25,8 @@ public class UpdateServerCommandValidator : AbstractValidator<UpdateServerComman
         RuleFor(x => x.ShortDescription).NotEmpty().MaximumLength(200);
         RuleFor(x => x.LongDescription).NotEmpty();
 
-        // TODO: Make sure editor is the same as the creator
+        RuleFor(x => new Tuple<Guid, string>(x.TargetServerId, x.EditorEmail))
+            .MustAsync(BeTheSameEmailWithCreator);
     }
 
     private async Task<bool> BeNotExistingName(string name, CancellationToken cancellationToken)
@@ -42,6 +43,20 @@ public class UpdateServerCommandValidator : AbstractValidator<UpdateServerComman
         var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
         if (result is null)
             throw new ServerNotFoundException(targetServerId.ToString());
+
+        return true;
+    }
+
+    private async Task<bool> BeTheSameEmailWithCreator(Tuple<Guid, string> props, CancellationToken cancellationToken)
+    {
+        (Guid targetServerId, string editorEmail) = props;
+
+        var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
+        if (result is null)
+            throw new ServerNotFoundException(targetServerId.ToString());
+
+        if (result.CreatorEmail.ToLower() != editorEmail.ToLower())
+            throw new UnauthorizedServerEditor(editorEmail);
 
         return true;
     }
