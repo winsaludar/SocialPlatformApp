@@ -20,6 +20,7 @@ public class ServersControllerTests
     private readonly InlineValidator<CreateServerCommand> _createServerCommandValidator;
     private readonly InlineValidator<GetServersQuery> _getServersQueryValidator;
     private readonly InlineValidator<UpdateServerCommand> _updateServerCommandValidator;
+    private readonly InlineValidator<DeleteServerCommand> _deleteServerCommandValidator;
     private readonly ServersController _controller;
 
     public ServersControllerTests()
@@ -28,11 +29,13 @@ public class ServersControllerTests
         _createServerCommandValidator = new InlineValidator<CreateServerCommand>();
         _getServersQueryValidator = new InlineValidator<GetServersQuery>();
         _updateServerCommandValidator = new InlineValidator<UpdateServerCommand>();
+        _deleteServerCommandValidator = new InlineValidator<DeleteServerCommand>();
 
         Mock<IValidatorManager> mockValidatorManager = new();
         mockValidatorManager.Setup(x => x.CreateServerCommandValidator).Returns(_createServerCommandValidator);
         mockValidatorManager.Setup(x => x.GetServersQueryValidator).Returns(_getServersQueryValidator);
         mockValidatorManager.Setup(x => x.UpdateServerCommandValidator).Returns(_updateServerCommandValidator);
+        mockValidatorManager.Setup(x => x.DeleteServerCommandValidator).Returns(_deleteServerCommandValidator);
 
         _controller = new ServersController(_mockMediator.Object, mockValidatorManager.Object);
     }
@@ -234,6 +237,57 @@ public class ServersControllerTests
 
         // Assert
         _mockMediator.Verify(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task DeleteServerAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+        Guid serverId = Guid.NewGuid();
+
+        // Act
+        var result = await _controller.DeleteServerAsync(serverId);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        Assert.IsType<UnauthorizedObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task DeleteServerAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        _deleteServerCommandValidator.RuleFor(x => x.TargetServerId).Must(name => false);
+
+        // Act
+        var result = await _controller.DeleteServerAsync(serverId);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<DeleteServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("TargetServerId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task DeleteServerAsync_ValidationResultIsValid_ReturnsOkObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        _deleteServerCommandValidator.RuleFor(x => x.TargetServerId).Must(name => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<DeleteServerCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(It.IsAny<bool>());
+
+        // Act
+        var result = await _controller.DeleteServerAsync(serverId);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<DeleteServerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
 
