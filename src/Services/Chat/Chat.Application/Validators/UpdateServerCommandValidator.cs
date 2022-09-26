@@ -24,6 +24,7 @@ public class UpdateServerCommandValidator : AbstractValidator<UpdateServerComman
 
         RuleFor(x => x.ShortDescription).NotEmpty().MaximumLength(200);
         RuleFor(x => x.LongDescription).NotEmpty();
+        RuleFor(x => x.EditorEmail).NotEmpty().EmailAddress();
 
         RuleFor(x => new Tuple<Guid, string>(x.TargetServerId, x.EditorEmail))
             .MustAsync(BeTheSameEmailWithCreator);
