@@ -36,7 +36,7 @@ public class UserRegisteredSuccessfulIntegrationEventHandler : IIntegrationEvent
             }
 
             var newId = await _mediator.Send(command);
-            _logger.LogInformation("User successfully created with Id: {Id}", newId);
+            _logger.LogInformation("User successfully created with Guid: {Guid}", newId);
         }
         catch (Exception ex)
         {

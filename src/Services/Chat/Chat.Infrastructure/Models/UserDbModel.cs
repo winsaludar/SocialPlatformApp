@@ -1,9 +1,15 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Chat.Infrastructure.Models;
 
-public class UserDbModel : BaseDbModel
+public class UserDbModel : EntityDbModel
 {
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    [BsonElement("id")]
+    public string Id { get; set; } = default!;
+
     [BsonElement("authId")]
     public string AuthId { get; set; } = default!;
 

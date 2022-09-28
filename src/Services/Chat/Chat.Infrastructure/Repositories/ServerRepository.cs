@@ -39,7 +39,7 @@ public class ServerRepository : IServerRepository
         result.ForEach(x =>
         {
             Server server = new(x.Name, x.ShortDescription, x.LongDescription, x.CreatorEmail, x.Thumbnail);
-            server.SetId(Guid.Parse(x.Id));
+            server.SetId(Guid.Parse(x.Guid));
             server.SetCreatedById(Guid.Parse(x.CreatedById));
             server.SetDateCreated(x.DateCreated);
             if (!string.IsNullOrEmpty(x.LastModifiedById))
@@ -60,7 +60,7 @@ public class ServerRepository : IServerRepository
             return null;
 
         Server server = new(result.Name, result.ShortDescription, result.LongDescription, result.CreatorEmail, result.Thumbnail);
-        server.SetId(Guid.Parse(result.Id));
+        server.SetId(Guid.Parse(result.Guid));
         server.SetCreatedById(Guid.Parse(result.CreatedById));
         server.SetDateCreated(result.DateCreated);
         if (!string.IsNullOrEmpty(result.LastModifiedById))
@@ -73,18 +73,24 @@ public class ServerRepository : IServerRepository
 
     public async Task<Server?> GetByIdAsync(Guid id)
     {
-        var result = await _serversCollection.Find(x => x.Id.ToLower() == id.ToString().ToLower()).FirstOrDefaultAsync();
+        var result = await _serversCollection.Find(x => x.Guid.ToLower() == id.ToString().ToLower()).FirstOrDefaultAsync();
         if (result == null)
             return null;
 
         Server server = new(result.Name, result.ShortDescription, result.LongDescription, result.CreatorEmail, result.Thumbnail);
-        server.SetId(Guid.Parse(result.Id));
+        server.SetId(Guid.Parse(result.Guid));
         server.SetCreatedById(Guid.Parse(result.CreatedById));
         server.SetDateCreated(result.DateCreated);
         if (!string.IsNullOrEmpty(result.LastModifiedById))
             server.SetLastModifiedById(Guid.Parse(result.LastModifiedById));
         if (result.DateLastModified.HasValue)
             server.SetDateLastModified(result.DateLastModified.Value);
+
+        // Add channels
+        result.Channels.ForEach(x =>
+        {
+            server.AddChannel(x.Name);
+        });
 
         return server;
     }
@@ -95,7 +101,7 @@ public class ServerRepository : IServerRepository
 
         ServerDbModel model = new()
         {
-            Id = newId.ToString(),
+            Guid = newId.ToString(),
             Name = newServer.Name,
             ShortDescription = newServer.ShortDescription,
             LongDescription = newServer.LongDescription,
@@ -104,6 +110,20 @@ public class ServerRepository : IServerRepository
             CreatedById = newServer.CreatedById.ToString(),
             DateCreated = DateTime.UtcNow
         };
+
+        List<ChannelDbModel> channels = new();
+        foreach (var item in newServer.Channels)
+        {
+            ChannelDbModel channel = new()
+            {
+                Name = item.Name,
+                DateCreated = item.DateCreated,
+                CreatedById = item.CreatedById.ToString()
+            };
+            channels.Add(channel);
+        }
+        model.Channels = channels;
+
         await _serversCollection.InsertOneAsync(model);
 
         return newId;
@@ -111,20 +131,43 @@ public class ServerRepository : IServerRepository
 
     public async Task UpdateAsync(Server server)
     {
-        var filter = Builders<ServerDbModel>.Filter.Where(x => x.Id.ToLower() == server.Id.ToString().ToLower());
-        var data = Builders<ServerDbModel>.Update
-            .Set(x => x.Name, server.Name)
-            .Set(x => x.ShortDescription, server.ShortDescription)
-            .Set(x => x.LongDescription, server.LongDescription)
-            .Set(x => x.Thumbnail, server.Thumbnail)
-            .Set(x => x.LastModifiedById, server.LastModifiedById.ToString())
-            .Set(x => x.DateLastModified, DateTime.UtcNow);
+        var result = await _serversCollection.Find(x => x.Guid.ToLower() == server.Id.ToString().ToLower()).FirstOrDefaultAsync();
+        if (result == null)
+            return;
 
-        await _serversCollection.UpdateOneAsync(filter, data);
+        ServerDbModel model = new()
+        {
+            Id = result.Id,
+            Guid = result.Guid.ToString(),
+            Name = server.Name,
+            ShortDescription = server.ShortDescription,
+            LongDescription = server.LongDescription,
+            CreatorEmail = result.CreatorEmail,
+            Thumbnail = server.Thumbnail,
+            CreatedById = result.CreatedById.ToString(),
+            DateCreated = result.DateCreated,
+            LastModifiedById = server.LastModifiedById.ToString(),
+            DateLastModified = DateTime.UtcNow,
+        };
+
+        List<ChannelDbModel> channels = new();
+        foreach (var item in server.Channels)
+        {
+            ChannelDbModel channel = new()
+            {
+                Name = item.Name,
+                DateCreated = item.DateCreated,
+                CreatedById = item.CreatedById.ToString()
+            };
+            channels.Add(channel);
+        }
+        model.Channels = channels;
+
+        await _serversCollection.ReplaceOneAsync(x => x.Guid.ToLower() == server.Id.ToString().ToLower(), model);
     }
 
     public async Task DeleteAsync(Guid id)
     {
-        await _serversCollection.DeleteOneAsync(x => x.Id.ToLower() == id.ToString().ToLower());
+        await _serversCollection.DeleteOneAsync(x => x.Guid.ToLower() == id.ToString().ToLower());
     }
 }
