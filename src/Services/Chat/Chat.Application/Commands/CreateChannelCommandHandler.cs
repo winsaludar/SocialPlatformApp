@@ -16,7 +16,7 @@ public class CreateChannelCommandHandler : IRequestHandler<CreateChannelCommand,
         if (server is null)
             throw new ServerNotFoundException(request.TargetServerId.ToString());
 
-        Guid channelId = server.AddChannel(request.Name);
+        Guid channelId = server.AddChannel(Guid.NewGuid(), request.Name, DateTime.UtcNow);
 
         await _repositoryManager.ServerRepository.UpdateAsync(server);
         return channelId;

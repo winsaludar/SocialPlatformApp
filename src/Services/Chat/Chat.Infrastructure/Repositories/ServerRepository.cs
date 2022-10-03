@@ -68,6 +68,14 @@ public class ServerRepository : IServerRepository
         if (result.DateLastModified.HasValue)
             server.SetDateLastModified(result.DateLastModified.Value);
 
+        // Add channels
+        result.Channels.ForEach(x =>
+        {
+            Guid id = Guid.Parse(x.Guid);
+            Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
+            server.AddChannel(id, x.Name, x.DateCreated, lastModifiedById, x.DateLastModified);
+        });
+
         return server;
     }
 
@@ -89,7 +97,9 @@ public class ServerRepository : IServerRepository
         // Add channels
         result.Channels.ForEach(x =>
         {
-            server.AddChannel(x.Name);
+            Guid id = Guid.Parse(x.Guid);
+            Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
+            server.AddChannel(id, x.Name, x.DateCreated, lastModifiedById, x.DateLastModified);
         });
 
         return server;
@@ -110,19 +120,6 @@ public class ServerRepository : IServerRepository
             CreatedById = newServer.CreatedById.ToString(),
             DateCreated = DateTime.UtcNow
         };
-
-        List<ChannelDbModel> channels = new();
-        foreach (var item in newServer.Channels)
-        {
-            ChannelDbModel channel = new()
-            {
-                Name = item.Name,
-                DateCreated = item.DateCreated,
-                CreatedById = item.CreatedById.ToString()
-            };
-            channels.Add(channel);
-        }
-        model.Channels = channels;
 
         await _serversCollection.InsertOneAsync(model);
 
@@ -155,6 +152,7 @@ public class ServerRepository : IServerRepository
         {
             ChannelDbModel channel = new()
             {
+                Guid = item.Id.ToString(),
                 Name = item.Name,
                 DateCreated = item.DateCreated,
                 CreatedById = item.CreatedById.ToString()

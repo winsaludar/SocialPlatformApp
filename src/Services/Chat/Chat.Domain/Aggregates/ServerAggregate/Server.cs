@@ -23,12 +23,18 @@ public class Server : Entity, IAggregateRoot
     public string? Thumbnail { get; private set; }
     public IReadOnlyCollection<Channel> Channels => _channels;
 
-    public Guid AddChannel(string name)
+    public Guid AddChannel(Guid id, string name, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
     {
         Channel newChannel = new(name);
-        newChannel.SetId(Guid.NewGuid());
-        newChannel.SetDateCreated(DateTime.UtcNow);
+        newChannel.SetId(id);
+        newChannel.SetDateCreated(dateCreated);
         newChannel.SetCreatedById(CreatedById);
+
+        if (lastModifiedById.HasValue)
+            newChannel.SetLastModifiedById(lastModifiedById.Value);
+
+        if (dateLastModified.HasValue)
+            newChannel.SetDateLastModified(dateLastModified.Value);
 
         _channels.Add(newChannel);
 
