@@ -15,7 +15,7 @@ namespace Chat.API.Controllers;
 public class ChannelsController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private IValidatorManager _validatorManager;
+    private readonly IValidatorManager _validatorManager;
 
     public ChannelsController(IMediator mediator, IValidatorManager validatorManager)
     {
