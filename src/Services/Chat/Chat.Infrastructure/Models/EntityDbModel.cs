@@ -3,18 +3,14 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Chat.Infrastructure.Models;
 
-public abstract class BaseDbModel
+public abstract class EntityDbModel
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    [BsonElement("rowId")]
-    public string? RowId { get; set; }
-
-    [BsonElement("id")]
-    public string Id { get; set; } = default!;
+    [BsonElement("guid")]
+    [BsonRepresentation(BsonType.String)]
+    public string Guid { get; set; } = default!;
 
     [BsonElement("createdById")]
-    public string CreatedById { get; set; }
+    public string CreatedById { get; set; } = default!;
 
     [BsonElement("dateCreated")]
     public DateTime DateCreated { get; set; }

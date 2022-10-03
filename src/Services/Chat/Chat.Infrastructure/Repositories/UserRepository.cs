@@ -23,7 +23,7 @@ public class UserRepository : IUserRepository
             return null;
 
         User user = new(Guid.Parse(result.AuthId), result.Username, result.Email);
-        user.SetId(Guid.Parse(result.Id));
+        user.SetId(Guid.Parse(result.Guid));
         user.SetCreatedById(Guid.Parse(result.CreatedById));
         user.SetDateCreated(result.DateCreated);
         if (!string.IsNullOrEmpty(result.LastModifiedById))
@@ -41,7 +41,7 @@ public class UserRepository : IUserRepository
             return null;
 
         User user = new(Guid.Parse(result.AuthId), result.Username, result.Email);
-        user.SetId(Guid.Parse(result.Id));
+        user.SetId(Guid.Parse(result.Guid));
         user.SetCreatedById(Guid.Parse(result.CreatedById));
         user.SetDateCreated(result.DateCreated);
         if (!string.IsNullOrEmpty(result.LastModifiedById))
@@ -58,7 +58,7 @@ public class UserRepository : IUserRepository
 
         UserDbModel model = new()
         {
-            Id = newId.ToString(),
+            Guid = newId.ToString(),
             AuthId = newUser.AuthId.ToString(),
             Username = newUser.Username,
             Email = newUser.Email,

@@ -3,8 +3,13 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Chat.Infrastructure.Models;
 
-public class ServerDbModel : BaseDbModel
+public class ServerDbModel : EntityDbModel
 {
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    [BsonElement("id")]
+    public string Id { get; set; } = default!;
+
     [BsonElement("name")]
     public string Name { get; set; } = default!;
 
@@ -19,4 +24,7 @@ public class ServerDbModel : BaseDbModel
 
     [BsonElement("thumbnail")]
     public string? Thumbnail { get; set; }
+
+    [BsonElement("channels")]
+    public List<ChannelDbModel> Channels { get; set; } = new List<ChannelDbModel>();
 }
