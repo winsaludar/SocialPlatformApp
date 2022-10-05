@@ -31,6 +31,13 @@ public class ChannelsController : ControllerBase
     public async Task<IActionResult> GetAllChannelsAsync(Guid serverId)
     {
         GetChannelsQuery query = new(serverId);
+        ValidationResult validationResult = await _validatorManager.GetChannelsQueryValidator.ValidateAsync(query);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
+
         var result = await _mediator.Send(query);
 
         return Ok(result);
