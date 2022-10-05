@@ -1,6 +1,8 @@
 ﻿using Chat.API.Extensions;
 using Chat.API.Models;
 using Chat.Application.Commands;
+using Chat.Application.DTOs;
+using Chat.Application.Queries;
 using Chat.Application.Validators;
 using FluentValidation.Results;
 using MediatR;
@@ -21,6 +23,17 @@ public class ChannelsController : ControllerBase
     {
         _mediator = mediator;
         _validatorManager = validatorManager;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ChannelDto>))]
+    [Route("{serverId}/channels")]
+    public async Task<IActionResult> GetAllChannelsAsync(Guid serverId)
+    {
+        GetChannelsQuery query = new(serverId);
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
     }
 
     [HttpPost]
