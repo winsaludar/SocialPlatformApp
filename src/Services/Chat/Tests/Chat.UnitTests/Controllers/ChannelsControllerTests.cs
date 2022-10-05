@@ -1,6 +1,8 @@
 ﻿using Chat.API.Controllers;
 using Chat.API.Models;
 using Chat.Application.Commands;
+using Chat.Application.DTOs;
+using Chat.Application.Queries;
 using Chat.Application.Validators;
 using FluentValidation;
 using MediatR;
@@ -14,18 +16,79 @@ namespace Chat.UnitTests.Controllers;
 public class ChannelsControllerTests
 {
     private readonly Mock<IMediator> _mockMediator;
+    private readonly InlineValidator<GetChannelsQuery> _getChannelsQueryValidator;
     private readonly InlineValidator<CreateChannelCommand> _createChannelCommandValidator;
     private ChannelsController _controller;
 
     public ChannelsControllerTests()
     {
         _mockMediator = new Mock<IMediator>();
+        _getChannelsQueryValidator = new InlineValidator<GetChannelsQuery>();
         _createChannelCommandValidator = new InlineValidator<CreateChannelCommand>();
 
         Mock<IValidatorManager> mockValidatorManager = new();
+        mockValidatorManager.Setup(x => x.GetChannelsQueryValidator).Returns(_getChannelsQueryValidator);
         mockValidatorManager.Setup(x => x.CreateChannelCommandValidator).Returns(_createChannelCommandValidator);
 
         _controller = new ChannelsController(_mockMediator.Object, mockValidatorManager.Object);
+    }
+
+    [Fact]
+    public async Task GetAllChannelsAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        _getChannelsQueryValidator.RuleFor(x => x.TargetServerId).Must(id => false);
+
+        // Act
+        var result = await _controller.GetAllChannelsAsync(Guid.Empty);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<GetChannelsQuery>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("TargetServerId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task GetAllChannelsAsync_ResultIsEmpty_ReturnsOkObjectResultWithEmptyData()
+    {
+        // Arrange
+        _getChannelsQueryValidator.RuleFor(x => x.TargetServerId).Must(id => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetChannelsQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Enumerable.Empty<ChannelDto>());
+
+        // Act
+        var result = await _controller.GetAllChannelsAsync(It.IsAny<Guid>());
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<GetChannelsQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var channels = Assert.IsAssignableFrom<IEnumerable<ChannelDto>>(okResult.Value);
+        Assert.Empty(channels);
+    }
+
+    [Fact]
+    public async Task GetAllChannelsAsync_ResultIsNotEmpty_ReturnsOkObjectResultWithData()
+    {
+        // Arrange
+        _getChannelsQueryValidator.RuleFor(x => x.TargetServerId).Must(id => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetChannelsQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ChannelDto>()
+            {
+                new ChannelDto(),
+                new ChannelDto(),
+                new ChannelDto()
+            });
+
+        // Act
+        var result = await _controller.GetAllChannelsAsync(It.IsAny<Guid>());
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<GetChannelsQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var channels = Assert.IsAssignableFrom<IEnumerable<ChannelDto>>(okResult.Value);
+        Assert.NotEmpty(channels);
+        Assert.Equal(3, channels.Count());
     }
 
     [Fact]
