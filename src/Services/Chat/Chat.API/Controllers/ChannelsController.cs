@@ -64,4 +64,21 @@ public class ChannelsController : ControllerBase
         var result = await _mediator.Send(command);
         return Ok(new { id = result, message = "Channel created" });
     }
+
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [Route("{serverId}/channels/{channelId}")]
+    public async Task<IActionResult> UpdateChannelAsync(Guid serverId, Guid channelId, [FromBody] CreateUpdateChannelModel request)
+    {
+        if (!User.IsValid())
+            return Unauthorized("User is invalid");
+
+        UpdateChannelCommand command = new(serverId, channelId, request.Name, User.Identity!.Name!);
+
+        await _mediator.Send(command);
+
+        return Ok("Channel updated");
+    }
 }
