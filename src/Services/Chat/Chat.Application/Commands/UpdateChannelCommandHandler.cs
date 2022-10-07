@@ -16,8 +16,12 @@ public class UpdateChannelCommandHandler : IRequestHandler<UpdateChannelCommand,
         if (server is null)
             throw new ServerNotFoundException(request.TargetServerId.ToString());
 
-        // TODO: Get channel from server
-        return false;
+        Guid updaterId = await GetUpdaterId(request.UpdatedBy);
+        server.UpdateChannel(request.TargetChannelId, request.Name, DateTime.UtcNow, updaterId);
+
+        await _repositoryManager.ServerRepository.UpdateAsync(server);
+
+        return true;
     }
 
     private async Task<Guid> GetUpdaterId(string? email)
