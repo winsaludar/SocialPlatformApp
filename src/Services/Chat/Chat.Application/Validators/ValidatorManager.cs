@@ -14,6 +14,7 @@ public class ValidatorManager : IValidatorManager
     private readonly Lazy<DeleteServerCommandValidator> _lazyDeleteServerCommandValidator;
     private readonly Lazy<CreateChannelCommandValidator> _lazyCreateChannelCommandValidator;
     private readonly Lazy<GetChannelsQueryValidator> _lazyGetChannelsQueryValidator;
+    private readonly Lazy<UpdateChannelCommandValidator> _lazyUpdateChannelCommandValidator;
 
     public ValidatorManager(IRepositoryManager repositoryManager)
     {
@@ -24,6 +25,7 @@ public class ValidatorManager : IValidatorManager
         _lazyDeleteServerCommandValidator = new Lazy<DeleteServerCommandValidator>(() => new DeleteServerCommandValidator(repositoryManager));
         _lazyCreateChannelCommandValidator = new Lazy<CreateChannelCommandValidator>(() => new CreateChannelCommandValidator(repositoryManager));
         _lazyGetChannelsQueryValidator = new Lazy<GetChannelsQueryValidator>(() => new GetChannelsQueryValidator(repositoryManager));
+        _lazyUpdateChannelCommandValidator = new Lazy<UpdateChannelCommandValidator>(() => new UpdateChannelCommandValidator(repositoryManager));
     }
 
     public AbstractValidator<CreateServerCommand> CreateServerCommandValidator => _lazyCreateServerCommandValidator.Value;
@@ -33,4 +35,5 @@ public class ValidatorManager : IValidatorManager
     public AbstractValidator<DeleteServerCommand> DeleteServerCommandValidator => _lazyDeleteServerCommandValidator.Value;
     public AbstractValidator<CreateChannelCommand> CreateChannelCommandValidator => _lazyCreateChannelCommandValidator.Value;
     public AbstractValidator<GetChannelsQuery> GetChannelsQueryValidator => _lazyGetChannelsQueryValidator.Value;
+    public AbstractValidator<UpdateChannelCommand> UpdateChannelCommandValidator => _lazyUpdateChannelCommandValidator.Value;
 }

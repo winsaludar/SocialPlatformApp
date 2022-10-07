@@ -4,6 +4,7 @@ using Chat.Application.Commands;
 using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
+using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -76,6 +77,12 @@ public class ChannelsController : ControllerBase
             return Unauthorized("User is invalid");
 
         UpdateChannelCommand command = new(serverId, channelId, request.Name, User.Identity!.Name!);
+        ValidationResult validationResult = await _validatorManager.UpdateChannelCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
 
         await _mediator.Send(command);
 
