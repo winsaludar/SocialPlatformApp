@@ -95,6 +95,12 @@ public class ChannelsController : ControllerBase
     public async Task<IActionResult> DeleteChannelAsync(Guid serverId, Guid channelId)
     {
         DeleteChannelCommand command = new(serverId, channelId);
+        ValidationResult validationResult = await _validatorManager.DeleteChannelCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
 
         await _mediator.Send(command);
 
