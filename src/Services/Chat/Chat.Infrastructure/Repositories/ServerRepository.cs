@@ -157,6 +157,13 @@ public class ServerRepository : IServerRepository
                 DateCreated = item.DateCreated,
                 CreatedById = item.CreatedById.ToString()
             };
+
+            if (item.DateLastModified.HasValue)
+                channel.DateLastModified = item.DateLastModified.Value;
+
+            if (item.LastModifiedById.HasValue)
+                channel.LastModifiedById = item.LastModifiedById.ToString();
+
             channels.Add(channel);
         }
         model.Channels = channels;

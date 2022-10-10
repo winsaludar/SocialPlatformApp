@@ -11,7 +11,7 @@ public abstract class Entity
     public virtual Guid CreatedById { get; protected set; }
     public virtual DateTime DateCreated { get; protected set; }
     public virtual Guid? LastModifiedById { get; protected set; }
-    public virtual DateTime DateLastModified { get; protected set; }
+    public virtual DateTime? DateLastModified { get; protected set; }
     public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
 
     public void SetId(Guid id) => Id = id;

@@ -40,4 +40,15 @@ public class Server : Entity, IAggregateRoot
 
         return newChannel.Id;
     }
+
+    public void UpdateChannel(Guid channelId, string name, DateTime dateLastModified, Guid lastModifiedId)
+    {
+        var channel = _channels.FirstOrDefault(x => x.Id == channelId);
+        if (channel is null)
+            return;
+
+        channel.SetName(name);
+        channel.SetDateLastModified(dateLastModified);
+        channel.SetLastModifiedById(lastModifiedId);
+    }
 }
