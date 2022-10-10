@@ -92,4 +92,36 @@ public class CreateChannelCommandValidatorTests
         // Act & Assert
         await Assert.ThrowsAsync<ChannelNameAlreadyExistException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
     }
+
+    [Fact]
+    public async Task CreatedBy_IsEmpty_ReturnsError()
+    {
+        // Arrange
+        CreateChannelCommand command = new(Guid.NewGuid(), "Channel Name", "");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
+
+        // Act
+        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
+
+        // Assert
+        Assert.NotEmpty(result.Errors);
+        Assert.True(result.Errors?.Any(x => x.PropertyName == "CreatedBy"));
+    }
+
+    [Fact]
+    public async Task CreatedBy_IsNotEmailAddress_ReturnsError()
+    {
+        // Arrange
+        CreateChannelCommand command = new(Guid.NewGuid(), "Channel Name", "notvalidemail.com");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
+
+        // Act
+        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
+
+        // Assert
+        Assert.NotEmpty(result.Errors);
+        Assert.True(result.Errors?.Any(x => x.PropertyName == "CreatedBy"));
+    }
 }

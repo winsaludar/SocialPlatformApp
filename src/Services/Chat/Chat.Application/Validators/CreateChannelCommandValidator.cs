@@ -13,16 +13,11 @@ public class CreateChannelCommandValidator : AbstractValidator<CreateChannelComm
     {
         _repositoryManager = repositoryManager;
 
-        RuleFor(x => x.TargetServerId)
-            .NotEmpty()
-            .MustAsync(BeExistingServer);
+        RuleFor(x => x.TargetServerId).NotEmpty().MustAsync(BeExistingServer);
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.CreatedBy).NotEmpty().EmailAddress();
 
-        RuleFor(x => x.Name)
-           .NotEmpty()
-           .MaximumLength(50);
-
-        RuleFor(x => new Tuple<Guid, string>(x.TargetServerId, x.Name))
-            .MustAsync(BeNotExistingName);
+        RuleFor(x => new Tuple<Guid, string>(x.TargetServerId, x.Name)).MustAsync(BeNotExistingName);
     }
 
     private async Task<bool> BeExistingServer(Guid targetServerId, CancellationToken cancellationToken)
