@@ -70,6 +70,20 @@ public class UpdateChannelCommandValidatorTests
     }
 
     [Fact]
+    public async Task TargetChannelId_IsInvalid_ThrowsChannelNotFoundException()
+    {
+        // Arrange
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.AddChannel(Guid.NewGuid(), "Different Channel", DateTime.UtcNow);
+        UpdateChannelCommand command = new(Guid.NewGuid(), Guid.NewGuid(), "Test Channel", "creator@example.com");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(targetServer);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ChannelNotFoundException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
     public async Task Name_IsEmpty_ReturnsError()
     {
         // Arrange
