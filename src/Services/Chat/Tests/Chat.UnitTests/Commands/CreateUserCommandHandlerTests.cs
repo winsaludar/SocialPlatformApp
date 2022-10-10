@@ -23,8 +23,7 @@ public class CreateUserCommandHandlerTests
     {
         // Arrange
         CreateUserCommand command = new(Guid.NewGuid(), "Username", "user@example.com", Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.UserRepository.AddAsync(It.IsAny<User>()))
-            .ReturnsAsync(Guid.NewGuid());
+        _mockRepositoryManager.Setup(x => x.UserRepository.AddAsync(It.IsAny<User>())).ReturnsAsync(Guid.NewGuid());
 
         // Act
         var result = await _createUserCommandHandler.Handle(command, It.IsAny<CancellationToken>());

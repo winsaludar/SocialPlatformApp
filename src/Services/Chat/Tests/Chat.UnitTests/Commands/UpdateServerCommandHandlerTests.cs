@@ -27,9 +27,8 @@ public class UpdateServerCommandHandlerTests
     {
         // Arrange
         Guid targetServerId = Guid.NewGuid();
-        UpdateServerCommand command = new(targetServerId, "Updated Name", "Updated Short Descrtion", "Updated Long Description", "editor@example.com", "");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Server)null!);
+        UpdateServerCommand command = new(targetServerId, "Updated Name", "Updated Short Descrtion", "Updated Long Description", "user@example.com", "");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
         _mockRepositoryManager.Verify(x => x.ServerRepository.UpdateAsync(It.IsAny<Server>()), Times.Never);
@@ -41,9 +40,9 @@ public class UpdateServerCommandHandlerTests
     {
         // Arrange
         Guid targetServerId = Guid.NewGuid();
-        UpdateServerCommand command = new(targetServerId, "Updated Name", "Updated Short Descrtion", "Updated Long Description", "editor@example.com", "");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, ""));
+        UpdateServerCommand command = new(targetServerId, "Updated Name", "Updated Short Descrtion", "Updated Long Description", "user@example.com", "");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, ""));
 
         // Act
         var result = await _updateServerCommandHandler.Handle(command, It.IsAny<CancellationToken>());

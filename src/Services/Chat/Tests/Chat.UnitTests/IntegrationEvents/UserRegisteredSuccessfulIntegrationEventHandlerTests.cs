@@ -63,8 +63,7 @@ public class UserRegisteredSuccessfulIntegrationEventHandlerTests
         // Assert
         UserRegisteredSuccessfulIntegrationEvent @event = new(Guid.NewGuid(), "Username", "email@example.com");
         _createUserValidator.RuleFor(x => x.Username).Must(name => true);
-        _mockMediator.Setup(x => x.Send(It.IsAny<CreateUserCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+        _mockMediator.Setup(x => x.Send(It.IsAny<CreateUserCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Guid.NewGuid());
 
         // Act
         await _handler.Handle(@event);

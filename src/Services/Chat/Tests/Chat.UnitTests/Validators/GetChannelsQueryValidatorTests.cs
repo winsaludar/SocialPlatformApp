@@ -25,8 +25,8 @@ public class GetChannelsQueryValidatorTests
     {
         // Arrange
         GetChannelsQuery query = new(Guid.Empty);
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", "creator@example.com", ""));
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
 
         // Act
         var result = await _validator.ValidateAsync(query, It.IsAny<CancellationToken>());
@@ -41,8 +41,7 @@ public class GetChannelsQueryValidatorTests
     {
         // Arrange
         GetChannelsQuery query = new(Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Server)null!);
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
         await Assert.ThrowsAsync<ServerNotFoundException>(() => _validator.ValidateAsync(query, It.IsAny<CancellationToken>()));

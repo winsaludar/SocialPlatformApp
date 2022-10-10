@@ -60,8 +60,7 @@ public class ChannelsControllerTests
     {
         // Arrange
         _getChannelsQueryValidator.RuleFor(x => x.TargetServerId).Must(id => true);
-        _mockMediator.Setup(x => x.Send(It.IsAny<GetChannelsQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<ChannelDto>());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetChannelsQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(Enumerable.Empty<ChannelDto>());
 
         // Act
         var result = await _controller.GetAllChannelsAsync(It.IsAny<Guid>());
@@ -78,8 +77,8 @@ public class ChannelsControllerTests
     {
         // Arrange
         _getChannelsQueryValidator.RuleFor(x => x.TargetServerId).Must(id => true);
-        _mockMediator.Setup(x => x.Send(It.IsAny<GetChannelsQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<ChannelDto>()
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetChannelsQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(
+            new List<ChannelDto>()
             {
                 new ChannelDto(),
                 new ChannelDto(),
@@ -140,8 +139,7 @@ public class ChannelsControllerTests
         Guid serverId = Guid.NewGuid();
         CreateUpdateChannelModel request = new() { Name = "Test Channel" };
         _createChannelCommandValidator.RuleFor(x => x.Name).Must(name => true);
-        _mockMediator.Setup(x => x.Send(It.IsAny<CreateChannelCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(It.IsAny<Guid>());
+        _mockMediator.Setup(x => x.Send(It.IsAny<CreateChannelCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<Guid>());
 
         // Act
         var result = await _controller.CreateChannelAsync(serverId, request);
@@ -197,8 +195,7 @@ public class ChannelsControllerTests
         Guid channelId = Guid.NewGuid();
         CreateUpdateChannelModel model = new() { Name = "Updated Channel Name" };
         _updateChannelCommandValidator.RuleFor(x => x.Name).Must(name => true);
-        _mockMediator.Setup(x => x.Send(It.IsAny<UpdateChannelCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(It.IsAny<bool>());
+        _mockMediator.Setup(x => x.Send(It.IsAny<UpdateChannelCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
 
         // Act
         var result = await _controller.UpdateChannelAsync(serverId, channelId, model);
@@ -235,8 +232,7 @@ public class ChannelsControllerTests
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
         _deleteChannelCommandValidator.RuleFor(x => x.TargetChannelId).Must(name => true);
-        _mockMediator.Setup(x => x.Send(It.IsAny<DeleteChannelCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(It.IsAny<bool>());
+        _mockMediator.Setup(x => x.Send(It.IsAny<DeleteChannelCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
 
         // Act
         var result = await _controller.DeleteChannelAsync(serverId, channelId);

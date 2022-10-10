@@ -24,9 +24,9 @@ public class DeleteServerCommandValidatorTests
     public async Task TargetServerId_IsEmpty_ReturnsError()
     {
         // Arrange
-        DeleteServerCommand command = new(Guid.Empty, "deleter@example.co");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
+        DeleteServerCommand command = new(Guid.Empty, "user@example.co");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -40,9 +40,8 @@ public class DeleteServerCommandValidatorTests
     public async Task TargetServerId_IsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
-        DeleteServerCommand command = new(Guid.NewGuid(), "deleter@example.co");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Server)null!);
+        DeleteServerCommand command = new(Guid.NewGuid(), "user@example.co");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
         await Assert.ThrowsAsync<ServerNotFoundException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
@@ -53,8 +52,8 @@ public class DeleteServerCommandValidatorTests
     {
         // Arrange
         DeleteServerCommand command = new(Guid.NewGuid(), "");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -69,8 +68,8 @@ public class DeleteServerCommandValidatorTests
     {
         // Arrange
         DeleteServerCommand command = new(Guid.NewGuid(), "notvalidemail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -84,9 +83,9 @@ public class DeleteServerCommandValidatorTests
     public async Task DeleterEmail_NotTheSameWithCreatorEmail_ReturnsAnError()
     {
         // Arrange
-        DeleteServerCommand command = new(Guid.NewGuid(), "different_email@example.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server("Server Name", "Short Description", "Long Description", "creator@example.com", ""));
+        DeleteServerCommand command = new(Guid.NewGuid(), "user1@example.com");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Server Name", "Short Description", "Long Description", "user2@example.com", ""));
 
         // Act & Assert
         await Assert.ThrowsAsync<UnauthorizedServerDeleterException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));

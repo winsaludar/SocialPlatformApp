@@ -25,11 +25,10 @@ public class DeleteChannelCommandValidatorTests
     {
         // Arrange
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
         targetServer.AddChannel(channelId, "Target Channel", DateTime.UtcNow);
         DeleteChannelCommand command = new(Guid.Empty, channelId);
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(targetServer);
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -44,8 +43,7 @@ public class DeleteChannelCommandValidatorTests
     {
         // Arrange
         DeleteChannelCommand command = new(Guid.Empty, Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Server)null!);
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
         await Assert.ThrowsAsync<ServerNotFoundException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
@@ -55,11 +53,10 @@ public class DeleteChannelCommandValidatorTests
     public async Task TargetChannelId_IsEmpty_ReturnsError()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
         targetServer.AddChannel(Guid.Empty, "Fake Channel", DateTime.UtcNow);
         DeleteChannelCommand command = new(Guid.NewGuid(), Guid.Empty);
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(targetServer);
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -73,11 +70,10 @@ public class DeleteChannelCommandValidatorTests
     public async Task TargetChannelId_IsInvalid_ThrowsChannelNotFoundException()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
         targetServer.AddChannel(Guid.NewGuid(), "Different Channel", DateTime.UtcNow);
         DeleteChannelCommand command = new(Guid.NewGuid(), Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(targetServer);
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act & Assert
         await Assert.ThrowsAsync<ChannelNotFoundException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));

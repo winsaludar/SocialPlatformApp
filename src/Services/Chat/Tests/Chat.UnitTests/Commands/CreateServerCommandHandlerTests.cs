@@ -25,11 +25,10 @@ public class CreateServerCommandHandlerTests
     public async Task Handle_ServerCreated_ReturnsServerGuid()
     {
         // Arrange
-        CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "creator@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.CreateAsync(It.IsAny<Server>()))
-            .ReturnsAsync(Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.UserRepository.GetByEmailAsync(It.IsAny<string>()))
-            .ReturnsAsync(new User(Guid.NewGuid(), "user", "user@example.com"));
+        CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "user@example.com", "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.CreateAsync(It.IsAny<Server>())).ReturnsAsync(Guid.NewGuid());
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByEmailAsync(It.IsAny<string>())).ReturnsAsync(
+            new User(Guid.NewGuid(), "user", "user@example.com"));
 
         // Act
         var result = await _createServerCommandHandler.Handle(command, It.IsAny<CancellationToken>());

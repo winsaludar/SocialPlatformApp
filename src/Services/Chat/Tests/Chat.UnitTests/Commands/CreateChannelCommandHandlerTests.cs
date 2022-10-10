@@ -28,8 +28,7 @@ public class CreateChannelCommandHandlerTests
         // Arrange
         Guid targetServerId = Guid.NewGuid();
         CreateChannelCommand command = new(targetServerId, "Test Channel");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Server)null!);
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
         _mockRepositoryManager.Verify(x => x.ServerRepository.UpdateAsync(It.IsAny<Server>()), Times.Never);
@@ -42,8 +41,8 @@ public class CreateChannelCommandHandlerTests
         // Arrange
         Guid targetServerId = Guid.NewGuid();
         CreateChannelCommand command = new(targetServerId, "Test Channel");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", ""));
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Target Server", "Short Desc", "Long Desc", ""));
 
         // Act
         var result = await _createChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());
