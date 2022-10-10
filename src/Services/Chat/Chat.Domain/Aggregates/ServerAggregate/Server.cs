@@ -51,4 +51,13 @@ public class Server : Entity, IAggregateRoot
         channel.SetDateLastModified(dateLastModified);
         channel.SetLastModifiedById(lastModifiedId);
     }
+
+    public void RemoveChannel(Guid channelId)
+    {
+        var channel = _channels.FirstOrDefault(x => x.Id == channelId);
+        if (channel is null)
+            return;
+
+        _channels.Remove(channel);
+    }
 }

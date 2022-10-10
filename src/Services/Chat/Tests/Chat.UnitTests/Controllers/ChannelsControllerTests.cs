@@ -19,6 +19,7 @@ public class ChannelsControllerTests
     private readonly InlineValidator<GetChannelsQuery> _getChannelsQueryValidator;
     private readonly InlineValidator<CreateChannelCommand> _createChannelCommandValidator;
     private readonly InlineValidator<UpdateChannelCommand> _updateChannelCommandValidator;
+    private readonly InlineValidator<DeleteChannelCommand> _deleteChannelCommandValidator;
     private ChannelsController _controller;
 
     public ChannelsControllerTests()
@@ -27,11 +28,13 @@ public class ChannelsControllerTests
         _getChannelsQueryValidator = new InlineValidator<GetChannelsQuery>();
         _createChannelCommandValidator = new InlineValidator<CreateChannelCommand>();
         _updateChannelCommandValidator = new InlineValidator<UpdateChannelCommand>();
+        _deleteChannelCommandValidator = new InlineValidator<DeleteChannelCommand>();
 
         Mock<IValidatorManager> mockValidatorManager = new();
         mockValidatorManager.Setup(x => x.GetChannelsQueryValidator).Returns(_getChannelsQueryValidator);
         mockValidatorManager.Setup(x => x.CreateChannelCommandValidator).Returns(_createChannelCommandValidator);
         mockValidatorManager.Setup(x => x.UpdateChannelCommandValidator).Returns(_updateChannelCommandValidator);
+        mockValidatorManager.Setup(x => x.DeleteChannelCommandValidator).Returns(_deleteChannelCommandValidator);
 
         _controller = new ChannelsController(_mockMediator.Object, mockValidatorManager.Object);
     }
@@ -161,7 +164,7 @@ public class ChannelsControllerTests
         var result = await _controller.UpdateChannelAsync(serverId, channelId, model);
 
         // Assert
-        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateChannelCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
@@ -179,7 +182,7 @@ public class ChannelsControllerTests
         var result = await _controller.UpdateChannelAsync(serverId, channelId, model);
 
         // Assert
-        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateChannelCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         var badResult = Assert.IsType<BadRequestObjectResult>(result);
         var errors = Assert.IsType<SerializableError>(badResult.Value);
         Assert.Equal("Name", errors.FirstOrDefault().Key);
@@ -202,6 +205,44 @@ public class ChannelsControllerTests
 
         // Assert
         _mockMediator.Verify(x => x.Send(It.IsAny<UpdateChannelCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task DeleteChannelAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        _deleteChannelCommandValidator.RuleFor(x => x.TargetChannelId).Must(name => false);
+
+        // Act
+        var result = await _controller.DeleteChannelAsync(serverId, channelId);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<DeleteChannelCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("TargetChannelId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task DeleteChannelAsync_ValidationResultIsValid_ReturnsOkObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        _deleteChannelCommandValidator.RuleFor(x => x.TargetChannelId).Must(name => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<DeleteChannelCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(It.IsAny<bool>());
+
+        // Act
+        var result = await _controller.DeleteChannelAsync(serverId, channelId);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<DeleteChannelCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
 

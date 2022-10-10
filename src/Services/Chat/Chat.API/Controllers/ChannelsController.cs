@@ -4,7 +4,6 @@ using Chat.Application.Commands;
 using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
-using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -87,5 +86,24 @@ public class ChannelsController : ControllerBase
         await _mediator.Send(command);
 
         return Ok("Channel updated");
+    }
+
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [Route("{serverId}/channels/{channelId}")]
+    public async Task<IActionResult> DeleteChannelAsync(Guid serverId, Guid channelId)
+    {
+        DeleteChannelCommand command = new(serverId, channelId);
+        ValidationResult validationResult = await _validatorManager.DeleteChannelCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
+
+        await _mediator.Send(command);
+
+        return Ok("Channel deleted");
     }
 }
