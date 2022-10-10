@@ -9,6 +9,7 @@ namespace Chat.UnitTests.Commands;
 public class CreateServerCommandHandlerTests
 {
     private readonly Mock<IRepositoryManager> _mockRepositoryManager;
+    private readonly Mock<IUserManager> _mockUserManager;
     private readonly CreateServerCommandHandler _createServerCommandHandler;
 
     public CreateServerCommandHandlerTests()
@@ -16,9 +17,10 @@ public class CreateServerCommandHandlerTests
         Mock<IServerRepository> mockServerRepository = new();
         Mock<IUserRepository> mockUserRepository = new();
         _mockRepositoryManager = new Mock<IRepositoryManager>();
+        _mockUserManager = new Mock<IUserManager>();
         _mockRepositoryManager.Setup(x => x.ServerRepository).Returns(mockServerRepository.Object);
         _mockRepositoryManager.Setup(x => x.UserRepository).Returns(mockUserRepository.Object);
-        _createServerCommandHandler = new(_mockRepositoryManager.Object);
+        _createServerCommandHandler = new(_mockRepositoryManager.Object, _mockUserManager.Object);
     }
 
     [Fact]
