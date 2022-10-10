@@ -24,8 +24,7 @@ public class GetServersQueryHandlerTests
     {
         // Arrange
         GetServersQuery query = new(1, 10, "");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-            .ReturnsAsync(Enumerable.Empty<Server>());
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(Enumerable.Empty<Server>());
 
         // Act
         var result = await _getServersQueryHandler.Handle(query, It.IsAny<CancellationToken>());
@@ -40,8 +39,8 @@ public class GetServersQueryHandlerTests
     {
         // Arrange
         GetServersQuery query = new(1, 10, "");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-            .ReturnsAsync(new List<Server>()
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(
+            new List<Server>()
             {
                 new Server("Server 1", "Short Description 1", "Short Description 1", "Thumbnail 1"),
                 new Server("Server 2", "Short Description 2", "Short Description 2", "Thumbnail 2"),

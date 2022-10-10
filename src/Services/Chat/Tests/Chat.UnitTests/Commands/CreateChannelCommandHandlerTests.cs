@@ -10,6 +10,7 @@ namespace Chat.UnitTests.Commands;
 public class CreateChannelCommandHandlerTests
 {
     private readonly Mock<IRepositoryManager> _mockRepositoryManager;
+    private readonly Mock<IUserManager> _mockUserManager;
     private readonly CreateChannelCommandHandler _createChannelCommandHandler;
 
     public CreateChannelCommandHandlerTests()
@@ -17,9 +18,10 @@ public class CreateChannelCommandHandlerTests
         Mock<IServerRepository> mockServerRepository = new();
         Mock<IUserRepository> mockUserRepository = new();
         _mockRepositoryManager = new Mock<IRepositoryManager>();
+        _mockUserManager = new Mock<IUserManager>();
         _mockRepositoryManager.Setup(x => x.ServerRepository).Returns(mockServerRepository.Object);
         _mockRepositoryManager.Setup(x => x.UserRepository).Returns(mockUserRepository.Object);
-        _createChannelCommandHandler = new(_mockRepositoryManager.Object);
+        _createChannelCommandHandler = new(_mockRepositoryManager.Object, _mockUserManager.Object);
     }
 
     [Fact]
@@ -27,9 +29,8 @@ public class CreateChannelCommandHandlerTests
     {
         // Arrange
         Guid targetServerId = Guid.NewGuid();
-        CreateChannelCommand command = new(targetServerId, "Test Channel");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Server)null!);
+        CreateChannelCommand command = new(targetServerId, "Test Channel", "user@example.com");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
         _mockRepositoryManager.Verify(x => x.ServerRepository.UpdateAsync(It.IsAny<Server>()), Times.Never);
@@ -41,9 +42,9 @@ public class CreateChannelCommandHandlerTests
     {
         // Arrange
         Guid targetServerId = Guid.NewGuid();
-        CreateChannelCommand command = new(targetServerId, "Test Channel");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", ""));
+        CreateChannelCommand command = new(targetServerId, "Test Channel", "user@example.com");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Target Server", "Short Desc", "Long Desc", ""));
 
         // Act
         var result = await _createChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());

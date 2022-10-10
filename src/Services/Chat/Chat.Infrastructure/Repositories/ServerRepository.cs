@@ -72,8 +72,10 @@ public class ServerRepository : IServerRepository
         result.Channels.ForEach(x =>
         {
             Guid id = Guid.Parse(x.Guid);
+            Guid createdById = Guid.Parse(x.CreatedById);
             Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
-            server.AddChannel(id, x.Name, x.DateCreated, lastModifiedById, x.DateLastModified);
+
+            server.AddChannel(id, x.Name, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
         });
 
         return server;
@@ -98,8 +100,9 @@ public class ServerRepository : IServerRepository
         result.Channels.ForEach(x =>
         {
             Guid id = Guid.Parse(x.Guid);
+            Guid createdById = Guid.Parse(x.CreatedById);
             Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
-            server.AddChannel(id, x.Name, x.DateCreated, lastModifiedById, x.DateLastModified);
+            server.AddChannel(id, x.Name, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
         });
 
         return server;

@@ -62,8 +62,7 @@ public class ServersControllerTests
     {
         // Arrange
         GetServersQuery query = new(1, 10, "");
-        _mockMediator.Setup(x => x.Send(query, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Enumerable.Empty<ServerDto>());
+        _mockMediator.Setup(x => x.Send(query, It.IsAny<CancellationToken>())).ReturnsAsync(Enumerable.Empty<ServerDto>());
 
         // Act
         var result = await _controller.GetAllServersAsync(1, 10, "");
@@ -80,8 +79,8 @@ public class ServersControllerTests
     {
         // Arrange
         GetServersQuery query = new(1, 10, "");
-        _mockMediator.Setup(x => x.Send(query, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<ServerDto>()
+        _mockMediator.Setup(x => x.Send(query, It.IsAny<CancellationToken>())).ReturnsAsync(
+            new List<ServerDto>()
             {
                 new ServerDto(),
                 new ServerDto(),
@@ -157,8 +156,7 @@ public class ServersControllerTests
             Thumbnail = ""
         };
         _createServerCommandValidator.RuleFor(x => x.Name).Must(name => true);
-        _mockMediator.Setup(x => x.Send(It.IsAny<CreateServerCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(It.IsAny<Guid>());
+        _mockMediator.Setup(x => x.Send(It.IsAny<CreateServerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<Guid>());
 
         // Act
         var result = await _controller.CreateServerAsync(model);
@@ -229,8 +227,7 @@ public class ServersControllerTests
             Thumbnail = ""
         };
         _updateServerCommandValidator.RuleFor(x => x.Name).Must(name => true);
-        _mockMediator.Setup(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(It.IsAny<bool>());
+        _mockMediator.Setup(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
 
         // Act
         var result = await _controller.UpdateServerAsync(serverId, model);
@@ -280,8 +277,7 @@ public class ServersControllerTests
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         _deleteServerCommandValidator.RuleFor(x => x.TargetServerId).Must(name => true);
-        _mockMediator.Setup(x => x.Send(It.IsAny<DeleteServerCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(It.IsAny<bool>());
+        _mockMediator.Setup(x => x.Send(It.IsAny<DeleteServerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
 
         // Act
         var result = await _controller.DeleteServerAsync(serverId);

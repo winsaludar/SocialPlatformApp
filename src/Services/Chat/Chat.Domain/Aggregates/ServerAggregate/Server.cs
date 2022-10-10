@@ -23,7 +23,7 @@ public class Server : Entity, IAggregateRoot
     public string? Thumbnail { get; private set; }
     public IReadOnlyCollection<Channel> Channels => _channels;
 
-    public Guid AddChannel(Guid id, string name, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
+    public Guid AddChannel(Guid id, string name, Guid createdById, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
     {
         Channel newChannel = new(name);
         newChannel.SetId(id);

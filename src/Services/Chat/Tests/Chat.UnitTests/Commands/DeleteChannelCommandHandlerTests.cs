@@ -29,8 +29,7 @@ public class DeleteChannelCommandHandlerTests
         Guid targetServerId = Guid.NewGuid();
         Guid targetChannelId = Guid.NewGuid();
         DeleteChannelCommand command = new(targetServerId, targetChannelId);
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Server)null!);
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
         _mockRepositoryManager.Verify(x => x.ServerRepository.UpdateAsync(It.IsAny<Server>()), Times.Never);
@@ -44,8 +43,8 @@ public class DeleteChannelCommandHandlerTests
         Guid targetServerId = Guid.NewGuid();
         Guid targetChannelId = Guid.NewGuid();
         DeleteChannelCommand command = new(targetServerId, targetChannelId);
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", ""));
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Target Server", "Short Desc", "Long Desc", ""));
 
         // Act
         var result = await _deleteChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());

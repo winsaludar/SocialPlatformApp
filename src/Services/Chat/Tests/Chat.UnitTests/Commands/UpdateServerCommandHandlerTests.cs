@@ -10,6 +10,7 @@ namespace Chat.UnitTests.Commands;
 public class UpdateServerCommandHandlerTests
 {
     private readonly Mock<IRepositoryManager> _mockRepositoryManager;
+    private readonly Mock<IUserManager> _mockUserManager;
     private readonly UpdateServerCommandHandler _updateServerCommandHandler;
 
     public UpdateServerCommandHandlerTests()
@@ -17,9 +18,10 @@ public class UpdateServerCommandHandlerTests
         Mock<IServerRepository> mockServerRepository = new();
         Mock<IUserRepository> mockUserRepository = new();
         _mockRepositoryManager = new Mock<IRepositoryManager>();
+        _mockUserManager = new Mock<IUserManager>();
         _mockRepositoryManager.Setup(x => x.ServerRepository).Returns(mockServerRepository.Object);
         _mockRepositoryManager.Setup(x => x.UserRepository).Returns(mockUserRepository.Object);
-        _updateServerCommandHandler = new(_mockRepositoryManager.Object);
+        _updateServerCommandHandler = new(_mockRepositoryManager.Object, _mockUserManager.Object);
     }
 
     [Fact]
@@ -27,9 +29,8 @@ public class UpdateServerCommandHandlerTests
     {
         // Arrange
         Guid targetServerId = Guid.NewGuid();
-        UpdateServerCommand command = new(targetServerId, "Updated Name", "Updated Short Descrtion", "Updated Long Description", "editor@example.com", "");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Server)null!);
+        UpdateServerCommand command = new(targetServerId, "Updated Name", "Updated Short Descrtion", "Updated Long Description", "user@example.com", "");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
         _mockRepositoryManager.Verify(x => x.ServerRepository.UpdateAsync(It.IsAny<Server>()), Times.Never);
@@ -41,9 +42,9 @@ public class UpdateServerCommandHandlerTests
     {
         // Arrange
         Guid targetServerId = Guid.NewGuid();
-        UpdateServerCommand command = new(targetServerId, "Updated Name", "Updated Short Descrtion", "Updated Long Description", "editor@example.com", "");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, ""));
+        UpdateServerCommand command = new(targetServerId, "Updated Name", "Updated Short Descrtion", "Updated Long Description", "user@example.com", "");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, ""));
 
         // Act
         var result = await _updateServerCommandHandler.Handle(command, It.IsAny<CancellationToken>());

@@ -53,8 +53,8 @@ public class CreateUserCommandValidatorTests
     {
         // Arrange
         CreateUserCommand command = new(Guid.NewGuid(), "existing-username", "user@example.com", Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.UserRepository.GetByUsernameAsync(It.IsAny<string>()))
-            .ReturnsAsync(new User(command.AuthId, command.Username, command.Email));
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByUsernameAsync(It.IsAny<string>())).ReturnsAsync(
+            new User(command.AuthId, command.Username, command.Email));
 
         // Act & Assert
         await Assert.ThrowsAsync<UsernameAlreadyExistException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
@@ -78,9 +78,9 @@ public class CreateUserCommandValidatorTests
     public async Task Email_AlreadyExist_ReturnsError()
     {
         // Arrange
-        CreateUserCommand command = new(Guid.NewGuid(), "Username", "existing@example.com", Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.UserRepository.GetByEmailAsync(It.IsAny<string>()))
-            .ReturnsAsync(new User(command.AuthId, command.Username, command.Email));
+        CreateUserCommand command = new(Guid.NewGuid(), "Username", "user@example.com", Guid.NewGuid());
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByEmailAsync(It.IsAny<string>())).ReturnsAsync(
+            new User(command.AuthId, command.Username, command.Email));
 
         // Act & Assert
         await Assert.ThrowsAsync<EmailAlreadyExistException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));

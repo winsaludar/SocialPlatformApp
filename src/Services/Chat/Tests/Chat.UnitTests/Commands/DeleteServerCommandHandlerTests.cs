@@ -27,9 +27,8 @@ public class DeleteServerCommandHandlerTests
     public async Task Handle_TargetServerIdIsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
-        DeleteServerCommand command = new(Guid.NewGuid(), "deleter@example.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync((Server)null!);
+        DeleteServerCommand command = new(Guid.NewGuid(), "user@example.com");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
         _mockRepositoryManager.Verify(x => x.ServerRepository.DeleteAsync(It.IsAny<Guid>()), Times.Never);
@@ -40,9 +39,9 @@ public class DeleteServerCommandHandlerTests
     public async Task Handle_ServerDeleted_ReturnsTrue()
     {
         // Arrange
-        DeleteServerCommand command = new(Guid.NewGuid(), "deleter@example.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
+        DeleteServerCommand command = new(Guid.NewGuid(), "user@example.com");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
+            new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
 
         // Act
         var result = await _deleteServerCommandHandler.Handle(command, It.IsAny<CancellationToken>());

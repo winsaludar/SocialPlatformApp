@@ -53,7 +53,7 @@ public class ChannelsController : ControllerBase
         if (!User.IsValid())
             return Unauthorized("User is invalid");
 
-        CreateChannelCommand command = new(serverId, request.Name);
+        CreateChannelCommand command = new(serverId, request.Name, User.Identity!.Name!);
         ValidationResult validationResult = await _validatorManager.CreateChannelCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {

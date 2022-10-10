@@ -9,6 +9,7 @@ namespace Chat.UnitTests.Commands;
 public class CreateServerCommandHandlerTests
 {
     private readonly Mock<IRepositoryManager> _mockRepositoryManager;
+    private readonly Mock<IUserManager> _mockUserManager;
     private readonly CreateServerCommandHandler _createServerCommandHandler;
 
     public CreateServerCommandHandlerTests()
@@ -16,20 +17,20 @@ public class CreateServerCommandHandlerTests
         Mock<IServerRepository> mockServerRepository = new();
         Mock<IUserRepository> mockUserRepository = new();
         _mockRepositoryManager = new Mock<IRepositoryManager>();
+        _mockUserManager = new Mock<IUserManager>();
         _mockRepositoryManager.Setup(x => x.ServerRepository).Returns(mockServerRepository.Object);
         _mockRepositoryManager.Setup(x => x.UserRepository).Returns(mockUserRepository.Object);
-        _createServerCommandHandler = new(_mockRepositoryManager.Object);
+        _createServerCommandHandler = new(_mockRepositoryManager.Object, _mockUserManager.Object);
     }
 
     [Fact]
     public async Task Handle_ServerCreated_ReturnsServerGuid()
     {
         // Arrange
-        CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "creator@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.CreateAsync(It.IsAny<Server>()))
-            .ReturnsAsync(Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.UserRepository.GetByEmailAsync(It.IsAny<string>()))
-            .ReturnsAsync(new User(Guid.NewGuid(), "user", "user@example.com"));
+        CreateServerCommand command = new("Server Name", "Short Description", "Long Description", "user@example.com", "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.CreateAsync(It.IsAny<Server>())).ReturnsAsync(Guid.NewGuid());
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByEmailAsync(It.IsAny<string>())).ReturnsAsync(
+            new User(Guid.NewGuid(), "user", "user@example.com"));
 
         // Act
         var result = await _createServerCommandHandler.Handle(command, It.IsAny<CancellationToken>());
