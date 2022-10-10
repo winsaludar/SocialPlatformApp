@@ -26,7 +26,7 @@ public class DeleteChannelCommandValidatorTests
         // Arrange
         Guid channelId = Guid.NewGuid();
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
-        targetServer.AddChannel(channelId, "Target Channel", DateTime.UtcNow);
+        targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow);
         DeleteChannelCommand command = new(Guid.Empty, channelId);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
@@ -54,7 +54,7 @@ public class DeleteChannelCommandValidatorTests
     {
         // Arrange
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
-        targetServer.AddChannel(Guid.Empty, "Fake Channel", DateTime.UtcNow);
+        targetServer.AddChannel(Guid.Empty, "Fake Channel", Guid.NewGuid(), DateTime.UtcNow);
         DeleteChannelCommand command = new(Guid.NewGuid(), Guid.Empty);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
@@ -71,7 +71,7 @@ public class DeleteChannelCommandValidatorTests
     {
         // Arrange
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
-        targetServer.AddChannel(Guid.NewGuid(), "Different Channel", DateTime.UtcNow);
+        targetServer.AddChannel(Guid.NewGuid(), "Different Channel", Guid.NewGuid(), DateTime.UtcNow);
         DeleteChannelCommand command = new(Guid.NewGuid(), Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 

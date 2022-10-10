@@ -7,8 +7,13 @@ namespace Chat.Application.Commands;
 public class CreateChannelCommandHandler : IRequestHandler<CreateChannelCommand, Guid>
 {
     private readonly IRepositoryManager _repositoryManager;
+    private readonly IUserManager _userManager;
 
-    public CreateChannelCommandHandler(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
+    public CreateChannelCommandHandler(IRepositoryManager repositoryManager, IUserManager userManager)
+    {
+        _repositoryManager = repositoryManager;
+        _userManager = userManager;
+    }
 
     public async Task<Guid> Handle(CreateChannelCommand request, CancellationToken cancellationToken)
     {
@@ -16,7 +21,8 @@ public class CreateChannelCommandHandler : IRequestHandler<CreateChannelCommand,
         if (server is null)
             throw new ServerNotFoundException(request.TargetServerId.ToString());
 
-        Guid channelId = server.AddChannel(Guid.NewGuid(), request.Name, DateTime.UtcNow);
+        Guid userId = await _userManager.GetUserIdByEmailAsync(request.CreatedBy);
+        Guid channelId = server.AddChannel(Guid.NewGuid(), request.Name, userId, DateTime.UtcNow);
 
         await _repositoryManager.ServerRepository.UpdateAsync(server);
         return channelId;

@@ -24,7 +24,7 @@ public class CreateChannelCommandValidatorTests
     public async Task TargetServerId_IsEmpty_ReturnsError()
     {
         // Arrange
-        CreateChannelCommand command = new(Guid.Empty, "Test Channel");
+        CreateChannelCommand command = new(Guid.Empty, "Test Channel", "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "creator@example.com", ""));
 
@@ -40,7 +40,7 @@ public class CreateChannelCommandValidatorTests
     public async Task TargetServerId_IsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
-        CreateChannelCommand command = new(Guid.NewGuid(), "Test Channel");
+        CreateChannelCommand command = new(Guid.NewGuid(), "Test Channel", "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -51,7 +51,7 @@ public class CreateChannelCommandValidatorTests
     public async Task Name_IsEmpty_ReturnsError()
     {
         // Arrange
-        CreateChannelCommand command = new(Guid.NewGuid(), "");
+        CreateChannelCommand command = new(Guid.NewGuid(), "", "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
 
@@ -68,7 +68,7 @@ public class CreateChannelCommandValidatorTests
     {
         // Arrange
         string name = "This is a long channel name that exceeds 50 characters in length 1234567890.";
-        CreateChannelCommand command = new(Guid.NewGuid(), name);
+        CreateChannelCommand command = new(Guid.NewGuid(), name, "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
 
@@ -84,9 +84,9 @@ public class CreateChannelCommandValidatorTests
     public async Task Name_AlreadyExist_ReturnsError()
     {
         // Arrange
-        CreateChannelCommand command = new(Guid.NewGuid(), "Existing Channel");
+        CreateChannelCommand command = new(Guid.NewGuid(), "Existing Channel", "user@example.com");
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
-        targetServer.AddChannel(Guid.NewGuid(), "Existing Channel", DateTime.UtcNow);
+        targetServer.AddChannel(Guid.NewGuid(), "Existing Channel", Guid.NewGuid(), DateTime.UtcNow);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act & Assert

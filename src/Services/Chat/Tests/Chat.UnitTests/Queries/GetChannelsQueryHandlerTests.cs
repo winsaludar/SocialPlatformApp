@@ -56,9 +56,9 @@ public class GetChannelsQueryHandlerTests
         // Arrange
         GetChannelsQuery query = new(Guid.NewGuid());
         Server server = new("Test Server", "Short Desc", "Long Descp", "user@example.com", "");
-        server.AddChannel(Guid.NewGuid(), "Channel 1", DateTime.UtcNow);
-        server.AddChannel(Guid.NewGuid(), "Channel 2", DateTime.UtcNow);
-        server.AddChannel(Guid.NewGuid(), "Channel 3", DateTime.UtcNow);
+        server.AddChannel(Guid.NewGuid(), "Channel 1", Guid.NewGuid(), DateTime.UtcNow);
+        server.AddChannel(Guid.NewGuid(), "Channel 2", Guid.NewGuid(), DateTime.UtcNow);
+        server.AddChannel(Guid.NewGuid(), "Channel 3", Guid.NewGuid(), DateTime.UtcNow);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(server);
 
         // Act
