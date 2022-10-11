@@ -1,4 +1,5 @@
-﻿using Chat.Application.DTOs;
+﻿using Chat.API.Extensions;
+using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -40,11 +41,12 @@ public class ChatHub : Hub
     }
 
     [HubMethodName("sendMessage")]
-    public async Task SendMessageAsync(Guid channelId, string username, string message)
+    public async Task SendMessageAsync(Guid channelId, string message)
     {
         ChannelDto channel = await GetChannel(channelId);
-        DateTime dateSent = DateTime.UtcNow;
-        await Clients.Groups(channel.Name).SendAsync("broadcastMessage", new { username, message, dateSentUtc = dateSent });
+        UserDto user = await GetUser();
+
+        await Clients.Groups(channel.Name).SendAsync("broadcastMessage", new { username = user.Username, message, dateSentUtc = DateTime.UtcNow });
     }
 
     [HubMethodName("leaveChannel")]
@@ -54,7 +56,7 @@ public class ChatHub : Hub
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, channel.Name);
     }
 
-    public async Task<ChannelDto> GetChannel(Guid channelId)
+    private async Task<ChannelDto> GetChannel(Guid channelId)
     {
         string? sid = Context.GetHttpContext()?.GetRouteValue("serverId") as string;
         if (string.IsNullOrEmpty(sid) || !Guid.TryParse(sid, out Guid serverId))
@@ -66,5 +68,19 @@ public class ChatHub : Hub
             throw new HubException($"Channel '{channelId}' not found");
 
         return channel;
+    }
+
+    private async Task<UserDto> GetUser()
+    {
+        if (!Context.User.IsValid())
+            throw new HubException("User is invalid");
+
+        string email = Context.User!.Identity!.Name!;
+        GetUserByEmailQuery query = new(email);
+        var user = await _mediator.Send(query);
+        if (user is null)
+            throw new HubException($"User '{email}' does not exist");
+
+        return user;
     }
 }
