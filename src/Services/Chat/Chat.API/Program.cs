@@ -1,3 +1,4 @@
+using Chat.API.Hubs;
 using Chat.API.Middlewares;
 using Chat.Application.IntegrationEvents;
 using Chat.Application.Validators;
@@ -67,6 +68,7 @@ void AddMiddlewares(WebApplicationBuilder builder)
 {
     builder.Services.AddRouting(options => options.LowercaseUrls = true);
     builder.Services.AddControllers();
+    builder.Services.AddSignalR();
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
@@ -138,19 +140,17 @@ void EnableMiddlewares(WebApplication app)
     app.UseMiddleware<ExceptionHandlingMiddleware>();
 
     app.UseHttpsRedirection();
-
     app.UseRouting();
-    app.UseWebSockets();
 
     app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
+    app.MapHub<ChatHub>("/chat/{serverId}");
 }
 
 void ConfigureEventBus(WebApplication app)
 {
     var eventBus = app.Services.GetService<IEventBus>();
-
     eventBus?.Subscribe<UserRegisteredSuccessfulIntegrationEvent, UserRegisteredSuccessfulIntegrationEventHandler>();
 }
