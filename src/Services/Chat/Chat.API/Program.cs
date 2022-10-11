@@ -57,6 +57,30 @@ void AddAuthentication(WebApplicationBuilder builder)
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
+
+        // Sending the access token in the request header is required due to
+        // a limitation in Browser APIs. We restrict it to only calls to the
+        // SignalR hub in this code.
+        // See https://docs.microsoft.com/aspnet/core/signalr/security#access-token-logging
+        // for more information about security considerations when using
+        // the query string to transmit the access token.
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Headers["access_token"];
+
+                // Make sure the request if for our chat hub
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/hubs/chat")))
+                {
+                    // Read the token out of the query string
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     });
 }
 
@@ -146,7 +170,7 @@ void EnableMiddlewares(WebApplication app)
     app.UseAuthorization();
 
     app.MapControllers();
-    app.MapHub<ChatHub>("/chat/{serverId}");
+    app.MapHub<ChatHub>("/hubs/chat/{serverId}");
 }
 
 void ConfigureEventBus(WebApplication app)

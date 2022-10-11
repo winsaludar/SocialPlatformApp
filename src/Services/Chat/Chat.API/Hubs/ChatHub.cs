@@ -1,19 +1,28 @@
-﻿using Chat.Domain.Aggregates.ServerAggregate;
-using Chat.Domain.SeedWork;
+﻿using Chat.Application.DTOs;
+using Chat.Application.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Chat.API.Hubs;
 
+[Authorize]
 public class ChatHub : Hub
 {
-    private readonly IRepositoryManager _repositoryManager;
+    private readonly IMediator _mediator;
 
-    public ChatHub(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
+    public ChatHub(IMediator mediator) => _mediator = mediator;
 
     public override async Task OnConnectedAsync()
     {
-        // Make sure serverId is valid
-        await GetServerAsync();
+        string? sid = Context.GetHttpContext()?.GetRouteValue("serverId") as string;
+        if (string.IsNullOrEmpty(sid) || !Guid.TryParse(sid, out Guid serverId))
+            throw new HubException($"Invalid server id: '{sid}'");
+
+        GetServerQuery query = new(serverId);
+        var server = await _mediator.Send(query);
+        if (server is null)
+            throw new HubException($"Server '{serverId}' not found");
 
         await base.OnConnectedAsync();
     }
@@ -26,14 +35,14 @@ public class ChatHub : Hub
     [HubMethodName("joinChannel")]
     public async Task JoinChannelAsync(Guid channelId)
     {
-        Channel channel = await GetChannelAsync(channelId);
+        ChannelDto channel = await GetChannel(channelId);
         await Groups.AddToGroupAsync(Context.ConnectionId, channel.Name);
     }
 
     [HubMethodName("sendMessage")]
     public async Task SendMessageAsync(Guid channelId, string username, string message)
     {
-        Channel channel = await GetChannelAsync(channelId);
+        ChannelDto channel = await GetChannel(channelId);
         DateTime dateSent = DateTime.UtcNow;
         await Clients.Groups(channel.Name).SendAsync("broadcastMessage", new { username, message, dateSentUtc = dateSent });
     }
@@ -41,26 +50,18 @@ public class ChatHub : Hub
     [HubMethodName("leaveChannel")]
     public async Task LeaveChannelAsync(Guid channelId)
     {
-        Channel channel = await GetChannelAsync(channelId);
+        ChannelDto channel = await GetChannel(channelId);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, channel.Name);
     }
 
-    private async Task<Server> GetServerAsync()
+    public async Task<ChannelDto> GetChannel(Guid channelId)
     {
         string? sid = Context.GetHttpContext()?.GetRouteValue("serverId") as string;
         if (string.IsNullOrEmpty(sid) || !Guid.TryParse(sid, out Guid serverId))
             throw new HubException($"Invalid server id: '{sid}'");
-        Server? server = await _repositoryManager.ServerRepository.GetByIdAsync(serverId);
-        if (server is null)
-            throw new HubException($"Server '{sid}' not found");
 
-        return server;
-    }
-
-    private async Task<Channel> GetChannelAsync(Guid channelId)
-    {
-        Server server = await GetServerAsync();
-        Channel? channel = server.Channels.FirstOrDefault(x => x.Id == channelId);
+        GetChannelQuery query = new(serverId, channelId);
+        var channel = await _mediator.Send(query);
         if (channel is null)
             throw new HubException($"Channel '{channelId}' not found");
 
