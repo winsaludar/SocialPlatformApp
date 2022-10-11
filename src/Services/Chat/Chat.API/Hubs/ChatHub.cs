@@ -1,6 +1,7 @@
 ﻿using Chat.API.Extensions;
-using Chat.Application.DTOs;
 using Chat.Application.Queries;
+using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Aggregates.UserAggregate;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -21,7 +22,7 @@ public class ChatHub : Hub
             throw new HubException($"Invalid server id: '{sid}'");
 
         GetServerQuery query = new(serverId);
-        var server = await _mediator.Send(query);
+        Server? server = await _mediator.Send(query);
         if (server is null)
             throw new HubException($"Server '{serverId}' not found");
 
@@ -36,15 +37,15 @@ public class ChatHub : Hub
     [HubMethodName("joinChannel")]
     public async Task JoinChannelAsync(Guid channelId)
     {
-        ChannelDto channel = await GetChannel(channelId);
+        Channel channel = await GetChannel(channelId);
         await Groups.AddToGroupAsync(Context.ConnectionId, channel.Name);
     }
 
     [HubMethodName("sendMessage")]
     public async Task SendMessageAsync(Guid channelId, string message)
     {
-        ChannelDto channel = await GetChannel(channelId);
-        UserDto user = await GetUser();
+        Channel channel = await GetChannel(channelId);
+        User user = await GetUser();
 
         await Clients.Groups(channel.Name).SendAsync("broadcastMessage", new { username = user.Username, message, dateSentUtc = DateTime.UtcNow });
     }
@@ -52,11 +53,11 @@ public class ChatHub : Hub
     [HubMethodName("leaveChannel")]
     public async Task LeaveChannelAsync(Guid channelId)
     {
-        ChannelDto channel = await GetChannel(channelId);
+        Channel channel = await GetChannel(channelId);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, channel.Name);
     }
 
-    private async Task<ChannelDto> GetChannel(Guid channelId)
+    private async Task<Channel> GetChannel(Guid channelId)
     {
         string? sid = Context.GetHttpContext()?.GetRouteValue("serverId") as string;
         if (string.IsNullOrEmpty(sid) || !Guid.TryParse(sid, out Guid serverId))
@@ -70,7 +71,7 @@ public class ChatHub : Hub
         return channel;
     }
 
-    private async Task<UserDto> GetUser()
+    private async Task<User> GetUser()
     {
         if (!Context.User.IsValid())
             throw new HubException("User is invalid");

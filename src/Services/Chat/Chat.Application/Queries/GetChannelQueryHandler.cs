@@ -1,29 +1,21 @@
-﻿using Chat.Application.DTOs;
+﻿using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.SeedWork;
 using MediatR;
 
 namespace Chat.Application.Queries;
 
-public class GetChannelQueryHandler : IRequestHandler<GetChannelQuery, ChannelDto?>
+public class GetChannelQueryHandler : IRequestHandler<GetChannelQuery, Channel?>
 {
     private readonly IRepositoryManager _repositoryManager;
 
     public GetChannelQueryHandler(IRepositoryManager repositoryManager) => _repositoryManager = repositoryManager;
 
-    public async Task<ChannelDto?> Handle(GetChannelQuery request, CancellationToken cancellationToken)
+    public async Task<Channel?> Handle(GetChannelQuery request, CancellationToken cancellationToken)
     {
         var server = await _repositoryManager.ServerRepository.GetByIdAsync(request.ServerId);
         if (server is null)
             return null;
 
-        var channel = server.Channels.FirstOrDefault(x => x.Id == request.ChannelId);
-        if (channel is null)
-            return null;
-
-        return new ChannelDto
-        {
-            Id = channel.Id,
-            Name = channel.Name
-        };
+        return server.Channels.FirstOrDefault(x => x.Id == request.ChannelId);
     }
 }

@@ -1,11 +1,11 @@
-﻿using Chat.Application.DTOs;
+﻿using Chat.Domain.Aggregates.ServerAggregate;
 using MediatR;
 using System.Runtime.Serialization;
 
 namespace Chat.Application.Queries;
 
 [DataContract]
-public class GetChannelQuery : IRequest<ChannelDto?>
+public class GetChannelQuery : IRequest<Channel?>
 {
     public GetChannelQuery(Guid serverId, Guid channelId)
     {

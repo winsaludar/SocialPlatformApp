@@ -1,11 +1,11 @@
-﻿using Chat.Application.DTOs;
+﻿using Chat.Domain.Aggregates.UserAggregate;
 using MediatR;
 using System.Runtime.Serialization;
 
 namespace Chat.Application.Queries;
 
 [DataContract]
-public class GetUserByEmailQuery : IRequest<UserDto?>
+public class GetUserByEmailQuery : IRequest<User?>
 {
     public GetUserByEmailQuery(string email)
     {
