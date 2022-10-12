@@ -1,4 +1,5 @@
 ﻿using Chat.API.Extensions;
+using Chat.Application.Commands;
 using Chat.Application.Queries;
 using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.Aggregates.UserAggregate;
@@ -17,15 +18,7 @@ public class ChatHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        string? sid = Context.GetHttpContext()?.GetRouteValue("serverId") as string;
-        if (string.IsNullOrEmpty(sid) || !Guid.TryParse(sid, out Guid serverId))
-            throw new HubException($"Invalid server id: '{sid}'");
-
-        GetServerQuery query = new(serverId);
-        Server? server = await _mediator.Send(query);
-        if (server is null)
-            throw new HubException($"Server '{serverId}' not found");
-
+        _ = await GetServerAsync(); // Calling to make sure server id is valid
         await base.OnConnectedAsync();
     }
 
@@ -37,15 +30,20 @@ public class ChatHub : Hub
     [HubMethodName("joinChannel")]
     public async Task JoinChannelAsync(Guid channelId)
     {
-        Channel channel = await GetChannel(channelId);
+        Channel channel = await GetChannelAsync(channelId);
         await Groups.AddToGroupAsync(Context.ConnectionId, channel.Name);
     }
 
     [HubMethodName("sendMessage")]
     public async Task SendMessageAsync(Guid channelId, string message)
     {
-        Channel channel = await GetChannel(channelId);
-        User user = await GetUser();
+        Server server = await GetServerAsync();
+        Channel channel = await GetChannelAsync(channelId);
+        User user = await GetUserAsync();
+
+        // TODO: Validate
+        AddMessageCommand command = new(server, channelId, user.Username, message);
+        await _mediator.Send(command);
 
         await Clients.Groups(channel.Name).SendAsync("broadcastMessage", new { username = user.Username, message, dateSentUtc = DateTime.UtcNow });
     }
@@ -53,11 +51,25 @@ public class ChatHub : Hub
     [HubMethodName("leaveChannel")]
     public async Task LeaveChannelAsync(Guid channelId)
     {
-        Channel channel = await GetChannel(channelId);
+        Channel channel = await GetChannelAsync(channelId);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, channel.Name);
     }
 
-    private async Task<Channel> GetChannel(Guid channelId)
+    private async Task<Server> GetServerAsync()
+    {
+        string? sid = Context.GetHttpContext()?.GetRouteValue("serverId") as string;
+        if (string.IsNullOrEmpty(sid) || !Guid.TryParse(sid, out Guid serverId))
+            throw new HubException($"Invalid server id: '{sid}'");
+
+        GetServerQuery query = new(serverId);
+        Server? server = await _mediator.Send(query);
+        if (server is null)
+            throw new HubException($"Server '{serverId}' not found");
+
+        return server;
+    }
+
+    private async Task<Channel> GetChannelAsync(Guid channelId)
     {
         string? sid = Context.GetHttpContext()?.GetRouteValue("serverId") as string;
         if (string.IsNullOrEmpty(sid) || !Guid.TryParse(sid, out Guid serverId))
@@ -71,7 +83,7 @@ public class ChatHub : Hub
         return channel;
     }
 
-    private async Task<User> GetUser()
+    private async Task<User> GetUserAsync()
     {
         if (!Context.User.IsValid())
             throw new HubException("User is invalid");
