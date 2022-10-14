@@ -1,5 +1,4 @@
-﻿using Chat.Domain.Aggregates.ServerAggregate;
-using Chat.Domain.Exceptions;
+﻿using Chat.Domain.Aggregates.MessageAggregate;
 using Chat.Domain.SeedWork;
 using MediatR;
 
@@ -13,14 +12,11 @@ public class AddMessageCommandHandler : IRequestHandler<AddMessageCommand, Guid>
 
     public async Task<Guid> Handle(AddMessageCommand request, CancellationToken cancellationToken)
     {
-        Channel? channel = request.TargetServer.Channels.FirstOrDefault(x => x.Id == request.TargetChannelId);
-        if (channel is null)
-            throw new ChannelNotFoundException(request.TargetChannelId.ToString());
+        Message msg = new(request.ServerId, request.ChannelId, request.SenderId, request.Username, request.Content);
+        msg.SetCreatedById(request.SenderId);
 
-        Guid id = Guid.NewGuid();
-        channel.AddMessage(id, request.Username, request.Content);
-        await _repositoryManager.ServerRepository.UpdateAsync(request.TargetServer);
+        Guid newId = await _repositoryManager.MessageRepository.CreateAsync(msg);
 
-        return id;
+        return newId;
     }
 }

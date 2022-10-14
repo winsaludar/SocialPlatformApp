@@ -42,7 +42,7 @@ public class ChatHub : Hub
         User user = await GetUserAsync();
 
         // TODO: Validate
-        AddMessageCommand command = new(server, channelId, user.Username, message);
+        AddMessageCommand command = new(server.Id, channelId, user.Id, user.Username, message);
         await _mediator.Send(command);
 
         await Clients.Groups(channel.Name).SendAsync("broadcastMessage", new { username = user.Username, message, dateSentUtc = DateTime.UtcNow });

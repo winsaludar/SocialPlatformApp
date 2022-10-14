@@ -1,4 +1,5 @@
-﻿using Chat.Domain.SeedWork;
+﻿using Chat.Domain.Aggregates.MessageAggregate;
+using Chat.Domain.SeedWork;
 
 namespace Chat.Domain.Aggregates.ServerAggregate;
 
@@ -16,14 +17,4 @@ public class Channel : Entity
     public IReadOnlyCollection<Message> Messages => _messages;
 
     public void SetName(string name) => Name = name;
-
-    public Guid AddMessage(Guid id, string username, string content)
-    {
-        Message message = new(username, content);
-        message.SetId(id);
-
-        _messages.Add(message);
-
-        return message.Id;
-    }
 }

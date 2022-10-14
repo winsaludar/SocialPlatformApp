@@ -1,12 +1,10 @@
-﻿using MediatR;
-using System.Runtime.Serialization;
+﻿using Chat.Domain.SeedWork;
 
-namespace Chat.Application.Commands;
+namespace Chat.Domain.Aggregates.MessageAggregate;
 
-[DataContract]
-public class AddMessageCommand : IRequest<Guid>
+public class Message : Entity, IAggregateRoot
 {
-    public AddMessageCommand(Guid serverId, Guid channelId, Guid senderId, string username, string content)
+    public Message(Guid serverId, Guid channelId, Guid senderId, string username, string content)
     {
         ServerId = serverId;
         ChannelId = channelId;
@@ -15,18 +13,9 @@ public class AddMessageCommand : IRequest<Guid>
         Content = content;
     }
 
-    [DataMember]
     public Guid ServerId { get; private set; }
-
-    [DataMember]
     public Guid ChannelId { get; private set; }
-
-    [DataMember]
     public Guid SenderId { get; private set; }
-
-    [DataMember]
     public string Username { get; private set; }
-
-    [DataMember]
     public string Content { get; private set; }
 }

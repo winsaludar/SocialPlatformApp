@@ -135,6 +135,7 @@ public class ServerRepository : IServerRepository
         if (result == null)
             return;
 
+        // Update server
         ServerDbModel model = new()
         {
             Id = result.Id,
@@ -150,6 +151,7 @@ public class ServerRepository : IServerRepository
             DateLastModified = DateTime.UtcNow,
         };
 
+        // Update channels
         List<ChannelDbModel> channels = new();
         foreach (var item in server.Channels)
         {
@@ -167,8 +169,6 @@ public class ServerRepository : IServerRepository
             if (item.LastModifiedById.HasValue)
                 channel.LastModifiedById = item.LastModifiedById.ToString();
 
-            channel = AddChannelMessages(channel, item);
-
             channels.Add(channel);
         }
         model.Channels = channels;
@@ -179,22 +179,5 @@ public class ServerRepository : IServerRepository
     public async Task DeleteAsync(Guid id)
     {
         await _serversCollection.DeleteOneAsync(x => x.Guid.ToLower() == id.ToString().ToLower());
-    }
-
-    private static ChannelDbModel AddChannelMessages(ChannelDbModel dbModel, Channel channel)
-    {
-        foreach (var message in channel.Messages)
-        {
-            MessageDbModel m = new()
-            {
-                Guid = message.Id.ToString(),
-                Username = message.Username,
-                Content = message.Content
-            };
-
-            dbModel.Messages.Add(m);
-        }
-
-        return dbModel;
     }
 }
