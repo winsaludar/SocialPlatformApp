@@ -1,8 +1,10 @@
 ﻿using Chat.API.Extensions;
 using Chat.Application.Commands;
 using Chat.Application.Queries;
+using Chat.Application.Validators;
 using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.Aggregates.UserAggregate;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -13,8 +15,13 @@ namespace Chat.API.Hubs;
 public class ChatHub : Hub
 {
     private readonly IMediator _mediator;
+    private readonly IValidatorManager _validatorManager;
 
-    public ChatHub(IMediator mediator) => _mediator = mediator;
+    public ChatHub(IMediator mediator, IValidatorManager validatorManager)
+    {
+        _mediator = mediator;
+        _validatorManager = validatorManager;
+    }
 
     public override async Task OnConnectedAsync()
     {
@@ -41,8 +48,11 @@ public class ChatHub : Hub
         Channel channel = await GetChannelAsync(channelId);
         User user = await GetUserAsync();
 
-        // TODO: Validate
         AddMessageCommand command = new(server.Id, channelId, user.Id, user.Username, message);
+        ValidationResult validationResult = await _validatorManager.AddMessageCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+            validationResult.ThrowHubException();
+
         await _mediator.Send(command);
 
         await Clients.Groups(channel.Name).SendAsync("broadcastMessage", new { username = user.Username, message, dateSentUtc = DateTime.UtcNow });
