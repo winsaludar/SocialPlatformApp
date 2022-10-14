@@ -26,5 +26,5 @@ public class ServerDbModel : EntityDbModel
     public string? Thumbnail { get; set; }
 
     [BsonElement("channels")]
-    public List<ChannelDbModel> Channels { get; set; } = new List<ChannelDbModel>();
+    public List<ChannelDbModel> Channels { get; set; } = new();
 }

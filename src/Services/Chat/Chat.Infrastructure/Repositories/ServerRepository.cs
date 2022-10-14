@@ -135,6 +135,7 @@ public class ServerRepository : IServerRepository
         if (result == null)
             return;
 
+        // Update server
         ServerDbModel model = new()
         {
             Id = result.Id,
@@ -150,6 +151,7 @@ public class ServerRepository : IServerRepository
             DateLastModified = DateTime.UtcNow,
         };
 
+        // Update channels
         List<ChannelDbModel> channels = new();
         foreach (var item in server.Channels)
         {
