@@ -21,28 +21,11 @@ public class UpdateChannelCommandValidatorTests
     }
 
     [Fact]
-    public async Task TargetServerId_IsEmpty_ReturnsError()
+    public async Task TargetServer_IsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
-        Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
-        targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow);
-        UpdateChannelCommand command = new(Guid.Empty, channelId, "Test Channel", "user@example.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
-
-        // Act
-        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
-
-        // Assert
-        Assert.NotEmpty(result.Errors);
-        Assert.True(result.Errors?.Any(x => x.PropertyName == "TargetServerId"));
-    }
-
-    [Fact]
-    public async Task TargetServerId_IsInvalid_ThrowsServerNotFoundException()
-    {
-        // Arrange
-        UpdateChannelCommand command = new(Guid.Empty, Guid.NewGuid(), "Test Channel", "user@example.com");
+        Server targetServer = GetTargetServer();
+        UpdateChannelCommand command = new(targetServer, Guid.NewGuid(), "Test Channel", Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -53,9 +36,9 @@ public class UpdateChannelCommandValidatorTests
     public async Task TargetChannelId_IsEmpty_ReturnsError()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(Guid.Empty, "Fake Channel", Guid.NewGuid(), DateTime.UtcNow);
-        UpdateChannelCommand command = new(Guid.NewGuid(), Guid.Empty, "Test Channel", "user@example.com");
+        UpdateChannelCommand command = new(targetServer, Guid.Empty, "Test Channel", Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -70,9 +53,9 @@ public class UpdateChannelCommandValidatorTests
     public async Task TargetChannelId_IsInvalid_ThrowsChannelNotFoundException()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(Guid.NewGuid(), "Different Channel", Guid.NewGuid(), DateTime.UtcNow);
-        UpdateChannelCommand command = new(Guid.NewGuid(), Guid.NewGuid(), "Test Channel", "user@example.com");
+        UpdateChannelCommand command = new(targetServer, Guid.NewGuid(), "Test Channel", Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act & Assert
@@ -84,9 +67,9 @@ public class UpdateChannelCommandValidatorTests
     {
         // Arrange
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow);
-        UpdateChannelCommand command = new(Guid.NewGuid(), channelId, "", "user@example.com");
+        UpdateChannelCommand command = new(targetServer, channelId, "", Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -103,9 +86,9 @@ public class UpdateChannelCommandValidatorTests
         // Arrange
         string name = "This is a long channel name that exceeds 50 characters in length 1234567890.";
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow);
-        UpdateChannelCommand command = new(Guid.NewGuid(), channelId, name, "user@example.com");
+        UpdateChannelCommand command = new(targetServer, channelId, name, Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -122,10 +105,10 @@ public class UpdateChannelCommandValidatorTests
         // Arrange
         Guid targetChannelId = Guid.NewGuid();
         Guid existingNameChannelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(targetChannelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow);
         targetServer.AddChannel(existingNameChannelId, "Existing Channel", Guid.NewGuid(), DateTime.UtcNow);
-        UpdateChannelCommand command = new(Guid.NewGuid(), targetChannelId, "Existing Channel", "user@example.com");
+        UpdateChannelCommand command = new(targetServer, targetChannelId, "Existing Channel", Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act & Assert
@@ -133,13 +116,13 @@ public class UpdateChannelCommandValidatorTests
     }
 
     [Fact]
-    public async Task UpdatedBy_IsEmpty_ReturnsError()
+    public async Task UpdatedById_IsEmpty_ReturnsError()
     {
         // Arrange
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow);
-        UpdateChannelCommand command = new(Guid.NewGuid(), channelId, "Channel Name", "");
+        UpdateChannelCommand command = new(targetServer, channelId, "Channel Name", Guid.Empty);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -147,24 +130,14 @@ public class UpdateChannelCommandValidatorTests
 
         // Assert
         Assert.NotEmpty(result.Errors);
-        Assert.True(result.Errors?.Any(x => x.PropertyName == "UpdatedBy"));
+        Assert.True(result.Errors?.Any(x => x.PropertyName == "UpdatedById"));
     }
 
-    [Fact]
-    public async Task UpdatedBy_IsNotEmailAddress_ReturnsError()
+    private static Server GetTargetServer()
     {
-        // Arrange
-        Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
-        targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow);
-        UpdateChannelCommand command = new(Guid.NewGuid(), channelId, "Channel Name", "notvalidemail.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
 
-        // Act
-        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
-
-        // Assert
-        Assert.NotEmpty(result.Errors);
-        Assert.True(result.Errors?.Any(x => x.PropertyName == "UpdatedBy"));
+        return targetServer;
     }
 }

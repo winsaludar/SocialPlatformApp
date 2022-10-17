@@ -1,4 +1,5 @@
 ﻿using Chat.Application.Commands;
+using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.Exceptions;
 using Chat.Domain.SeedWork;
 using FluentValidation;
@@ -13,21 +14,13 @@ public class UpdateServerCommandValidator : AbstractValidator<UpdateServerComman
     {
         _repositoryManager = repositoryManager;
 
-        RuleFor(x => x.TargetServerId)
-            .NotEmpty()
-            .MustAsync(BeExistingServer);
-
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .MaximumLength(50)
-            .MustAsync(BeNotExistingName);
-
+        RuleFor(x => x.TargetServer).MustAsync(BeExistingServer);
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(50).MustAsync(BeNotExistingName);
         RuleFor(x => x.ShortDescription).NotEmpty().MaximumLength(200);
         RuleFor(x => x.LongDescription).NotEmpty();
-        RuleFor(x => x.EditorEmail).NotEmpty().EmailAddress();
+        RuleFor(x => x.UpdatedById).NotEmpty();
 
-        RuleFor(x => new Tuple<Guid, string>(x.TargetServerId, x.EditorEmail))
-            .MustAsync(BeTheSameEmailWithCreator);
+        RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.UpdatedById)).MustAsync(BeTheSameWithCreator);
     }
 
     private async Task<bool> BeNotExistingName(string name, CancellationToken cancellationToken)
@@ -39,25 +32,25 @@ public class UpdateServerCommandValidator : AbstractValidator<UpdateServerComman
         return true;
     }
 
-    private async Task<bool> BeExistingServer(Guid targetServerId, CancellationToken cancellationToken)
+    private async Task<bool> BeExistingServer(Server targetServer, CancellationToken cancellationToken)
     {
-        var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
+        var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
         if (result is null)
-            throw new ServerNotFoundException(targetServerId.ToString());
+            throw new ServerNotFoundException(targetServer.Id.ToString());
 
         return true;
     }
 
-    private async Task<bool> BeTheSameEmailWithCreator(Tuple<Guid, string> props, CancellationToken cancellationToken)
+    private async Task<bool> BeTheSameWithCreator(Tuple<Server, Guid> props, CancellationToken cancellationToken)
     {
-        (Guid targetServerId, string editorEmail) = props;
+        (Server targetServer, Guid updatedById) = props;
 
-        var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
+        var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
         if (result is null)
-            throw new ServerNotFoundException(targetServerId.ToString());
+            throw new ServerNotFoundException(targetServer.Id.ToString());
 
-        if (result.CreatorEmail.ToLower() != editorEmail.ToLower())
-            throw new UnauthorizedServerEditorException(editorEmail);
+        if (result.CreatedById != updatedById)
+            throw new UnauthorizedUserException(updatedById.ToString());
 
         return true;
     }

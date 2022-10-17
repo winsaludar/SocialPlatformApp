@@ -21,26 +21,11 @@ public class UpdateServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task TargetServerId_IsEmpty_ReturnsError()
-    {
-        // Arrange
-        UpdateServerCommand command = new(Guid.Empty, "Name", "Short Description", "Long Description", "user@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, command.Thumbnail));
-
-        // Act
-        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
-
-        // Assert
-        Assert.NotEmpty(result.Errors);
-        Assert.True(result.Errors?.Any(x => x.PropertyName == "TargetServerId"));
-    }
-
-    [Fact]
     public async Task TargetServerId_IsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
-        UpdateServerCommand command = new(Guid.NewGuid(), "Name", "Short Description", "Long Description", "user@example.com", "Thumbnail");
+        Server targetServer = GetTargetServer();
+        UpdateServerCommand command = new(targetServer, "Name", "Short Description", "Long Description", Guid.NewGuid(), "Thumbnail");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -51,9 +36,11 @@ public class UpdateServerCommandValidatorTests
     public async Task Name_IsEmpty_ReturnsError()
     {
         // Arrange
-        UpdateServerCommand command = new(Guid.NewGuid(), "", "Short Description", "Long Description", "user@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, command.Thumbnail));
+        Guid userId = Guid.NewGuid();
+        Server targetServer = GetTargetServer();
+        targetServer.SetCreatedById(userId);
+        UpdateServerCommand command = new(targetServer, "", "Short Description", "Long Description", userId, "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -67,10 +54,12 @@ public class UpdateServerCommandValidatorTests
     public async Task Name_ExceedsMaximumCharacterLength_ReturnsError()
     {
         // Arrange
+        Guid userId = Guid.NewGuid();
+        Server targetServer = GetTargetServer();
+        targetServer.SetCreatedById(userId);
         string name = "This is a long server name that exceeds 50 characters in length 1234567890.";
-        UpdateServerCommand command = new(Guid.NewGuid(), name, "Short Description", "Long Description", "user@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, command.Thumbnail));
+        UpdateServerCommand command = new(targetServer, name, "Short Description", "Long Description", userId, "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -84,9 +73,9 @@ public class UpdateServerCommandValidatorTests
     public async Task Name_NewNameAlreadyExist_ReturnsError()
     {
         // Arrange
-        UpdateServerCommand command = new(Guid.NewGuid(), "New Name", "Short Description", "Long Description", "user@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, command.Thumbnail));
+        Server targetServer = GetTargetServer();
+        UpdateServerCommand command = new(targetServer, "New Name", "Short Description", "Long Description", Guid.NewGuid(), "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetTargetServer());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByNameAsync(It.IsAny<string>())).ReturnsAsync(
             new Server("Existing Name", "Existing Short Desc", "Existing Long Desc", "user@example.com", ""));
 
@@ -98,9 +87,11 @@ public class UpdateServerCommandValidatorTests
     public async Task ShortDescription_IsEmpty_ReturnsAnError()
     {
         // Arrange
-        UpdateServerCommand command = new(Guid.NewGuid(), "Name", "", "Long Description", "user@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, command.Thumbnail));
+        Guid userId = Guid.NewGuid();
+        Server targetServer = GetTargetServer();
+        targetServer.SetCreatedById(userId);
+        UpdateServerCommand command = new(targetServer, "Name", "", "Long Description", userId, "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -114,12 +105,14 @@ public class UpdateServerCommandValidatorTests
     public async Task ShortDescription_ExceedsMaximumCharacterLength_ReturnsAnError()
     {
         // Arrange
+        Guid userId = Guid.NewGuid();
+        Server targetServer = GetTargetServer();
+        targetServer.SetCreatedById(userId);
         string shortDescription = @"This is a long server short description that exceeds 200 characters in length 1234567890. 
         This is a long server short description that exceeds 200 characters in length 1234567890. This is a long server short description that exceeds 200 characters 
         in length 1234567890. This is a long server short description that exceeds 200 characters in length 1234567890.";
-        UpdateServerCommand command = new(Guid.NewGuid(), "Name", shortDescription, "Long Description", "user@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, command.Thumbnail));
+        UpdateServerCommand command = new(targetServer, "Name", shortDescription, "Long Description", userId, "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -133,9 +126,11 @@ public class UpdateServerCommandValidatorTests
     public async Task LongDescription_IsEmpty_ReturnsAnError()
     {
         // Arrange
-        UpdateServerCommand command = new(Guid.NewGuid(), "Name", "Short Description", "", "user@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, command.Thumbnail));
+        Guid userId = Guid.NewGuid();
+        Server targetServer = GetTargetServer();
+        targetServer.SetCreatedById(userId);
+        UpdateServerCommand command = new(targetServer, "Name", "Short Description", "", userId, "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -146,46 +141,38 @@ public class UpdateServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task EditorEmail_IsEmpty_ReturnsAnError()
+    public async Task UpdatedById_IsEmpty_ReturnsAnError()
     {
         // Arrange
-        UpdateServerCommand command = new(Guid.NewGuid(), "Name", "Short Description", "Long Description", "", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, command.Thumbnail));
+        Server targetServer = GetTargetServer();
+        UpdateServerCommand command = new(targetServer, "Name", "Short Description", "Long Description", Guid.Empty, "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetTargetServer());
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
 
         // Assert
         Assert.NotEmpty(result.Errors);
-        Assert.True(result.Errors?.Any(x => x.PropertyName == "EditorEmail"));
+        Assert.True(result.Errors?.Any(x => x.PropertyName == "UpdatedById"));
     }
 
     [Fact]
-    public async Task EditorEmail_IsNotValidEmailAddress_ReturnsAnError()
+    public async Task UpdatedById_NotTheSameWithCreator_ThrowsUnauthorizedUserException()
     {
         // Arrange
-        UpdateServerCommand command = new(Guid.NewGuid(), "Name", "Short Description", "Long Description", "notvalidemail", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, command.EditorEmail, command.Thumbnail));
-
-        // Act
-        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
-
-        // Assert
-        Assert.NotEmpty(result.Errors);
-        Assert.True(result.Errors?.Any(x => x.PropertyName == "EditorEmail"));
-    }
-
-    [Fact]
-    public async Task EditorEmail_NotTheSameWithCreatorEmail_ReturnsAnError()
-    {
-        // Arrange
-        UpdateServerCommand command = new(Guid.NewGuid(), "Name", "Short Description", "Long Description", "user1@example.com", "Thumbnail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server(command.Name, command.ShortDescription, command.LongDescription, "user2@example.com", command.Thumbnail));
+        Server targetServer = GetTargetServer();
+        UpdateServerCommand command = new(targetServer, "Name", "Short Description", "Long Description", Guid.NewGuid(), "Thumbnail");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetTargetServer());
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedServerEditorException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+        await Assert.ThrowsAsync<UnauthorizedUserException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+    }
+
+    private static Server GetTargetServer()
+    {
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+
+        return targetServer;
     }
 }

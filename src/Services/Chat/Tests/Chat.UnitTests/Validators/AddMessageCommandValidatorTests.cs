@@ -26,7 +26,7 @@ public class AddMessageCommandValidatorTests
     {
         // Arrange
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
         AddMessageCommand command = new(Guid.Empty, channelId, Guid.NewGuid(), "user", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -55,7 +55,7 @@ public class AddMessageCommandValidatorTests
     {
         // Arrange
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(Guid.Empty, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
         AddMessageCommand command = new(Guid.NewGuid(), Guid.Empty, Guid.NewGuid(), "user", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -72,7 +72,7 @@ public class AddMessageCommandValidatorTests
     public async Task ChannelId_IsInvalid_ThrowsChannelNotFoundException()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(Guid.NewGuid(), "Different Channel", Guid.NewGuid(), DateTime.UtcNow);
         AddMessageCommand command = new(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "user", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -87,7 +87,7 @@ public class AddMessageCommandValidatorTests
         // Arrange
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
         AddMessageCommand command = new(serverId, channelId, Guid.Empty, "user", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -106,7 +106,7 @@ public class AddMessageCommandValidatorTests
         // Arrange
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
         AddMessageCommand command = new(serverId, channelId, Guid.NewGuid(), "", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -125,7 +125,7 @@ public class AddMessageCommandValidatorTests
         // Arrange
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
         AddMessageCommand command = new(serverId, channelId, Guid.NewGuid(), "user", "");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -175,7 +175,7 @@ public class AddMessageCommandValidatorTests
             "convallis";
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
         AddMessageCommand command = new(serverId, channelId, Guid.NewGuid(), "user", message);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -186,5 +186,13 @@ public class AddMessageCommandValidatorTests
         // Assert
         Assert.NotEmpty(result.Errors);
         Assert.True(result.Errors?.Any(x => x.PropertyName == "Content"));
+    }
+
+    private static Server GetTargetServer()
+    {
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+
+        return targetServer;
     }
 }

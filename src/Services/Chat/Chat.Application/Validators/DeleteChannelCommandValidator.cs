@@ -1,4 +1,5 @@
 ﻿using Chat.Application.Commands;
+using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.Exceptions;
 using Chat.Domain.SeedWork;
 using FluentValidation;
@@ -13,28 +14,28 @@ public class DeleteChannelCommandValidator : AbstractValidator<DeleteChannelComm
     {
         _repositoryManager = repositoryManager;
 
-        RuleFor(x => x.TargetServerId).NotEmpty().MustAsync(BeExistingServer);
+        RuleFor(x => x.TargetServer).MustAsync(BeExistingServer);
         RuleFor(x => x.TargetChannelId).NotEmpty();
 
-        RuleFor(x => new Tuple<Guid, Guid>(x.TargetServerId, x.TargetChannelId)).MustAsync(BeExistingChannel);
+        RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.TargetChannelId)).MustAsync(BeExistingChannel);
     }
 
-    private async Task<bool> BeExistingServer(Guid targetServerId, CancellationToken cancellationToken)
+    private async Task<bool> BeExistingServer(Server targetServer, CancellationToken cancellationToken)
     {
-        var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
+        var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
         if (result is null)
-            throw new ServerNotFoundException(targetServerId.ToString());
+            throw new ServerNotFoundException(targetServer.Id.ToString());
 
         return true;
     }
 
-    private async Task<bool> BeExistingChannel(Tuple<Guid, Guid> props, CancellationToken cancellationToken)
+    private async Task<bool> BeExistingChannel(Tuple<Server, Guid> props, CancellationToken cancellationToken)
     {
-        (Guid targetServerId, Guid targetChannelId) = props;
+        (Server targetServer, Guid targetChannelId) = props;
 
-        var server = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
+        var server = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
         if (server is null)
-            throw new ServerNotFoundException(targetServerId.ToString());
+            throw new ServerNotFoundException(targetServer.Id.ToString());
 
         if (!server.Channels.Any(x => x.Id == targetChannelId))
             throw new ChannelNotFoundException(targetChannelId.ToString());

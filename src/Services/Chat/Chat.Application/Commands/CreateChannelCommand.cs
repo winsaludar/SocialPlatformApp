@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Chat.Domain.Aggregates.ServerAggregate;
+using MediatR;
 using System.Runtime.Serialization;
 
 namespace Chat.Application.Commands;
@@ -6,19 +7,19 @@ namespace Chat.Application.Commands;
 [DataContract]
 public class CreateChannelCommand : IRequest<Guid>
 {
-    public CreateChannelCommand(Guid targetServerId, string name, string createdBy)
+    public CreateChannelCommand(Server targetServer, string name, Guid createdById)
     {
-        TargetServerId = targetServerId;
+        TargetServer = targetServer;
         Name = name;
-        CreatedBy = createdBy;
+        CreatedById = createdById;
     }
 
     [DataMember]
-    public Guid TargetServerId { get; private set; }
+    public Server TargetServer { get; private set; }
 
     [DataMember]
     public string Name { get; private set; }
 
     [DataMember]
-    public string CreatedBy { get; private set; }
+    public Guid CreatedById { get; private set; }
 }

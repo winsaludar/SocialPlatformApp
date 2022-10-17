@@ -6,15 +6,15 @@ namespace Chat.Application.Commands;
 [DataContract]
 public class DeleteServerCommand : IRequest<bool>
 {
-    public DeleteServerCommand(Guid targetServerId, string deleterEmail)
+    public DeleteServerCommand(Guid targetServerId, Guid deletedById)
     {
         TargetServerId = targetServerId;
-        DeleterEmail = deleterEmail;
+        DeletedById = deletedById;
     }
 
     [DataMember]
     public Guid TargetServerId { get; private set; }
 
     [DataMember]
-    public string DeleterEmail { get; private set; }
+    public Guid DeletedById { get; private set; }
 }

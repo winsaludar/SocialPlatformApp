@@ -1,7 +1,6 @@
 ﻿using Chat.Application.Commands;
 using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.Aggregates.UserAggregate;
-using Chat.Domain.Exceptions;
 using Chat.Domain.SeedWork;
 using Moq;
 
@@ -23,28 +22,12 @@ public class DeleteChannelCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_TargetServerIdIsInvalid_ThrowsServerNotFoundException()
-    {
-        // Arrange
-        Guid targetServerId = Guid.NewGuid();
-        Guid targetChannelId = Guid.NewGuid();
-        DeleteChannelCommand command = new(targetServerId, targetChannelId);
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
-
-        // Act & Assert
-        _mockRepositoryManager.Verify(x => x.ServerRepository.UpdateAsync(It.IsAny<Server>()), Times.Never);
-        await Assert.ThrowsAsync<ServerNotFoundException>(() => _deleteChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>()));
-    }
-
-    [Fact]
     public async Task Handle_ChannelDeleted_ReturnsTrue()
     {
         // Arrange
-        Guid targetServerId = Guid.NewGuid();
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "");
         Guid targetChannelId = Guid.NewGuid();
-        DeleteChannelCommand command = new(targetServerId, targetChannelId);
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server("Target Server", "Short Desc", "Long Desc", ""));
+        DeleteChannelCommand command = new(targetServer, targetChannelId);
 
         // Act
         var result = await _deleteChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());

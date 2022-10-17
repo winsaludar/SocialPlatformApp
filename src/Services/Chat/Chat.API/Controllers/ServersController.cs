@@ -4,6 +4,9 @@ using Chat.Application.Commands;
 using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
+using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Aggregates.UserAggregate;
+using Chat.Domain.Exceptions;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -48,10 +51,8 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     public async Task<IActionResult> CreateServerAsync([FromBody] CreateUpdateServerModel request)
     {
-        if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized("User is invalid");
-
-        CreateServerCommand command = new(request.Name, request.ShortDescription, request.LongDescription, User.Identity.Name, request.Thumbnail);
+        User user = await GetUserAsync();
+        CreateServerCommand command = new(request.Name, request.ShortDescription, request.LongDescription, User.Identity!.Name!, user.Id, request.Thumbnail);
         ValidationResult validationResult = await _validatorManager.CreateServerCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
@@ -68,13 +69,13 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
     [Route("{serverId}")]
     public async Task<IActionResult> UpdateServerAsync(Guid serverId, [FromBody] CreateUpdateServerModel request)
     {
-        if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized("User is invalid");
-
-        UpdateServerCommand command = new(serverId, request.Name, request.ShortDescription, request.LongDescription, User.Identity.Name, request.Thumbnail);
+        User user = await GetUserAsync();
+        Server server = await GetServerAsync(serverId);
+        UpdateServerCommand command = new(server, request.Name, request.ShortDescription, request.LongDescription, user.Id, request.Thumbnail);
         ValidationResult validationResult = await _validatorManager.UpdateServerCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
@@ -94,10 +95,8 @@ public class ServersController : ControllerBase
     [Route("{serverId}")]
     public async Task<IActionResult> DeleteServerAsync(Guid serverId)
     {
-        if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
-            return Unauthorized("User is invalid");
-
-        DeleteServerCommand command = new(serverId, User.Identity.Name);
+        User user = await GetUserAsync();
+        DeleteServerCommand command = new(serverId, user.Id);
         ValidationResult validationResult = await _validatorManager.DeleteServerCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
@@ -108,5 +107,28 @@ public class ServersController : ControllerBase
         await _mediator.Send(command);
 
         return Ok("Server deleted");
+    }
+
+    private async Task<User> GetUserAsync()
+    {
+        if (!User.IsValid())
+            throw new UnauthorizedAccessException("User is invalid");
+
+        GetUserByEmailQuery query = new(User.Identity!.Name!);
+        var user = await _mediator.Send(query);
+        if (user is null)
+            throw new UnauthorizedAccessException($"User '{User.Identity!.Name!}' does not exist");
+
+        return user;
+    }
+
+    private async Task<Server> GetServerAsync(Guid serverId)
+    {
+        GetServerQuery query = new(serverId);
+        Server? server = await _mediator.Send(query);
+        if (server is null)
+            throw new ServerNotFoundException(serverId.ToString());
+
+        return server;
     }
 }
