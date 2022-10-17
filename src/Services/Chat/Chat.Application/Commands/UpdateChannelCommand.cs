@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Chat.Domain.Aggregates.ServerAggregate;
+using MediatR;
 using System.Runtime.Serialization;
 
 namespace Chat.Application.Commands;
@@ -6,16 +7,16 @@ namespace Chat.Application.Commands;
 [DataContract]
 public class UpdateChannelCommand : IRequest<bool>
 {
-    public UpdateChannelCommand(Guid targetServerId, Guid targetChannelId, string name, string updatedBy)
+    public UpdateChannelCommand(Server targetServer, Guid targetChannelId, string name, string updatedBy)
     {
-        TargetServerId = targetServerId;
+        TargetServer = targetServer;
         TargetChannelId = targetChannelId;
         Name = name;
         UpdatedBy = updatedBy;
     }
 
     [DataMember]
-    public Guid TargetServerId { get; private set; }
+    public Server TargetServer { get; private set; }
 
     [DataMember]
     public Guid TargetChannelId { get; private set; }

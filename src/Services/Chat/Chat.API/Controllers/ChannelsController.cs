@@ -73,13 +73,15 @@ public class ChannelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
     [Route("{serverId}/channels/{channelId}")]
     public async Task<IActionResult> UpdateChannelAsync(Guid serverId, Guid channelId, [FromBody] CreateUpdateChannelModel request)
     {
         if (!User.IsValid())
             return Unauthorized("User is invalid");
 
-        UpdateChannelCommand command = new(serverId, channelId, request.Name, User.Identity!.Name!);
+        Server server = await GetServerAsync(serverId);
+        UpdateChannelCommand command = new(server, channelId, request.Name, User.Identity!.Name!);
         ValidationResult validationResult = await _validatorManager.UpdateChannelCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {

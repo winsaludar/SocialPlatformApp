@@ -184,6 +184,20 @@ public class ChannelsControllerTests
     }
 
     [Fact]
+    public async Task UpdateChannelAsync_TargetServerNotFound_ReturnsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        CreateUpdateChannelModel model = new() { Name = "Updated Channel Name" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.UpdateChannelAsync(serverId, channelId, model));
+    }
+
+    [Fact]
     public async Task UpdateChannelAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
     {
         // Arrange
@@ -191,6 +205,7 @@ public class ChannelsControllerTests
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
         CreateUpdateChannelModel model = new() { Name = "Updated Channel Name" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", "creator@example.com", ""));
         _updateChannelCommandValidator.RuleFor(x => x.Name).Must(name => false);
 
         // Act
@@ -211,6 +226,7 @@ public class ChannelsControllerTests
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
         CreateUpdateChannelModel model = new() { Name = "Updated Channel Name" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", "creator@example.com", ""));
         _updateChannelCommandValidator.RuleFor(x => x.Name).Must(name => true);
         _mockMediator.Setup(x => x.Send(It.IsAny<UpdateChannelCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
 

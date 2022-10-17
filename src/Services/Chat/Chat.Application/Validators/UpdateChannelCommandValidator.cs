@@ -1,4 +1,5 @@
 ﻿using Chat.Application.Commands;
+using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.Exceptions;
 using Chat.Domain.SeedWork;
 using FluentValidation;
@@ -13,31 +14,31 @@ public class UpdateChannelCommandValidator : AbstractValidator<UpdateChannelComm
     {
         _repositoryManager = repositoryManager;
 
-        RuleFor(x => x.TargetServerId).NotEmpty().MustAsync(BeExistingServer);
+        RuleFor(x => x.TargetServer).MustAsync(BeExistingServer);
         RuleFor(x => x.TargetChannelId).NotEmpty();
         RuleFor(x => x.Name).NotEmpty().MaximumLength(50);
         RuleFor(x => x.UpdatedBy).NotEmpty().EmailAddress();
 
-        RuleFor(x => new Tuple<Guid, Guid>(x.TargetServerId, x.TargetChannelId)).MustAsync(BeExistingChannel);
-        RuleFor(x => new Tuple<Guid, Guid, string>(x.TargetServerId, x.TargetChannelId, x.Name)).MustAsync(BeNotExistingName);
+        RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.TargetChannelId)).MustAsync(BeExistingChannel);
+        RuleFor(x => new Tuple<Server, Guid, string>(x.TargetServer, x.TargetChannelId, x.Name)).MustAsync(BeNotExistingName);
     }
 
-    private async Task<bool> BeExistingServer(Guid targetServerId, CancellationToken cancellationToken)
+    private async Task<bool> BeExistingServer(Server targetServer, CancellationToken cancellationToken)
     {
-        var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
+        var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
         if (result is null)
-            throw new ServerNotFoundException(targetServerId.ToString());
+            throw new ServerNotFoundException(targetServer.Id.ToString());
 
         return true;
     }
 
-    private async Task<bool> BeExistingChannel(Tuple<Guid, Guid> props, CancellationToken cancellationToken)
+    private async Task<bool> BeExistingChannel(Tuple<Server, Guid> props, CancellationToken cancellationToken)
     {
-        (Guid targetServerId, Guid targetChannelId) = props;
+        (Server targetServer, Guid targetChannelId) = props;
 
-        var server = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
+        var server = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
         if (server is null)
-            throw new ServerNotFoundException(targetServerId.ToString());
+            throw new ServerNotFoundException(targetServer.Id.ToString());
 
         if (!server.Channels.Any(x => x.Id == targetChannelId))
             throw new ChannelNotFoundException(targetChannelId.ToString());
@@ -45,13 +46,13 @@ public class UpdateChannelCommandValidator : AbstractValidator<UpdateChannelComm
         return true;
     }
 
-    private async Task<bool> BeNotExistingName(Tuple<Guid, Guid, string> props, CancellationToken cancellationToken)
+    private async Task<bool> BeNotExistingName(Tuple<Server, Guid, string> props, CancellationToken cancellationToken)
     {
-        (Guid targetServerId, Guid targetChannelId, string channelName) = props;
+        (Server targetServer, Guid targetChannelId, string channelName) = props;
 
-        var server = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
+        var server = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
         if (server is null)
-            throw new ServerNotFoundException(targetServerId.ToString());
+            throw new ServerNotFoundException(targetServer.Id.ToString());
 
         var channel = server.Channels.FirstOrDefault(x => x.Name.ToLower() == channelName.ToLower());
         if (channel is not null && channel.Id != targetChannelId)
