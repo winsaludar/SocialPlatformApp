@@ -4,6 +4,8 @@ using Chat.Application.Commands;
 using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
+using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Exceptions;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -48,7 +50,7 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     public async Task<IActionResult> CreateServerAsync([FromBody] CreateUpdateServerModel request)
     {
-        if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+        if (!User.IsValid())
             return Unauthorized("User is invalid");
 
         CreateServerCommand command = new(request.Name, request.ShortDescription, request.LongDescription, User.Identity.Name, request.Thumbnail);
@@ -68,13 +70,15 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
     [Route("{serverId}")]
     public async Task<IActionResult> UpdateServerAsync(Guid serverId, [FromBody] CreateUpdateServerModel request)
     {
-        if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+        if (!User.IsValid())
             return Unauthorized("User is invalid");
 
-        UpdateServerCommand command = new(serverId, request.Name, request.ShortDescription, request.LongDescription, User.Identity.Name, request.Thumbnail);
+        Server server = await GetServerAsync(serverId);
+        UpdateServerCommand command = new(server, request.Name, request.ShortDescription, request.LongDescription, User.Identity!.Name!, request.Thumbnail);
         ValidationResult validationResult = await _validatorManager.UpdateServerCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
@@ -108,5 +112,15 @@ public class ServersController : ControllerBase
         await _mediator.Send(command);
 
         return Ok("Server deleted");
+    }
+
+    private async Task<Server> GetServerAsync(Guid serverId)
+    {
+        GetServerQuery query = new(serverId);
+        Server? server = await _mediator.Send(query);
+        if (server is null)
+            throw new ServerNotFoundException(serverId.ToString());
+
+        return server;
     }
 }

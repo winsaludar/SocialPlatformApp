@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Chat.Domain.Aggregates.ServerAggregate;
+using MediatR;
 using System.Runtime.Serialization;
 
 namespace Chat.Application.Commands;
@@ -6,15 +7,18 @@ namespace Chat.Application.Commands;
 [DataContract]
 public record UpdateServerCommand : IRequest<bool>
 {
-    public UpdateServerCommand(Guid targetServerId, string name, string shortDescription, string longDescription, string editorEmail, string? thumbnail = "")
+    public UpdateServerCommand(Server targetServer, string name, string shortDescription, string longDescription, string editorEmail, string? thumbnail = "")
     {
-        TargetServerId = targetServerId;
+        TargetServer = targetServer;
         Name = name;
         ShortDescription = shortDescription;
         LongDescription = longDescription;
         EditorEmail = editorEmail;
         Thumbnail = thumbnail;
     }
+
+    [DataMember]
+    public Server TargetServer { get; private set; }
 
     [DataMember]
     public string Name { get; private set; }
@@ -30,7 +34,4 @@ public record UpdateServerCommand : IRequest<bool>
 
     [DataMember]
     public string? Thumbnail { get; private set; }
-
-    [DataMember]
-    public Guid TargetServerId { get; private set; }
 }

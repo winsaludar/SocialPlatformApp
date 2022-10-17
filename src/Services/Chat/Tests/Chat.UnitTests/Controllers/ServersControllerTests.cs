@@ -4,6 +4,8 @@ using Chat.Application.Commands;
 using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
+using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Exceptions;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -189,6 +191,25 @@ public class ServersControllerTests
     }
 
     [Fact]
+    public async Task UpdateServerAsync_TargetServerNotFound_ReturnsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        CreateUpdateServerModel model = new()
+        {
+            Name = "",
+            ShortDescription = "Updated Short Description",
+            LongDescription = "Updated Long Description",
+            Thumbnail = ""
+        };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.UpdateServerAsync(serverId, model));
+    }
+
+    [Fact]
     public async Task UpdateServerAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
     {
         // Arrange
@@ -201,6 +222,7 @@ public class ServersControllerTests
             LongDescription = "Updated Long Description",
             Thumbnail = ""
         };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _updateServerCommandValidator.RuleFor(x => x.Name).Must(name => false);
 
         // Act
@@ -226,6 +248,7 @@ public class ServersControllerTests
             LongDescription = "Updated Long Description",
             Thumbnail = ""
         };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _updateServerCommandValidator.RuleFor(x => x.Name).Must(name => true);
         _mockMediator.Setup(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
 
@@ -312,5 +335,13 @@ public class ServersControllerTests
         {
             HttpContext = new DefaultHttpContext { User = user }
         };
+    }
+
+    private static Server GetTargetServer()
+    {
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+
+        return targetServer;
     }
 }
