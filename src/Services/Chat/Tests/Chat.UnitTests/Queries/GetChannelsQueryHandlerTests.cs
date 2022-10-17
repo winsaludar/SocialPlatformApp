@@ -39,8 +39,7 @@ public class GetChannelsQueryHandlerTests
     {
         // Arrange
         GetChannelsQuery query = new(Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server("Test Server", "Short Desc", "Long Descp", "user@example.com", ""));
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetTargetServer());
 
         // Act
         var result = await _getChannelsQueryHandler.Handle(query, It.IsAny<CancellationToken>());
@@ -55,7 +54,7 @@ public class GetChannelsQueryHandlerTests
     {
         // Arrange
         GetChannelsQuery query = new(Guid.NewGuid());
-        Server server = new("Test Server", "Short Desc", "Long Descp", "user@example.com", "");
+        Server server = GetTargetServer();
         server.AddChannel(Guid.NewGuid(), "Channel 1", Guid.NewGuid(), DateTime.UtcNow);
         server.AddChannel(Guid.NewGuid(), "Channel 2", Guid.NewGuid(), DateTime.UtcNow);
         server.AddChannel(Guid.NewGuid(), "Channel 3", Guid.NewGuid(), DateTime.UtcNow);
@@ -68,5 +67,13 @@ public class GetChannelsQueryHandlerTests
         var channels = Assert.IsAssignableFrom<IEnumerable<ChannelDto>>(result);
         Assert.NotEmpty(channels);
         Assert.Equal(3, channels.Count());
+    }
+
+    private static Server GetTargetServer()
+    {
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+
+        return targetServer;
     }
 }

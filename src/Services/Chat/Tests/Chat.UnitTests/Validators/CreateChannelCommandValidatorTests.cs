@@ -24,8 +24,7 @@ public class CreateChannelCommandValidatorTests
     public async Task TargetServer_IsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
-        targetServer.SetId(Guid.NewGuid());
+        Server targetServer = GetTargetServer();
         CreateChannelCommand command = new(targetServer, "Test Channel", "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
@@ -37,8 +36,7 @@ public class CreateChannelCommandValidatorTests
     public async Task Name_IsEmpty_ReturnsError()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
-        targetServer.SetId(Guid.NewGuid());
+        Server targetServer = GetTargetServer();
         CreateChannelCommand command = new(targetServer, "", "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
@@ -55,8 +53,7 @@ public class CreateChannelCommandValidatorTests
     public async Task Name_ExceedsMaximumCharacterLength_ReturnsError()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
-        targetServer.SetId(Guid.NewGuid());
+        Server targetServer = GetTargetServer();
         string name = "This is a long channel name that exceeds 50 characters in length 1234567890.";
         CreateChannelCommand command = new(targetServer, name, "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
@@ -74,8 +71,7 @@ public class CreateChannelCommandValidatorTests
     public async Task Name_AlreadyExist_ReturnsError()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
-        targetServer.SetId(Guid.NewGuid());
+        Server targetServer = GetTargetServer();
         CreateChannelCommand command = new(targetServer, "Existing Channel", "user@example.com");
         targetServer.AddChannel(Guid.NewGuid(), "Existing Channel", Guid.NewGuid(), DateTime.UtcNow);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -88,8 +84,7 @@ public class CreateChannelCommandValidatorTests
     public async Task CreatedBy_IsEmpty_ReturnsError()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
-        targetServer.SetId(Guid.NewGuid());
+        Server targetServer = GetTargetServer();
         CreateChannelCommand command = new(targetServer, "Channel Name", "");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
@@ -105,8 +100,7 @@ public class CreateChannelCommandValidatorTests
     public async Task CreatedBy_IsNotEmailAddress_ReturnsError()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
-        targetServer.SetId(Guid.NewGuid());
+        Server targetServer = GetTargetServer();
         CreateChannelCommand command = new(targetServer, "Channel Name", "notvalidemail.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
@@ -116,5 +110,13 @@ public class CreateChannelCommandValidatorTests
         // Assert
         Assert.NotEmpty(result.Errors);
         Assert.True(result.Errors?.Any(x => x.PropertyName == "CreatedBy"));
+    }
+
+    private static Server GetTargetServer()
+    {
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+
+        return targetServer;
     }
 }

@@ -24,8 +24,7 @@ public class DeleteChannelCommandValidatorTests
     public async Task TargetServer_IsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
-        targetServer.SetId(Guid.NewGuid());
+        Server targetServer = GetTargetServer();
         DeleteChannelCommand command = new(targetServer, Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
@@ -37,8 +36,7 @@ public class DeleteChannelCommandValidatorTests
     public async Task TargetChannelId_IsEmpty_ReturnsError()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
-        targetServer.SetId(Guid.NewGuid());
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(Guid.Empty, "Fake Channel", Guid.NewGuid(), DateTime.UtcNow);
         DeleteChannelCommand command = new(targetServer, Guid.Empty);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -55,13 +53,20 @@ public class DeleteChannelCommandValidatorTests
     public async Task TargetChannelId_IsInvalid_ThrowsChannelNotFoundException()
     {
         // Arrange
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
-        targetServer.SetId(Guid.NewGuid());
+        Server targetServer = GetTargetServer();
         targetServer.AddChannel(Guid.NewGuid(), "Different Channel", Guid.NewGuid(), DateTime.UtcNow);
         DeleteChannelCommand command = new(targetServer, Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act & Assert
         await Assert.ThrowsAsync<ChannelNotFoundException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+    }
+
+    private static Server GetTargetServer()
+    {
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+
+        return targetServer;
     }
 }
