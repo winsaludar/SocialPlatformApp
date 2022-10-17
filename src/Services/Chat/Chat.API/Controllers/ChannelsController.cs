@@ -99,10 +99,16 @@ public class ChannelsController : ControllerBase
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
     [Route("{serverId}/channels/{channelId}")]
     public async Task<IActionResult> DeleteChannelAsync(Guid serverId, Guid channelId)
     {
-        DeleteChannelCommand command = new(serverId, channelId);
+        GetServerQuery getServerQuery = new(serverId);
+        Server? server = await _mediator.Send(getServerQuery);
+        if (server is null)
+            throw new ServerNotFoundException(serverId.ToString());
+
+        DeleteChannelCommand command = new(server, channelId);
         ValidationResult validationResult = await _validatorManager.DeleteChannelCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {

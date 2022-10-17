@@ -223,12 +223,26 @@ public class ChannelsControllerTests
     }
 
     [Fact]
+    public async Task DeleteChannelAsync_TargetServerNotFound_ReturnsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.DeleteChannelAsync(serverId, channelId));
+    }
+
+    [Fact]
     public async Task DeleteChannelAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
     {
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", "creator@example.com", ""));
         _deleteChannelCommandValidator.RuleFor(x => x.TargetChannelId).Must(name => false);
 
         // Act
@@ -248,6 +262,7 @@ public class ChannelsControllerTests
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", "creator@example.com", ""));
         _deleteChannelCommandValidator.RuleFor(x => x.TargetChannelId).Must(name => true);
         _mockMediator.Setup(x => x.Send(It.IsAny<DeleteChannelCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
 

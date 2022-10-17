@@ -29,7 +29,6 @@ public class CreateChannelCommandHandlerTests
         // Arrange
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "");
         CreateChannelCommand command = new(targetServer, "Test Channel", "user@example.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _createChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());
