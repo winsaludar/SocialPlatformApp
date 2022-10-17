@@ -157,7 +157,7 @@ public class UpdateServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task UpdatedById_NotTheSameWithCreator_ReturnsAnError()
+    public async Task UpdatedById_NotTheSameWithCreator_ThrowsUnauthorizedUserException()
     {
         // Arrange
         Server targetServer = GetTargetServer();
@@ -165,7 +165,7 @@ public class UpdateServerCommandValidatorTests
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetTargetServer());
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedServerEditorException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+        await Assert.ThrowsAsync<UnauthorizedUserException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
     }
 
     private static Server GetTargetServer()

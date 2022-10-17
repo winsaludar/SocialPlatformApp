@@ -65,14 +65,14 @@ public class DeleteServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task DeletedById_NotTheSameWithCreator_ReturnsAnError()
+    public async Task DeletedById_NotTheSameWithCreator_ThrowsUnauthorizedUserException()
     {
         // Arrange
         DeleteServerCommand command = new(Guid.NewGuid(), Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetTargetServer());
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedServerDeleterException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+        await Assert.ThrowsAsync<UnauthorizedUserException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
     }
 
     private static Server GetTargetServer()

@@ -50,7 +50,7 @@ public class UpdateServerCommandValidator : AbstractValidator<UpdateServerComman
             throw new ServerNotFoundException(targetServer.Id.ToString());
 
         if (result.CreatedById != updatedById)
-            throw new UnauthorizedServerEditorException(updatedById.ToString());
+            throw new UnauthorizedUserException(updatedById.ToString());
 
         return true;
     }

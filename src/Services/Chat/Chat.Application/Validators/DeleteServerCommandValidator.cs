@@ -36,7 +36,7 @@ public class DeleteServerCommandValidator : AbstractValidator<DeleteServerComman
             throw new ServerNotFoundException(targetServerId.ToString());
 
         if (result.CreatedById != deletedById)
-            throw new UnauthorizedServerDeleterException(deletedById.ToString());
+            throw new UnauthorizedUserException(deletedById.ToString());
 
         return true;
     }
