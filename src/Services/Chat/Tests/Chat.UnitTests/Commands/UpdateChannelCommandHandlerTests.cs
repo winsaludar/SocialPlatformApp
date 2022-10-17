@@ -9,7 +9,6 @@ namespace Chat.UnitTests.Commands;
 public class UpdateChannelCommandHandlerTests
 {
     private readonly Mock<IRepositoryManager> _mockRepositoryManager;
-    private readonly Mock<IUserManager> _mockUserManager;
     private readonly UpdateChannelCommandHandler _updateChannelCommandHandler;
 
     public UpdateChannelCommandHandlerTests()
@@ -17,10 +16,9 @@ public class UpdateChannelCommandHandlerTests
         Mock<IServerRepository> mockServerRepository = new();
         Mock<IUserRepository> mockUserRepository = new();
         _mockRepositoryManager = new Mock<IRepositoryManager>();
-        _mockUserManager = new Mock<IUserManager>();
         _mockRepositoryManager.Setup(x => x.ServerRepository).Returns(mockServerRepository.Object);
         _mockRepositoryManager.Setup(x => x.UserRepository).Returns(mockUserRepository.Object);
-        _updateChannelCommandHandler = new(_mockRepositoryManager.Object, _mockUserManager.Object);
+        _updateChannelCommandHandler = new(_mockRepositoryManager.Object);
     }
 
     [Fact]
@@ -29,7 +27,7 @@ public class UpdateChannelCommandHandlerTests
         // Arrange
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "");
         Guid targetChannelId = Guid.NewGuid();
-        UpdateChannelCommand command = new(targetServer, targetChannelId, "Updated Name", "user@example.com");
+        UpdateChannelCommand command = new(targetServer, targetChannelId, "Updated Name", Guid.NewGuid());
 
         // Act
         var result = await _updateChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());

@@ -7,13 +7,13 @@ namespace Chat.Application.Commands;
 [DataContract]
 public record UpdateServerCommand : IRequest<bool>
 {
-    public UpdateServerCommand(Server targetServer, string name, string shortDescription, string longDescription, string editorEmail, string? thumbnail = "")
+    public UpdateServerCommand(Server targetServer, string name, string shortDescription, string longDescription, Guid updatedById, string? thumbnail = "")
     {
         TargetServer = targetServer;
         Name = name;
         ShortDescription = shortDescription;
         LongDescription = longDescription;
-        EditorEmail = editorEmail;
+        UpdatedById = updatedById;
         Thumbnail = thumbnail;
     }
 
@@ -30,7 +30,7 @@ public record UpdateServerCommand : IRequest<bool>
     public string LongDescription { get; private set; }
 
     [DataMember]
-    public string EditorEmail { get; private set; }
+    public Guid UpdatedById { get; private set; }
 
     [DataMember]
     public string? Thumbnail { get; private set; }

@@ -5,6 +5,7 @@ using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
 using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Aggregates.UserAggregate;
 using Chat.Domain.Exceptions;
 using FluentValidation.Results;
 using MediatR;
@@ -53,11 +54,9 @@ public class ChannelsController : ControllerBase
     [Route("{serverId}/channels")]
     public async Task<IActionResult> CreateChannelAsync(Guid serverId, [FromBody] CreateUpdateChannelModel request)
     {
-        if (!User.IsValid())
-            return Unauthorized("User is invalid");
-
+        User user = await GetUserAsync();
         Server server = await GetServerAsync(serverId);
-        CreateChannelCommand command = new(server, request.Name, User.Identity!.Name!);
+        CreateChannelCommand command = new(server, request.Name, user.Id);
         ValidationResult validationResult = await _validatorManager.CreateChannelCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
@@ -77,11 +76,9 @@ public class ChannelsController : ControllerBase
     [Route("{serverId}/channels/{channelId}")]
     public async Task<IActionResult> UpdateChannelAsync(Guid serverId, Guid channelId, [FromBody] CreateUpdateChannelModel request)
     {
-        if (!User.IsValid())
-            return Unauthorized("User is invalid");
-
+        User user = await GetUserAsync();
         Server server = await GetServerAsync(serverId);
-        UpdateChannelCommand command = new(server, channelId, request.Name, User.Identity!.Name!);
+        UpdateChannelCommand command = new(server, channelId, request.Name, user.Id);
         ValidationResult validationResult = await _validatorManager.UpdateChannelCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
@@ -113,6 +110,19 @@ public class ChannelsController : ControllerBase
         await _mediator.Send(command);
 
         return Ok("Channel deleted");
+    }
+
+    private async Task<User> GetUserAsync()
+    {
+        if (!User.IsValid())
+            throw new UnauthorizedAccessException("User is invalid");
+
+        GetUserByEmailQuery query = new(User.Identity!.Name!);
+        var user = await _mediator.Send(query);
+        if (user is null)
+            throw new UnauthorizedAccessException($"User '{User.Identity!.Name!}' does not exist");
+
+        return user;
     }
 
     private async Task<Server> GetServerAsync(Guid serverId)

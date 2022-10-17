@@ -24,9 +24,11 @@ public class DeleteServerCommandValidatorTests
     public async Task TargetServerId_IsEmpty_ReturnsError()
     {
         // Arrange
-        DeleteServerCommand command = new(Guid.Empty, "user@example.co");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
+        Guid userId = Guid.NewGuid();
+        DeleteServerCommand command = new(Guid.Empty, userId);
+        Server targetServer = GetTargetServer();
+        targetServer.SetCreatedById(userId);
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -40,7 +42,7 @@ public class DeleteServerCommandValidatorTests
     public async Task TargetServerId_IsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
-        DeleteServerCommand command = new(Guid.NewGuid(), "user@example.co");
+        DeleteServerCommand command = new(Guid.NewGuid(), Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -48,46 +50,36 @@ public class DeleteServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task DeleterEmail_IsEmpty_ReturnsAnError()
+    public async Task DeletedById_IsEmpty_ReturnsAnError()
     {
         // Arrange
-        DeleteServerCommand command = new(Guid.NewGuid(), "");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
+        DeleteServerCommand command = new(Guid.NewGuid(), Guid.Empty);
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetTargetServer());
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
 
         // Assert
         Assert.NotEmpty(result.Errors);
-        Assert.True(result.Errors?.Any(x => x.PropertyName == "DeleterEmail"));
+        Assert.True(result.Errors?.Any(x => x.PropertyName == "DeletedById"));
     }
 
     [Fact]
-    public async Task DeleterEmail_IsNotValidEmailAddress_ReturnsAnError()
+    public async Task DeletedById_NotTheSameWithCreator_ReturnsAnError()
     {
         // Arrange
-        DeleteServerCommand command = new(Guid.NewGuid(), "notvalidemail");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server("Server Name", "Short Description", "Long Description", command.DeleterEmail, ""));
-
-        // Act
-        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
-
-        // Assert
-        Assert.NotEmpty(result.Errors);
-        Assert.True(result.Errors?.Any(x => x.PropertyName == "DeleterEmail"));
-    }
-
-    [Fact]
-    public async Task DeleterEmail_NotTheSameWithCreatorEmail_ReturnsAnError()
-    {
-        // Arrange
-        DeleteServerCommand command = new(Guid.NewGuid(), "user1@example.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server("Server Name", "Short Description", "Long Description", "user2@example.com", ""));
+        DeleteServerCommand command = new(Guid.NewGuid(), Guid.NewGuid());
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetTargetServer());
 
         // Act & Assert
         await Assert.ThrowsAsync<UnauthorizedServerDeleterException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+    }
+
+    private static Server GetTargetServer()
+    {
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+
+        return targetServer;
     }
 }

@@ -2,5 +2,5 @@
 
 public class UnauthorizedServerDeleterException : UnauthorizedAccessException
 {
-    public UnauthorizedServerDeleterException(string email) : base($"Email '{email}' is unauthorized to delete the server") { }
+    public UnauthorizedServerDeleterException(string emailOrId) : base($"User '{emailOrId}' is unauthorized to delete the server") { }
 }

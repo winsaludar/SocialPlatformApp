@@ -14,8 +14,8 @@ public class DeleteServerCommandValidator : AbstractValidator<DeleteServerComman
         _repositoryManager = repositoryManager;
 
         RuleFor(x => x.TargetServerId).NotEmpty().MustAsync(BeExistingServer);
-        RuleFor(x => x.DeleterEmail).NotEmpty().EmailAddress();
-        RuleFor(x => new Tuple<Guid, string>(x.TargetServerId, x.DeleterEmail)).MustAsync(BeTheSameEmailWithCreator);
+        RuleFor(x => x.DeletedById).NotEmpty();
+        RuleFor(x => new Tuple<Guid, Guid>(x.TargetServerId, x.DeletedById)).MustAsync(BeTheSameWithCreator);
     }
 
     private async Task<bool> BeExistingServer(Guid targetServerId, CancellationToken cancellationToken)
@@ -27,16 +27,16 @@ public class DeleteServerCommandValidator : AbstractValidator<DeleteServerComman
         return true;
     }
 
-    private async Task<bool> BeTheSameEmailWithCreator(Tuple<Guid, string> props, CancellationToken cancellationToken)
+    private async Task<bool> BeTheSameWithCreator(Tuple<Guid, Guid> props, CancellationToken cancellationToken)
     {
-        (Guid targetServerId, string deleterEmail) = props;
+        (Guid targetServerId, Guid deletedById) = props;
 
         var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServerId);
         if (result is null)
             throw new ServerNotFoundException(targetServerId.ToString());
 
-        if (result.CreatorEmail.ToLower() != deleterEmail.ToLower())
-            throw new UnauthorizedServerDeleterException(deleterEmail);
+        if (result.CreatedById != deletedById)
+            throw new UnauthorizedServerDeleterException(deletedById.ToString());
 
         return true;
     }

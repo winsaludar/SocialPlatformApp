@@ -16,7 +16,7 @@ public class CreateChannelCommandValidator : AbstractValidator<CreateChannelComm
 
         RuleFor(x => x.TargetServer).MustAsync(BeExistingServer);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(50);
-        RuleFor(x => x.CreatedBy).NotEmpty().EmailAddress();
+        RuleFor(x => x.CreatedById).NotEmpty();
 
         RuleFor(x => new Tuple<Server, string>(x.TargetServer, x.Name)).MustAsync(BeNotExistingName);
     }

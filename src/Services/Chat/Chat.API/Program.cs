@@ -107,7 +107,6 @@ void AddDependencies(WebApplicationBuilder builder)
     builder.Services.AddScoped<IValidatorManager, ValidatorManager>();
 
     builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
-    builder.Services.AddScoped<IUserManager, UserManager>();
 }
 
 void RegisterEventBus(WebApplicationBuilder builder)

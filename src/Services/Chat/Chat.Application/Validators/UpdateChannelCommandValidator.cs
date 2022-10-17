@@ -17,7 +17,7 @@ public class UpdateChannelCommandValidator : AbstractValidator<UpdateChannelComm
         RuleFor(x => x.TargetServer).MustAsync(BeExistingServer);
         RuleFor(x => x.TargetChannelId).NotEmpty();
         RuleFor(x => x.Name).NotEmpty().MaximumLength(50);
-        RuleFor(x => x.UpdatedBy).NotEmpty().EmailAddress();
+        RuleFor(x => x.UpdatedById).NotEmpty();
 
         RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.TargetChannelId)).MustAsync(BeExistingChannel);
         RuleFor(x => new Tuple<Server, Guid, string>(x.TargetServer, x.TargetChannelId, x.Name)).MustAsync(BeNotExistingName);

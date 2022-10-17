@@ -7,12 +7,12 @@ namespace Chat.Application.Commands;
 [DataContract]
 public class UpdateChannelCommand : IRequest<bool>
 {
-    public UpdateChannelCommand(Server targetServer, Guid targetChannelId, string name, string updatedBy)
+    public UpdateChannelCommand(Server targetServer, Guid targetChannelId, string name, Guid updatedById)
     {
         TargetServer = targetServer;
         TargetChannelId = targetChannelId;
         Name = name;
-        UpdatedBy = updatedBy;
+        UpdatedById = updatedById;
     }
 
     [DataMember]
@@ -25,5 +25,5 @@ public class UpdateChannelCommand : IRequest<bool>
     public string Name { get; private set; }
 
     [DataMember]
-    public string UpdatedBy { get; private set; }
+    public Guid UpdatedById { get; private set; }
 }

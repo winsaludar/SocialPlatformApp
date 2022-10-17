@@ -2,5 +2,5 @@
 
 public class UnauthorizedServerEditorException : UnauthorizedAccessException
 {
-    public UnauthorizedServerEditorException(string email) : base($"Email '{email}' is unauthorized to edit the server") { }
+    public UnauthorizedServerEditorException(string emailOrId) : base($"User '{emailOrId}' is unauthorized to edit the server") { }
 }

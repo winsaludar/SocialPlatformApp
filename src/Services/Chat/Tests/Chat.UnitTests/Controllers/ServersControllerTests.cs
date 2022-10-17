@@ -5,6 +5,7 @@ using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
 using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Aggregates.UserAggregate;
 using Chat.Domain.Exceptions;
 using FluentValidation;
 using MediatR;
@@ -101,7 +102,7 @@ public class ServersControllerTests
     }
 
     [Fact]
-    public async Task CreateServerAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    public async Task CreateServerAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
     {
         // Arrange
         SetUpNullUserIdentity();
@@ -113,12 +114,8 @@ public class ServersControllerTests
             Thumbnail = ""
         };
 
-        // Act
-        var result = await _controller.CreateServerAsync(model);
-
-        // Assert
-        _mockMediator.Verify(x => x.Send(It.IsAny<CreateServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
-        Assert.IsType<UnauthorizedObjectResult>(result);
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.CreateServerAsync(model));
     }
 
     [Fact]
@@ -133,6 +130,7 @@ public class ServersControllerTests
             LongDescription = "Long Description",
             Thumbnail = ""
         };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _createServerCommandValidator.RuleFor(x => x.Name).Must(name => false);
 
         // Act
@@ -157,8 +155,9 @@ public class ServersControllerTests
             LongDescription = "Long Description",
             Thumbnail = ""
         };
-        _createServerCommandValidator.RuleFor(x => x.Name).Must(name => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<CreateServerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<Guid>());
+        _createServerCommandValidator.RuleFor(x => x.Name).Must(name => true);
 
         // Act
         var result = await _controller.CreateServerAsync(model);
@@ -169,7 +168,7 @@ public class ServersControllerTests
     }
 
     [Fact]
-    public async Task UpdateServerAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    public async Task UpdateServerAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
     {
         // Arrange
         SetUpNullUserIdentity();
@@ -182,12 +181,8 @@ public class ServersControllerTests
             Thumbnail = ""
         };
 
-        // Act
-        var result = await _controller.UpdateServerAsync(serverId, model);
-
-        // Assert
-        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
-        Assert.IsType<UnauthorizedObjectResult>(result);
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.UpdateServerAsync(serverId, model));
     }
 
     [Fact]
@@ -203,6 +198,7 @@ public class ServersControllerTests
             LongDescription = "Updated Long Description",
             Thumbnail = ""
         };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -222,6 +218,7 @@ public class ServersControllerTests
             LongDescription = "Updated Long Description",
             Thumbnail = ""
         };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _updateServerCommandValidator.RuleFor(x => x.Name).Must(name => false);
 
@@ -248,6 +245,7 @@ public class ServersControllerTests
             LongDescription = "Updated Long Description",
             Thumbnail = ""
         };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _updateServerCommandValidator.RuleFor(x => x.Name).Must(name => true);
         _mockMediator.Setup(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
@@ -261,18 +259,14 @@ public class ServersControllerTests
     }
 
     [Fact]
-    public async Task DeleteServerAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    public async Task DeleteServerAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
     {
         // Arrange
         SetUpNullUserIdentity();
         Guid serverId = Guid.NewGuid();
 
-        // Act
-        var result = await _controller.DeleteServerAsync(serverId);
-
-        // Assert
-        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
-        Assert.IsType<UnauthorizedObjectResult>(result);
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.DeleteServerAsync(serverId));
     }
 
     [Fact]
@@ -281,6 +275,7 @@ public class ServersControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _deleteServerCommandValidator.RuleFor(x => x.TargetServerId).Must(name => false);
 
         // Act
@@ -299,6 +294,7 @@ public class ServersControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _deleteServerCommandValidator.RuleFor(x => x.TargetServerId).Must(name => true);
         _mockMediator.Setup(x => x.Send(It.IsAny<DeleteServerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
 
@@ -343,5 +339,10 @@ public class ServersControllerTests
         targetServer.SetId(Guid.NewGuid());
 
         return targetServer;
+    }
+
+    private static User GetUser()
+    {
+        return new User(Guid.NewGuid(), "user", "user@example.com");
     }
 }

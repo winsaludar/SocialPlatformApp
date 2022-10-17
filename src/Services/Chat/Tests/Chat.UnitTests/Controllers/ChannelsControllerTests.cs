@@ -5,6 +5,7 @@ using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
 using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Aggregates.UserAggregate;
 using Chat.Domain.Exceptions;
 using FluentValidation;
 using MediatR;
@@ -99,19 +100,15 @@ public class ChannelsControllerTests
     }
 
     [Fact]
-    public async Task CreateChannelAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    public async Task CreateChannelAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
     {
         // Arrange
         SetUpNullUserIdentity();
         Guid serverId = Guid.NewGuid();
         CreateUpdateChannelModel request = new() { Name = "Test Channel" };
 
-        // Act
-        var result = await _controller.CreateChannelAsync(serverId, request);
-
-        // Assert
-        _mockMediator.Verify(x => x.Send(It.IsAny<CreateChannelCommand>(), It.IsAny<CancellationToken>()), Times.Never);
-        Assert.IsType<UnauthorizedObjectResult>(result);
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.CreateChannelAsync(serverId, request));
     }
 
     [Fact]
@@ -121,6 +118,7 @@ public class ChannelsControllerTests
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         CreateUpdateChannelModel request = new() { Name = "" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -134,6 +132,7 @@ public class ChannelsControllerTests
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         CreateUpdateChannelModel request = new() { Name = "" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _createChannelCommandValidator.RuleFor(x => x.Name).Must(name => false);
 
@@ -154,6 +153,7 @@ public class ChannelsControllerTests
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         CreateUpdateChannelModel request = new() { Name = "Test Channel" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _createChannelCommandValidator.RuleFor(x => x.Name).Must(name => true);
         _mockMediator.Setup(x => x.Send(It.IsAny<CreateChannelCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<Guid>());
@@ -167,7 +167,7 @@ public class ChannelsControllerTests
     }
 
     [Fact]
-    public async Task UpdateChannelAsync_UserIdentityIsNull_ReturnsUnauthorizedObjectResult()
+    public async Task UpdateChannelAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
     {
         // Arrange
         SetUpNullUserIdentity();
@@ -175,12 +175,8 @@ public class ChannelsControllerTests
         Guid channelId = Guid.NewGuid();
         CreateUpdateChannelModel model = new() { Name = "Updated Channel Name" };
 
-        // Act
-        var result = await _controller.UpdateChannelAsync(serverId, channelId, model);
-
-        // Assert
-        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateChannelCommand>(), It.IsAny<CancellationToken>()), Times.Never);
-        Assert.IsType<UnauthorizedObjectResult>(result);
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.UpdateChannelAsync(serverId, channelId, model));
     }
 
     [Fact]
@@ -191,6 +187,7 @@ public class ChannelsControllerTests
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
         CreateUpdateChannelModel model = new() { Name = "Updated Channel Name" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -205,6 +202,7 @@ public class ChannelsControllerTests
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
         CreateUpdateChannelModel model = new() { Name = "Updated Channel Name" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _updateChannelCommandValidator.RuleFor(x => x.Name).Must(name => false);
 
@@ -226,6 +224,7 @@ public class ChannelsControllerTests
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
         CreateUpdateChannelModel model = new() { Name = "Updated Channel Name" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _updateChannelCommandValidator.RuleFor(x => x.Name).Must(name => true);
         _mockMediator.Setup(x => x.Send(It.IsAny<UpdateChannelCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
@@ -323,5 +322,10 @@ public class ChannelsControllerTests
         targetServer.SetId(Guid.NewGuid());
 
         return targetServer;
+    }
+
+    private static User GetUser()
+    {
+        return new User(Guid.NewGuid(), "user", "user@example.com");
     }
 }
