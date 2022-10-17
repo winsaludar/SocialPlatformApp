@@ -1,7 +1,6 @@
 ﻿using Chat.Application.Commands;
 using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.Aggregates.UserAggregate;
-using Chat.Domain.Exceptions;
 using Chat.Domain.SeedWork;
 using Moq;
 
@@ -21,18 +20,6 @@ public class DeleteServerCommandHandlerTests
         _mockRepositoryManager.Setup(x => x.UserRepository).Returns(mockUserRepository.Object);
 
         _deleteServerCommandHandler = new DeleteServerCommandHandler(_mockRepositoryManager.Object);
-    }
-
-    [Fact]
-    public async Task Handle_TargetServerIdIsInvalid_ThrowsServerNotFoundException()
-    {
-        // Arrange
-        DeleteServerCommand command = new(Guid.NewGuid(), "user@example.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
-
-        // Act & Assert
-        _mockRepositoryManager.Verify(x => x.ServerRepository.DeleteAsync(It.IsAny<Guid>()), Times.Never);
-        await Assert.ThrowsAsync<ServerNotFoundException>(() => _deleteServerCommandHandler.Handle(command, It.IsAny<CancellationToken>()));
     }
 
     [Fact]

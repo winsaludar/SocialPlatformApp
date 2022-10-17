@@ -56,11 +56,7 @@ public class ChannelsController : ControllerBase
         if (!User.IsValid())
             return Unauthorized("User is invalid");
 
-        GetServerQuery getServerQuery = new(serverId);
-        Server? server = await _mediator.Send(getServerQuery);
-        if (server is null)
-            throw new ServerNotFoundException(serverId.ToString());
-
+        Server server = await GetServerAsync(serverId);
         CreateChannelCommand command = new(server, request.Name, User.Identity!.Name!);
         ValidationResult validationResult = await _validatorManager.CreateChannelCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
@@ -103,11 +99,7 @@ public class ChannelsController : ControllerBase
     [Route("{serverId}/channels/{channelId}")]
     public async Task<IActionResult> DeleteChannelAsync(Guid serverId, Guid channelId)
     {
-        GetServerQuery getServerQuery = new(serverId);
-        Server? server = await _mediator.Send(getServerQuery);
-        if (server is null)
-            throw new ServerNotFoundException(serverId.ToString());
-
+        Server server = await GetServerAsync(serverId);
         DeleteChannelCommand command = new(server, channelId);
         ValidationResult validationResult = await _validatorManager.DeleteChannelCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
@@ -119,5 +111,15 @@ public class ChannelsController : ControllerBase
         await _mediator.Send(command);
 
         return Ok("Channel deleted");
+    }
+
+    private async Task<Server> GetServerAsync(Guid serverId)
+    {
+        GetServerQuery query = new(serverId);
+        Server? server = await _mediator.Send(query);
+        if (server is null)
+            throw new ServerNotFoundException(serverId.ToString());
+
+        return server;
     }
 }

@@ -94,10 +94,10 @@ public class ServersController : ControllerBase
     [Route("{serverId}")]
     public async Task<IActionResult> DeleteServerAsync(Guid serverId)
     {
-        if (User == null || User.Identity == null || string.IsNullOrEmpty(User.Identity.Name))
+        if (!User.IsValid())
             return Unauthorized("User is invalid");
 
-        DeleteServerCommand command = new(serverId, User.Identity.Name);
+        DeleteServerCommand command = new(serverId, User.Identity!.Name!);
         ValidationResult validationResult = await _validatorManager.DeleteServerCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {
