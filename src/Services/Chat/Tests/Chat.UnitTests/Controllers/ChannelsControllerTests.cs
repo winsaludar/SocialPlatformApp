@@ -4,6 +4,8 @@ using Chat.Application.Commands;
 using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
+using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Exceptions;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -113,12 +115,26 @@ public class ChannelsControllerTests
     }
 
     [Fact]
+    public async Task CreateChannelAsync_TargetServerNotFound_ReturnsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        CreateUpdateChannelModel request = new() { Name = "" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.CreateChannelAsync(serverId, request));
+    }
+
+    [Fact]
     public async Task CreateChannelAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
     {
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         CreateUpdateChannelModel request = new() { Name = "" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", "creator@example.com", ""));
         _createChannelCommandValidator.RuleFor(x => x.Name).Must(name => false);
 
         // Act
@@ -138,6 +154,7 @@ public class ChannelsControllerTests
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         CreateUpdateChannelModel request = new() { Name = "Test Channel" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new Server("Target Server", "Short Desc", "Long Desc", "creator@example.com", ""));
         _createChannelCommandValidator.RuleFor(x => x.Name).Must(name => true);
         _mockMediator.Setup(x => x.Send(It.IsAny<CreateChannelCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<Guid>());
 

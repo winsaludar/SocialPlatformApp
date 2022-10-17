@@ -4,6 +4,8 @@ using Chat.Application.Commands;
 using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
+using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Exceptions;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -47,13 +49,19 @@ public class ChannelsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(object))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
     [Route("{serverId}/channels")]
     public async Task<IActionResult> CreateChannelAsync(Guid serverId, [FromBody] CreateUpdateChannelModel request)
     {
         if (!User.IsValid())
             return Unauthorized("User is invalid");
 
-        CreateChannelCommand command = new(serverId, request.Name, User.Identity!.Name!);
+        GetServerQuery getServerQuery = new(serverId);
+        Server? server = await _mediator.Send(getServerQuery);
+        if (server is null)
+            throw new ServerNotFoundException(serverId.ToString());
+
+        CreateChannelCommand command = new(server, request.Name, User.Identity!.Name!);
         ValidationResult validationResult = await _validatorManager.CreateChannelCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {

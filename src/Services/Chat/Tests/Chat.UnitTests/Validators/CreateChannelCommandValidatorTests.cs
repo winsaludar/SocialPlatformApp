@@ -21,26 +21,12 @@ public class CreateChannelCommandValidatorTests
     }
 
     [Fact]
-    public async Task TargetServerId_IsEmpty_ReturnsError()
+    public async Task TargetServer_IsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
-        CreateChannelCommand command = new(Guid.Empty, "Test Channel", "user@example.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server("Target Server", "Short Desc", "Long Desc", "creator@example.com", ""));
-
-        // Act
-        var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
-
-        // Assert
-        Assert.NotEmpty(result.Errors);
-        Assert.True(result.Errors?.Any(x => x.PropertyName == "TargetServerId"));
-    }
-
-    [Fact]
-    public async Task TargetServerId_IsInvalid_ThrowsServerNotFoundException()
-    {
-        // Arrange
-        CreateChannelCommand command = new(Guid.NewGuid(), "Test Channel", "user@example.com");
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "Test Channel", "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -51,7 +37,9 @@ public class CreateChannelCommandValidatorTests
     public async Task Name_IsEmpty_ReturnsError()
     {
         // Arrange
-        CreateChannelCommand command = new(Guid.NewGuid(), "", "user@example.com");
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "", "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
 
@@ -67,8 +55,10 @@ public class CreateChannelCommandValidatorTests
     public async Task Name_ExceedsMaximumCharacterLength_ReturnsError()
     {
         // Arrange
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
         string name = "This is a long channel name that exceeds 50 characters in length 1234567890.";
-        CreateChannelCommand command = new(Guid.NewGuid(), name, "user@example.com");
+        CreateChannelCommand command = new(targetServer, name, "user@example.com");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
 
@@ -84,8 +74,9 @@ public class CreateChannelCommandValidatorTests
     public async Task Name_AlreadyExist_ReturnsError()
     {
         // Arrange
-        CreateChannelCommand command = new(Guid.NewGuid(), "Existing Channel", "user@example.com");
-        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "user@example.com", "");
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "Existing Channel", "user@example.com");
         targetServer.AddChannel(Guid.NewGuid(), "Existing Channel", Guid.NewGuid(), DateTime.UtcNow);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
@@ -97,9 +88,10 @@ public class CreateChannelCommandValidatorTests
     public async Task CreatedBy_IsEmpty_ReturnsError()
     {
         // Arrange
-        CreateChannelCommand command = new(Guid.NewGuid(), "Channel Name", "");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "Channel Name", "");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -113,9 +105,10 @@ public class CreateChannelCommandValidatorTests
     public async Task CreatedBy_IsNotEmailAddress_ReturnsError()
     {
         // Arrange
-        CreateChannelCommand command = new(Guid.NewGuid(), "Channel Name", "notvalidemail.com");
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
-            new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "Channel Name", "notvalidemail.com");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
