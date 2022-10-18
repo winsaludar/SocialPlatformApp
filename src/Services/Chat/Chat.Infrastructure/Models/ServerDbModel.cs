@@ -27,4 +27,7 @@ public class ServerDbModel : EntityDbModel
 
     [BsonElement("channels")]
     public List<ChannelDbModel> Channels { get; set; } = new();
+
+    [BsonElement("members")]
+    public List<MemberDbModel> Members { get; set; } = new();
 }

@@ -5,6 +5,7 @@ namespace Chat.Domain.Aggregates.ServerAggregate;
 public class Server : Entity, IAggregateRoot
 {
     private readonly List<Channel> _channels;
+    private readonly List<Member> _members;
 
     public Server(string name, string shortDescription, string longDescription, string creatorEmail, string? thumbnail = "")
     {
@@ -14,6 +15,7 @@ public class Server : Entity, IAggregateRoot
         CreatorEmail = creatorEmail;
         Thumbnail = thumbnail;
         _channels = new List<Channel>();
+        _members = new List<Member>();
     }
 
     public string Name { get; private set; }
@@ -22,6 +24,7 @@ public class Server : Entity, IAggregateRoot
     public string CreatorEmail { get; private set; }
     public string? Thumbnail { get; private set; }
     public IReadOnlyCollection<Channel> Channels => _channels;
+    public IReadOnlyCollection<Member> Members => _members;
 
     public Guid AddChannel(Guid id, string name, Guid createdById, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
     {
@@ -60,4 +63,6 @@ public class Server : Entity, IAggregateRoot
 
         _channels.Remove(channel);
     }
+
+    public void AddMember(Guid userId, string username, DateTime dateJoined) => _members.Add(new(userId, username, dateJoined));
 }
