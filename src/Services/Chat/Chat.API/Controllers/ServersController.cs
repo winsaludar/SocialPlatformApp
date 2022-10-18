@@ -119,6 +119,12 @@ public class ServersController : ControllerBase
         User user = await GetUserAsync();
         Server server = await GetServerAsync(serverId);
         JoinServerCommand command = new(server, user.Id, user.Username);
+        ValidationResult validationResult = await _validatorManager.JoinServerCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
 
         await _mediator.Send(command);
 
