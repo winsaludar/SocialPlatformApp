@@ -21,7 +21,7 @@ public class UpdateServerCommandValidatorTests
     }
 
     [Fact]
-    public async Task TargetServerId_IsInvalid_ThrowsServerNotFoundException()
+    public async Task TargetServer_IsInvalid_ThrowsServerNotFoundException()
     {
         // Arrange
         Server targetServer = GetTargetServer();
