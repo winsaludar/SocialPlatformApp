@@ -31,7 +31,7 @@ public class Server : Entity, IAggregateRoot
         Channel newChannel = new(name);
         newChannel.SetId(id);
         newChannel.SetDateCreated(dateCreated);
-        newChannel.SetCreatedById(CreatedById);
+        newChannel.SetCreatedById(createdById);
 
         if (lastModifiedById.HasValue)
             newChannel.SetLastModifiedById(lastModifiedById.Value);
