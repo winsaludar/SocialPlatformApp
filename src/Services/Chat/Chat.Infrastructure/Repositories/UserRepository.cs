@@ -22,16 +22,7 @@ public class UserRepository : IUserRepository
         if (result == null)
             return null;
 
-        User user = new(Guid.Parse(result.AuthId), result.Username, result.Email);
-        user.SetId(Guid.Parse(result.Guid));
-        user.SetCreatedById(Guid.Parse(result.CreatedById));
-        user.SetDateCreated(result.DateCreated);
-        if (!string.IsNullOrEmpty(result.LastModifiedById))
-            user.SetLastModifiedById(Guid.Parse(result.LastModifiedById));
-        if (result.DateLastModified.HasValue)
-            user.SetDateLastModified(result.DateLastModified.Value);
-
-        return user;
+        return CreateUserFromDbModel(result);
     }
 
     public async Task<User?> GetByEmailAsync(string email)
@@ -40,16 +31,16 @@ public class UserRepository : IUserRepository
         if (result == null)
             return null;
 
-        User user = new(Guid.Parse(result.AuthId), result.Username, result.Email);
-        user.SetId(Guid.Parse(result.Guid));
-        user.SetCreatedById(Guid.Parse(result.CreatedById));
-        user.SetDateCreated(result.DateCreated);
-        if (!string.IsNullOrEmpty(result.LastModifiedById))
-            user.SetLastModifiedById(Guid.Parse(result.LastModifiedById));
-        if (result.DateLastModified.HasValue)
-            user.SetDateLastModified(result.DateLastModified.Value);
+        return CreateUserFromDbModel(result);
+    }
 
-        return user;
+    public async Task<User?> GetByIdAsync(Guid id)
+    {
+        var result = await _usersCollection.Find(x => x.Id.ToLower() == id.ToString().ToLower()).FirstOrDefaultAsync();
+        if (result == null)
+            return null;
+
+        return CreateUserFromDbModel(result);
     }
 
     public async Task<Guid> AddAsync(User newUser)
@@ -68,5 +59,19 @@ public class UserRepository : IUserRepository
         await _usersCollection.InsertOneAsync(model);
 
         return newId;
+    }
+
+    private static User CreateUserFromDbModel(UserDbModel dbModel)
+    {
+        User user = new(Guid.Parse(dbModel.AuthId), dbModel.Username, dbModel.Email);
+        user.SetId(Guid.Parse(dbModel.Guid));
+        user.SetCreatedById(Guid.Parse(dbModel.CreatedById));
+        user.SetDateCreated(dbModel.DateCreated);
+        if (!string.IsNullOrEmpty(dbModel.LastModifiedById))
+            user.SetLastModifiedById(Guid.Parse(dbModel.LastModifiedById));
+        if (dbModel.DateLastModified.HasValue)
+            user.SetDateLastModified(dbModel.DateLastModified.Value);
+
+        return user;
     }
 }

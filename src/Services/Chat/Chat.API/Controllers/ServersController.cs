@@ -109,6 +109,29 @@ public class ServersController : ControllerBase
         return Ok("Server deleted");
     }
 
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+    [Route("{serverId}/join")]
+    public async Task<IActionResult> JoinServerAsync(Guid serverId)
+    {
+        User user = await GetUserAsync();
+        Server server = await GetServerAsync(serverId);
+        JoinServerCommand command = new(server, user.Id, user.Username);
+        ValidationResult validationResult = await _validatorManager.JoinServerCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
+
+        await _mediator.Send(command);
+
+        return Ok("Welcome to the server");
+    }
+
     private async Task<User> GetUserAsync()
     {
         if (!User.IsValid())

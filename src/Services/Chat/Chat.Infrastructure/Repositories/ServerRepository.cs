@@ -78,6 +78,9 @@ public class ServerRepository : IServerRepository
             server.AddChannel(id, x.Name, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
         });
 
+        // Add members
+        result.Members.ForEach(x => server.AddMember(x.UserId, x.Username, x.DateJoined));
+
         return server;
     }
 
@@ -104,6 +107,9 @@ public class ServerRepository : IServerRepository
             Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
             server.AddChannel(id, x.Name, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
         });
+
+        // Add members
+        result.Members.ForEach(x => server.AddMember(x.UserId, x.Username, x.DateJoined));
 
         return server;
     }
@@ -134,6 +140,9 @@ public class ServerRepository : IServerRepository
         var result = await _serversCollection.Find(x => x.Guid.ToLower() == server.Id.ToString().ToLower()).FirstOrDefaultAsync();
         if (result == null)
             return;
+
+        // TODO: Refactor updating; Do not fetch channels & members and re-insert every update
+        // Just insert if channel/member has value
 
         // Update server
         ServerDbModel model = new()
@@ -172,6 +181,20 @@ public class ServerRepository : IServerRepository
             channels.Add(channel);
         }
         model.Channels = channels;
+
+        // Update members
+        List<MemberDbModel> members = new();
+        foreach (var item in server.Members)
+        {
+            MemberDbModel member = new()
+            {
+                UserId = item.UserId,
+                Username = item.Username,
+                DateJoined = item.DateJoined
+            };
+            members.Add(member);
+        }
+        model.Members = members;
 
         await _serversCollection.ReplaceOneAsync(x => x.Guid.ToLower() == server.Id.ToString().ToLower(), model);
     }
