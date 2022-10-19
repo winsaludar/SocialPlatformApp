@@ -36,7 +36,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetByIdAsync(Guid id)
     {
-        var result = await _usersCollection.Find(x => x.Id.ToLower() == id.ToString().ToLower()).FirstOrDefaultAsync();
+        var result = await _usersCollection.Find(x => x.Guid.ToLower() == id.ToString()).FirstOrDefaultAsync();
         if (result == null)
             return null;
 
