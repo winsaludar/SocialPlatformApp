@@ -113,6 +113,7 @@ public class ServersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
     [Route("{serverId}/join")]
     public async Task<IActionResult> JoinServerAsync(Guid serverId)
     {
