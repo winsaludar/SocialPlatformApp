@@ -1,6 +1,7 @@
 ﻿using Chat.Application.Commands;
 using Chat.Application.Validators;
 using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Aggregates.UserAggregate;
 using Chat.Domain.Exceptions;
 using Chat.Domain.SeedWork;
 using Moq;
@@ -15,8 +16,10 @@ public class JoinServerCommandValidatorTests
     public JoinServerCommandValidatorTests()
     {
         Mock<IServerRepository> mockServerRepository = new();
+        Mock<IUserRepository> mockUserRepository = new();
         _mockRepositoryManager = new Mock<IRepositoryManager>();
         _mockRepositoryManager.Setup(x => x.ServerRepository).Returns(mockServerRepository.Object);
+        _mockRepositoryManager.Setup(x => x.UserRepository).Returns(mockUserRepository.Object);
         _validator = new JoinServerCommandValidator(_mockRepositoryManager.Object);
     }
 
@@ -39,6 +42,7 @@ public class JoinServerCommandValidatorTests
         Server targetServer = GetTargetServer();
         JoinServerCommand command = new(targetServer, Guid.Empty, "user");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetUser());
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -49,12 +53,26 @@ public class JoinServerCommandValidatorTests
     }
 
     [Fact]
+    public async Task UserId_IsInvalid_ThrowsUserNotFoundException()
+    {
+        // Arrange
+        Server targetServer = GetTargetServer();
+        JoinServerCommand command = new(targetServer, Guid.NewGuid(), "user");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((User)null!);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UserNotFoundException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
     public async Task Username_IsEmpty_ReturnsAnError()
     {
         // Arrange
         Server targetServer = GetTargetServer();
         JoinServerCommand command = new(targetServer, Guid.NewGuid(), "");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetUser());
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -68,12 +86,12 @@ public class JoinServerCommandValidatorTests
     public async Task User_IsAlreadyAMember_ThrowsUserIsAlreadyAMemberException()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
-        string username = "user";
+        User existingUser = GetUser();
         Server targetServer = GetTargetServer();
-        targetServer.AddMember(userId, username, DateTime.UtcNow);
-        JoinServerCommand command = new(targetServer, userId, username);
+        targetServer.AddMember(existingUser.Id, existingUser.Username, DateTime.UtcNow);
+        JoinServerCommand command = new(targetServer, existingUser.Id, existingUser.Username);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(existingUser);
 
         // Act & Assert
         await Assert.ThrowsAsync<UserIsAlreadyAMemberException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
@@ -85,5 +103,13 @@ public class JoinServerCommandValidatorTests
         targetServer.SetId(Guid.NewGuid());
 
         return targetServer;
+    }
+
+    private static User GetUser()
+    {
+        User user = new(Guid.NewGuid(), "user", "user@example.com");
+        user.SetId(Guid.NewGuid());
+
+        return user;
     }
 }

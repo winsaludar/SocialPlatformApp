@@ -15,7 +15,7 @@ public class JoinServerCommandValidator : AbstractValidator<JoinServerCommand>
         _repositoryManager = repositoryManager;
 
         RuleFor(x => x.TargetServer).MustAsync(BeExistingServer);
-        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.UserId).NotEmpty().MustAsync(BeExistingUser);
         RuleFor(x => x.Username).NotEmpty();
 
         RuleFor(x => new Tuple<Server, Guid, string>(x.TargetServer, x.UserId, x.Username)).MustAsync(BeNotExistingMember);
@@ -26,6 +26,15 @@ public class JoinServerCommandValidator : AbstractValidator<JoinServerCommand>
         var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
         if (result is null)
             throw new ServerNotFoundException(targetServer.Id.ToString());
+
+        return true;
+    }
+
+    private async Task<bool> BeExistingUser(Guid userId, CancellationToken cancellationToken)
+    {
+        var result = await _repositoryManager.UserRepository.GetByIdAsync(userId);
+        if (result is null)
+            throw new UserNotFoundException(userId.ToString());
 
         return true;
     }
