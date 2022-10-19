@@ -1,0 +1,138 @@
+﻿using Chat.API.Controllers;
+using Chat.API.Models;
+using Chat.Application.Commands;
+using Chat.Application.Queries;
+using Chat.Application.Validators;
+using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Aggregates.UserAggregate;
+using Chat.Domain.Exceptions;
+using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using System.Security.Claims;
+
+namespace Chat.UnitTests.Controllers;
+
+public class UserControllerTests
+{
+    private readonly Mock<IMediator> _mockMediator;
+    private readonly InlineValidator<ChangeUsernameCommand> _changeUserCommandValidator;
+    private readonly UserController _controller;
+
+    public UserControllerTests()
+    {
+        _mockMediator = new Mock<IMediator>();
+        _changeUserCommandValidator = new InlineValidator<ChangeUsernameCommand>();
+
+        Mock<IValidatorManager> mockValidatorManager = new();
+        mockValidatorManager.Setup(x => x.ChangeUsernameCommandValidator).Returns(_changeUserCommandValidator);
+
+        _controller = new UserController(_mockMediator.Object, mockValidatorManager.Object);
+    }
+
+    [Fact]
+    public async Task ChangeUsernameAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+        ChangeUsernameModel request = new() { ServerId = Guid.NewGuid(), NewUsername = "username" };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.ChangeUsernameAsync(request));
+    }
+
+    [Fact]
+    public async Task ChangeUsernameAsync_ServerIdIsInvalid_ThrowsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        ChangeUsernameModel request = new() { ServerId = Guid.NewGuid(), NewUsername = "username" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.ChangeUsernameAsync(request));
+    }
+
+    [Fact]
+    public async Task ChangeUsernameAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        ChangeUsernameModel request = new() { ServerId = Guid.NewGuid(), NewUsername = "username" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _changeUserCommandValidator.RuleFor(x => x.UserId).Must(userId => false);
+
+        // Act
+        var result = await _controller.ChangeUsernameAsync(request);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<JoinServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("UserId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task ChangeUsernameAsync_ValidationResultIsValid_ReturnsOkRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        ChangeUsernameModel request = new() { ServerId = Guid.NewGuid(), NewUsername = "username" };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _changeUserCommandValidator.RuleFor(x => x.UserId).Must(userId => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<ChangeUsernameCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.ChangeUsernameAsync(request);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<ChangeUsernameCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    private void SetUpNullUserIdentity()
+    {
+        // Setup a null User.Identity
+        Mock<ClaimsPrincipal> user = new();
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user.Object }
+        };
+    }
+
+    private void SetUpFakeUserIdentity()
+    {
+        // Setup User.Identity
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, "1"),
+            new Claim("name", "test@example.com"),
+        };
+        ClaimsIdentity identity = new(claims, "Test");
+        ClaimsPrincipal user = new(identity);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+    }
+
+    private static Server GetTargetServer()
+    {
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetId(Guid.NewGuid());
+
+        return targetServer;
+    }
+
+    private static User GetUser()
+    {
+        return new User(Guid.NewGuid(), "user", "user@example.com");
+    }
+}
