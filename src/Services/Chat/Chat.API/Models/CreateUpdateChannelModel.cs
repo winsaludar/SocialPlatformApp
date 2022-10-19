@@ -1,6 +1,6 @@
 ﻿namespace Chat.API.Models;
 
-public class CreateUpdateChannelModel
+public record CreateUpdateChannelModel
 {
     public string Name { get; set; } = default!;
 }

@@ -46,7 +46,7 @@ public class Server : Entity, IAggregateRoot
 
     public void UpdateChannel(Guid channelId, string name, DateTime dateLastModified, Guid lastModifiedId)
     {
-        var channel = _channels.FirstOrDefault(x => x.Id == channelId);
+        Channel? channel = _channels.FirstOrDefault(x => x.Id == channelId);
         if (channel is null)
             return;
 
@@ -57,7 +57,7 @@ public class Server : Entity, IAggregateRoot
 
     public void RemoveChannel(Guid channelId)
     {
-        var channel = _channels.FirstOrDefault(x => x.Id == channelId);
+        Channel? channel = _channels.FirstOrDefault(x => x.Id == channelId);
         if (channel is null)
             return;
 
@@ -68,10 +68,20 @@ public class Server : Entity, IAggregateRoot
 
     public void RemoveMember(Guid userId)
     {
-        var member = _members.FirstOrDefault(x => x.UserId == userId);
+        Member? member = _members.FirstOrDefault(x => x.UserId == userId);
         if (member is null)
             return;
 
         _members.Remove(member);
+    }
+
+    public void ChangeUsername(Guid userId, string newUsername)
+    {
+        Member? member = _members.FirstOrDefault(x => x.UserId == userId);
+        if (member is null)
+            return;
+
+        _members.Remove(member);
+        _members.Add(new(userId, newUsername, member.DateJoined));
     }
 }
