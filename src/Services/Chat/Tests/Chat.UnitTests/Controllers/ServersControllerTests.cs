@@ -25,6 +25,7 @@ public class ServersControllerTests
     private readonly InlineValidator<UpdateServerCommand> _updateServerCommandValidator;
     private readonly InlineValidator<DeleteServerCommand> _deleteServerCommandValidator;
     private readonly InlineValidator<JoinServerCommand> _joinServerCommandValidator;
+    private readonly InlineValidator<LeaveServerCommand> _leaveServerCommandValidator;
     private readonly ServersController _controller;
 
     public ServersControllerTests()
@@ -35,6 +36,7 @@ public class ServersControllerTests
         _updateServerCommandValidator = new InlineValidator<UpdateServerCommand>();
         _deleteServerCommandValidator = new InlineValidator<DeleteServerCommand>();
         _joinServerCommandValidator = new InlineValidator<JoinServerCommand>();
+        _leaveServerCommandValidator = new InlineValidator<LeaveServerCommand>();
 
         Mock<IValidatorManager> mockValidatorManager = new();
         mockValidatorManager.Setup(x => x.CreateServerCommandValidator).Returns(_createServerCommandValidator);
@@ -42,6 +44,7 @@ public class ServersControllerTests
         mockValidatorManager.Setup(x => x.UpdateServerCommandValidator).Returns(_updateServerCommandValidator);
         mockValidatorManager.Setup(x => x.DeleteServerCommandValidator).Returns(_deleteServerCommandValidator);
         mockValidatorManager.Setup(x => x.JoinServerCommandValidator).Returns(_joinServerCommandValidator);
+        mockValidatorManager.Setup(x => x.LeaveServerCommandValidator).Returns(_leaveServerCommandValidator);
 
         _controller = new ServersController(_mockMediator.Object, mockValidatorManager.Object);
     }
@@ -370,6 +373,70 @@ public class ServersControllerTests
 
         // Assert
         _mockMediator.Verify(x => x.Send(It.IsAny<JoinServerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task LeaveServerAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+        Guid serverId = Guid.NewGuid();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.LeaveServerAsync(serverId));
+    }
+
+    [Fact]
+    public async Task LeaveServerAsync_ServerIdIsInvalid_ThrowsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.LeaveServerAsync(serverId));
+    }
+
+    [Fact]
+    public async Task LeaveServerAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _leaveServerCommandValidator.RuleFor(x => x.UserId).Must(userId => false);
+
+        // Act
+        var result = await _controller.LeaveServerAsync(serverId);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<LeaveServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("UserId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task LeaveServerAsync_ValidationResultIsValid_ReturnsOkRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _leaveServerCommandValidator.RuleFor(x => x.UserId).Must(userId => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<LeaveServerCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.LeaveServerAsync(serverId);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<LeaveServerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
 
