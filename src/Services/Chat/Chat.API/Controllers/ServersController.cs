@@ -132,6 +132,29 @@ public class ServersController : ControllerBase
         return Ok("Welcome to the server");
     }
 
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+    [Route("{serverId}/leave")]
+    public async Task<IActionResult> LeaveServerAsync(Guid serverId)
+    {
+        User user = await GetUserAsync();
+        Server server = await GetServerAsync(serverId);
+        LeaveServerCommand command = new(server, user.Id);
+        //ValidationResult validationResult = await _validatorManager.LeaveServerCommandValidator.ValidateAsync(command);
+        //if (!validationResult.IsValid)
+        //{
+        //    validationResult.AddToModelState(ModelState);
+        //    return BadRequest(ModelState);
+        //}
+
+        await _mediator.Send(command);
+
+        return Ok("Farewell old friend");
+    }
+
     private async Task<User> GetUserAsync()
     {
         if (!User.IsValid())

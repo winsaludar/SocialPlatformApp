@@ -65,4 +65,13 @@ public class Server : Entity, IAggregateRoot
     }
 
     public void AddMember(Guid userId, string username, DateTime dateJoined) => _members.Add(new(userId, username, dateJoined));
+
+    public void RemoveMember(Guid userId)
+    {
+        var member = _members.FirstOrDefault(x => x.UserId == userId);
+        if (member is null)
+            return;
+
+        _members.Remove(member);
+    }
 }
