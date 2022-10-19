@@ -143,12 +143,12 @@ public class ServersController : ControllerBase
         User user = await GetUserAsync();
         Server server = await GetServerAsync(serverId);
         LeaveServerCommand command = new(server, user.Id);
-        //ValidationResult validationResult = await _validatorManager.LeaveServerCommandValidator.ValidateAsync(command);
-        //if (!validationResult.IsValid)
-        //{
-        //    validationResult.AddToModelState(ModelState);
-        //    return BadRequest(ModelState);
-        //}
+        ValidationResult validationResult = await _validatorManager.LeaveServerCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
 
         await _mediator.Send(command);
 

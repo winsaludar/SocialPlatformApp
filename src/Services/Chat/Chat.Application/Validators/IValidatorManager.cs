@@ -17,4 +17,5 @@ public interface IValidatorManager
     public AbstractValidator<DeleteChannelCommand> DeleteChannelCommandValidator { get; }
     public AbstractValidator<AddMessageCommand> AddMessageCommandValidator { get; }
     public AbstractValidator<JoinServerCommand> JoinServerCommandValidator { get; }
+    public AbstractValidator<LeaveServerCommand> LeaveServerCommandValidator { get; }
 }
