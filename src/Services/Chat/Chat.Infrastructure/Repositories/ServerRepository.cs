@@ -89,9 +89,6 @@ public class ServerRepository : IServerRepository
         if (existingServer == null)
             return;
 
-        // TODO: Refactor updating; Do not fetch channels & members and re-insert every update
-        // Just insert if channel/member has value
-
         // Update server
         UpdateDefinitionBuilder<ServerDbModel> updateBuilder = Builders<ServerDbModel>.Update;
         UpdateDefinition<ServerDbModel> update = updateBuilder.Set(x => x.Name, server.Name)
@@ -101,29 +98,24 @@ public class ServerRepository : IServerRepository
             .Set(x => x.LastModifiedById, server.LastModifiedById.ToString())
             .Set(x => x.DateLastModified, DateTime.UtcNow);
 
-        // Update channels
-        //List<ChannelDbModel> channels = new();
-        //foreach (var item in server.Channels)
-        //{
-        //    ChannelDbModel channel = new()
-        //    {
-        //        Guid = item.Id.ToString(),
-        //        Name = item.Name,
-        //        DateCreated = item.DateCreated,
-        //        CreatedById = item.CreatedById.ToString()
-        //    };
+        // Add/Update channels
+        List<ChannelDbModel> channels = new();
+        foreach (var item in server.Channels)
+        {
+            ChannelDbModel channel = new()
+            {
+                Guid = item.Id.ToString(),
+                Name = item.Name,
+                DateCreated = item.DateCreated,
+                CreatedById = item.CreatedById.ToString(),
+                LastModifiedById = item.LastModifiedById?.ToString(),
+                DateLastModified = item.DateLastModified
+            };
+            channels.Add(channel);
+        }
+        update = update.Set(x => x.Channels, channels);
 
-        //    if (item.DateLastModified.HasValue)
-        //        channel.DateLastModified = item.DateLastModified.Value;
-
-        //    if (item.LastModifiedById.HasValue)
-        //        channel.LastModifiedById = item.LastModifiedById.ToString();
-
-        //    channels.Add(channel);
-        //}
-        //model.Channels = channels;
-
-        //// Update members
+        // Update members
         //List<MemberDbModel> members = new();
         //foreach (var item in server.Members)
         //{
