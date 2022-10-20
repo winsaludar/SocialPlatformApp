@@ -7,10 +7,11 @@ namespace Chat.Application.Commands;
 [DataContract]
 public class AddModeratorCommand : IRequest<bool>
 {
-    public AddModeratorCommand(Server targetServer, Guid userId)
+    public AddModeratorCommand(Server targetServer, Guid userId, Guid addedById)
     {
         TargetServer = targetServer;
         UserId = userId;
+        AddedById = addedById;
     }
 
     [DataMember]
@@ -18,4 +19,7 @@ public class AddModeratorCommand : IRequest<bool>
 
     [DataMember]
     public Guid UserId { get; private set; }
+
+    [DataMember]
+    public Guid AddedById { get; private set; }
 }

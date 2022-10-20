@@ -6,6 +6,7 @@ using Chat.Application.Validators;
 using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.Aggregates.UserAggregate;
 using Chat.Domain.Exceptions;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,9 +35,15 @@ public class ModeratorsController : ControllerBase
     [Route("{serverId}/moderators")]
     public async Task<IActionResult> AddModeratorAsync(Guid serverId, [FromBody] AddModeratorModel request)
     {
-        User user = await GetUserAsync();
+        User currentUser = await GetUserAsync();
         Server server = await GetServerAsync(serverId);
-        AddModeratorCommand command = new(server, user.Id);
+        AddModeratorCommand command = new(server, request.UserId, currentUser.Id);
+        ValidationResult validationResult = await _validatorManager.AddModeratorCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
 
         await _mediator.Send(command);
 
