@@ -82,66 +82,62 @@ public class ServerRepository : IServerRepository
 
     public async Task UpdateAsync(Server server)
     {
-        var result = await _serversCollection.Find(x => x.Guid.ToLower() == server.Id.ToString().ToLower()).FirstOrDefaultAsync();
-        if (result == null)
+        FilterDefinitionBuilder<ServerDbModel> filterBuilder = Builders<ServerDbModel>.Filter;
+        FilterDefinition<ServerDbModel> filter = filterBuilder.Eq(x => x.Guid, server.Id.ToString());
+
+        var existingServer = await _serversCollection.Find(filter).FirstOrDefaultAsync();
+        if (existingServer == null)
             return;
 
         // TODO: Refactor updating; Do not fetch channels & members and re-insert every update
         // Just insert if channel/member has value
 
         // Update server
-        ServerDbModel model = new()
-        {
-            Id = result.Id,
-            Guid = result.Guid.ToString(),
-            Name = server.Name,
-            ShortDescription = server.ShortDescription,
-            LongDescription = server.LongDescription,
-            CreatorEmail = result.CreatorEmail,
-            Thumbnail = server.Thumbnail,
-            CreatedById = result.CreatedById.ToString(),
-            DateCreated = result.DateCreated,
-            LastModifiedById = server.LastModifiedById.ToString(),
-            DateLastModified = DateTime.UtcNow,
-        };
+        UpdateDefinitionBuilder<ServerDbModel> updateBuilder = Builders<ServerDbModel>.Update;
+        UpdateDefinition<ServerDbModel> update = updateBuilder.Set(x => x.Name, server.Name)
+            .Set(x => x.ShortDescription, server.ShortDescription)
+            .Set(x => x.LongDescription, server.LongDescription)
+            .Set(x => x.Thumbnail, server.Thumbnail)
+            .Set(x => x.LastModifiedById, server.LastModifiedById.ToString())
+            .Set(x => x.DateLastModified, DateTime.UtcNow);
 
         // Update channels
-        List<ChannelDbModel> channels = new();
-        foreach (var item in server.Channels)
-        {
-            ChannelDbModel channel = new()
-            {
-                Guid = item.Id.ToString(),
-                Name = item.Name,
-                DateCreated = item.DateCreated,
-                CreatedById = item.CreatedById.ToString()
-            };
+        //List<ChannelDbModel> channels = new();
+        //foreach (var item in server.Channels)
+        //{
+        //    ChannelDbModel channel = new()
+        //    {
+        //        Guid = item.Id.ToString(),
+        //        Name = item.Name,
+        //        DateCreated = item.DateCreated,
+        //        CreatedById = item.CreatedById.ToString()
+        //    };
 
-            if (item.DateLastModified.HasValue)
-                channel.DateLastModified = item.DateLastModified.Value;
+        //    if (item.DateLastModified.HasValue)
+        //        channel.DateLastModified = item.DateLastModified.Value;
 
-            if (item.LastModifiedById.HasValue)
-                channel.LastModifiedById = item.LastModifiedById.ToString();
+        //    if (item.LastModifiedById.HasValue)
+        //        channel.LastModifiedById = item.LastModifiedById.ToString();
 
-            channels.Add(channel);
-        }
-        model.Channels = channels;
+        //    channels.Add(channel);
+        //}
+        //model.Channels = channels;
 
-        // Update members
-        List<MemberDbModel> members = new();
-        foreach (var item in server.Members)
-        {
-            MemberDbModel member = new()
-            {
-                UserId = item.UserId,
-                Username = item.Username,
-                DateJoined = item.DateJoined
-            };
-            members.Add(member);
-        }
-        model.Members = members;
+        //// Update members
+        //List<MemberDbModel> members = new();
+        //foreach (var item in server.Members)
+        //{
+        //    MemberDbModel member = new()
+        //    {
+        //        UserId = item.UserId,
+        //        Username = item.Username,
+        //        DateJoined = item.DateJoined
+        //    };
+        //    members.Add(member);
+        //}
+        //model.Members = members;
 
-        await _serversCollection.ReplaceOneAsync(x => x.Guid.ToLower() == server.Id.ToString().ToLower(), model);
+        await _serversCollection.UpdateOneAsync(filter, update);
     }
 
     public async Task DeleteAsync(Guid id)
