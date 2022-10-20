@@ -129,6 +129,19 @@ public class ServerRepository : IServerRepository
         }
         update = update.Set(x => x.Members, members);
 
+        // Add/Update moderators
+        List<ModeratorDbModel> moderators = new();
+        foreach (var item in server.Moderators)
+        {
+            ModeratorDbModel moderator = new()
+            {
+                UserId = item.UserId,
+                DateStarted = item.DateStarted
+            };
+            moderators.Add(moderator);
+        }
+        update = update.Set(x => x.Moderators, moderators);
+
         await _serversCollection.UpdateOneAsync(filter, update);
     }
 
@@ -137,7 +150,7 @@ public class ServerRepository : IServerRepository
         await _serversCollection.DeleteOneAsync(x => x.Guid.ToLower() == id.ToString().ToLower());
     }
 
-    private static Server CreateServerFromDbModel(ServerDbModel dbModel, bool includeChannels = true, bool includeMembers = true)
+    private static Server CreateServerFromDbModel(ServerDbModel dbModel, bool includeChannels = true, bool includeMembers = true, bool includeModerators = true)
     {
         Server server = new(dbModel.Name, dbModel.ShortDescription, dbModel.LongDescription, dbModel.CreatorEmail, dbModel.Thumbnail);
         server.SetId(Guid.Parse(dbModel.Guid));
@@ -165,6 +178,12 @@ public class ServerRepository : IServerRepository
         if (includeMembers)
         {
             dbModel.Members.ForEach(x => server.AddMember(x.UserId, x.Username, x.DateJoined));
+        }
+
+        // Add moderators
+        if (includeModerators)
+        {
+            dbModel.Moderators.ForEach(x => server.AddModerator(x.UserId, x.DateStarted));
         }
 
         return server;
