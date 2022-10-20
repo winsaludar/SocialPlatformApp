@@ -115,19 +115,19 @@ public class ServerRepository : IServerRepository
         }
         update = update.Set(x => x.Channels, channels);
 
-        // Update members
-        //List<MemberDbModel> members = new();
-        //foreach (var item in server.Members)
-        //{
-        //    MemberDbModel member = new()
-        //    {
-        //        UserId = item.UserId,
-        //        Username = item.Username,
-        //        DateJoined = item.DateJoined
-        //    };
-        //    members.Add(member);
-        //}
-        //model.Members = members;
+        // Add/Update members
+        List<MemberDbModel> members = new();
+        foreach (var item in server.Members)
+        {
+            MemberDbModel member = new()
+            {
+                UserId = item.UserId,
+                Username = item.Username,
+                DateJoined = item.DateJoined
+            };
+            members.Add(member);
+        }
+        update = update.Set(x => x.Members, members);
 
         await _serversCollection.UpdateOneAsync(filter, update);
     }
