@@ -36,19 +36,7 @@ public class ServerRepository : IServerRepository
             return Enumerable.Empty<Server>();
 
         List<Server> servers = new();
-        result.ForEach(x =>
-        {
-            Server server = new(x.Name, x.ShortDescription, x.LongDescription, x.CreatorEmail, x.Thumbnail);
-            server.SetId(Guid.Parse(x.Guid));
-            server.SetCreatedById(Guid.Parse(x.CreatedById));
-            server.SetDateCreated(x.DateCreated);
-            if (!string.IsNullOrEmpty(x.LastModifiedById))
-                server.SetLastModifiedById(Guid.Parse(x.LastModifiedById));
-            if (x.DateLastModified.HasValue)
-                server.SetDateLastModified(x.DateLastModified.Value);
-
-            servers.Add(server);
-        });
+        result.ForEach(x => servers.Add(CreateServerFromDbModel(x, includeChannels: false, includeMembers: false)));
 
         return servers;
     }
@@ -59,29 +47,7 @@ public class ServerRepository : IServerRepository
         if (result == null)
             return null;
 
-        Server server = new(result.Name, result.ShortDescription, result.LongDescription, result.CreatorEmail, result.Thumbnail);
-        server.SetId(Guid.Parse(result.Guid));
-        server.SetCreatedById(Guid.Parse(result.CreatedById));
-        server.SetDateCreated(result.DateCreated);
-        if (!string.IsNullOrEmpty(result.LastModifiedById))
-            server.SetLastModifiedById(Guid.Parse(result.LastModifiedById));
-        if (result.DateLastModified.HasValue)
-            server.SetDateLastModified(result.DateLastModified.Value);
-
-        // Add channels
-        result.Channels.ForEach(x =>
-        {
-            Guid id = Guid.Parse(x.Guid);
-            Guid createdById = Guid.Parse(x.CreatedById);
-            Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
-
-            server.AddChannel(id, x.Name, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
-        });
-
-        // Add members
-        result.Members.ForEach(x => server.AddMember(x.UserId, x.Username, x.DateJoined));
-
-        return server;
+        return CreateServerFromDbModel(result);
     }
 
     public async Task<Server?> GetByIdAsync(Guid id)
@@ -90,28 +56,7 @@ public class ServerRepository : IServerRepository
         if (result == null)
             return null;
 
-        Server server = new(result.Name, result.ShortDescription, result.LongDescription, result.CreatorEmail, result.Thumbnail);
-        server.SetId(Guid.Parse(result.Guid));
-        server.SetCreatedById(Guid.Parse(result.CreatedById));
-        server.SetDateCreated(result.DateCreated);
-        if (!string.IsNullOrEmpty(result.LastModifiedById))
-            server.SetLastModifiedById(Guid.Parse(result.LastModifiedById));
-        if (result.DateLastModified.HasValue)
-            server.SetDateLastModified(result.DateLastModified.Value);
-
-        // Add channels
-        result.Channels.ForEach(x =>
-        {
-            Guid id = Guid.Parse(x.Guid);
-            Guid createdById = Guid.Parse(x.CreatedById);
-            Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
-            server.AddChannel(id, x.Name, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
-        });
-
-        // Add members
-        result.Members.ForEach(x => server.AddMember(x.UserId, x.Username, x.DateJoined));
-
-        return server;
+        return CreateServerFromDbModel(result);
     }
 
     public async Task<Guid> CreateAsync(Server newServer)
@@ -137,30 +82,23 @@ public class ServerRepository : IServerRepository
 
     public async Task UpdateAsync(Server server)
     {
-        var result = await _serversCollection.Find(x => x.Guid.ToLower() == server.Id.ToString().ToLower()).FirstOrDefaultAsync();
-        if (result == null)
+        FilterDefinitionBuilder<ServerDbModel> filterBuilder = Builders<ServerDbModel>.Filter;
+        FilterDefinition<ServerDbModel> filter = filterBuilder.Eq(x => x.Guid, server.Id.ToString());
+
+        var existingServer = await _serversCollection.Find(filter).FirstOrDefaultAsync();
+        if (existingServer == null)
             return;
 
-        // TODO: Refactor updating; Do not fetch channels & members and re-insert every update
-        // Just insert if channel/member has value
-
         // Update server
-        ServerDbModel model = new()
-        {
-            Id = result.Id,
-            Guid = result.Guid.ToString(),
-            Name = server.Name,
-            ShortDescription = server.ShortDescription,
-            LongDescription = server.LongDescription,
-            CreatorEmail = result.CreatorEmail,
-            Thumbnail = server.Thumbnail,
-            CreatedById = result.CreatedById.ToString(),
-            DateCreated = result.DateCreated,
-            LastModifiedById = server.LastModifiedById.ToString(),
-            DateLastModified = DateTime.UtcNow,
-        };
+        UpdateDefinitionBuilder<ServerDbModel> updateBuilder = Builders<ServerDbModel>.Update;
+        UpdateDefinition<ServerDbModel> update = updateBuilder.Set(x => x.Name, server.Name)
+            .Set(x => x.ShortDescription, server.ShortDescription)
+            .Set(x => x.LongDescription, server.LongDescription)
+            .Set(x => x.Thumbnail, server.Thumbnail)
+            .Set(x => x.LastModifiedById, server.LastModifiedById.ToString())
+            .Set(x => x.DateLastModified, DateTime.UtcNow);
 
-        // Update channels
+        // Add/Update channels
         List<ChannelDbModel> channels = new();
         foreach (var item in server.Channels)
         {
@@ -169,20 +107,15 @@ public class ServerRepository : IServerRepository
                 Guid = item.Id.ToString(),
                 Name = item.Name,
                 DateCreated = item.DateCreated,
-                CreatedById = item.CreatedById.ToString()
+                CreatedById = item.CreatedById.ToString(),
+                LastModifiedById = item.LastModifiedById?.ToString(),
+                DateLastModified = item.DateLastModified
             };
-
-            if (item.DateLastModified.HasValue)
-                channel.DateLastModified = item.DateLastModified.Value;
-
-            if (item.LastModifiedById.HasValue)
-                channel.LastModifiedById = item.LastModifiedById.ToString();
-
             channels.Add(channel);
         }
-        model.Channels = channels;
+        update = update.Set(x => x.Channels, channels);
 
-        // Update members
+        // Add/Update members
         List<MemberDbModel> members = new();
         foreach (var item in server.Members)
         {
@@ -194,13 +127,46 @@ public class ServerRepository : IServerRepository
             };
             members.Add(member);
         }
-        model.Members = members;
+        update = update.Set(x => x.Members, members);
 
-        await _serversCollection.ReplaceOneAsync(x => x.Guid.ToLower() == server.Id.ToString().ToLower(), model);
+        await _serversCollection.UpdateOneAsync(filter, update);
     }
 
     public async Task DeleteAsync(Guid id)
     {
         await _serversCollection.DeleteOneAsync(x => x.Guid.ToLower() == id.ToString().ToLower());
+    }
+
+    private static Server CreateServerFromDbModel(ServerDbModel dbModel, bool includeChannels = true, bool includeMembers = true)
+    {
+        Server server = new(dbModel.Name, dbModel.ShortDescription, dbModel.LongDescription, dbModel.CreatorEmail, dbModel.Thumbnail);
+        server.SetId(Guid.Parse(dbModel.Guid));
+        server.SetCreatedById(Guid.Parse(dbModel.CreatedById));
+        server.SetDateCreated(dbModel.DateCreated);
+        if (!string.IsNullOrEmpty(dbModel.LastModifiedById))
+            server.SetLastModifiedById(Guid.Parse(dbModel.LastModifiedById));
+        if (dbModel.DateLastModified.HasValue)
+            server.SetDateLastModified(dbModel.DateLastModified.Value);
+
+        // Add channels
+        if (includeChannels)
+        {
+            dbModel.Channels.ForEach(x =>
+            {
+                Guid id = Guid.Parse(x.Guid);
+                Guid createdById = Guid.Parse(x.CreatedById);
+                Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
+
+                server.AddChannel(id, x.Name, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
+            });
+        }
+
+        // Add members
+        if (includeMembers)
+        {
+            dbModel.Members.ForEach(x => server.AddMember(x.UserId, x.Username, x.DateJoined));
+        }
+
+        return server;
     }
 }
