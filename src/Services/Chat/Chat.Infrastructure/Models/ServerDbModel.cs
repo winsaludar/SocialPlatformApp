@@ -30,4 +30,7 @@ public class ServerDbModel : EntityDbModel
 
     [BsonElement("members")]
     public List<MemberDbModel> Members { get; set; } = new();
+
+    [BsonElement("moderators")]
+    public List<ModeratorDbModel> Moderators { get; set; } = new();
 }
