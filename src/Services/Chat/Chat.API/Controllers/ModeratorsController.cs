@@ -61,12 +61,12 @@ public class ModeratorsController : ControllerBase
         User currentUser = await GetUserAsync();
         Server server = await GetServerAsync(serverId);
         RemoveModeratorCommand command = new(server, request.UserId, currentUser.Id);
-        //ValidationResult validationResult = await _validatorManager.AddModeratorCommandValidator.ValidateAsync(command);
-        //if (!validationResult.IsValid)
-        //{
-        //    validationResult.AddToModelState(ModelState);
-        //    return BadRequest(ModelState);
-        //}
+        ValidationResult validationResult = await _validatorManager.RemoveModeratorCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
 
         await _mediator.Send(command);
 

@@ -21,6 +21,7 @@ public class ValidatorManager : IValidatorManager
     private readonly Lazy<LeaveServerCommandValidator> _lazyLeaveServerCommandValidator;
     private readonly Lazy<ChangeUsernameCommandValidator> _lazyChangeUsernameCommandValidator;
     private readonly Lazy<AddModeratorCommandValidator> _lazyAddModeratorCommandValidator;
+    private readonly Lazy<RemoveModeratorCommandValidator> _lazyRemoveModeratorCommandValidator;
 
     public ValidatorManager(IRepositoryManager repositoryManager)
     {
@@ -38,6 +39,7 @@ public class ValidatorManager : IValidatorManager
         _lazyLeaveServerCommandValidator = new Lazy<LeaveServerCommandValidator>(() => new LeaveServerCommandValidator(repositoryManager));
         _lazyChangeUsernameCommandValidator = new Lazy<ChangeUsernameCommandValidator>(() => new ChangeUsernameCommandValidator(repositoryManager));
         _lazyAddModeratorCommandValidator = new Lazy<AddModeratorCommandValidator>(() => new AddModeratorCommandValidator(repositoryManager));
+        _lazyRemoveModeratorCommandValidator = new Lazy<RemoveModeratorCommandValidator>(() => new RemoveModeratorCommandValidator(repositoryManager));
     }
 
     public AbstractValidator<CreateServerCommand> CreateServerCommandValidator => _lazyCreateServerCommandValidator.Value;
@@ -54,4 +56,5 @@ public class ValidatorManager : IValidatorManager
     public AbstractValidator<LeaveServerCommand> LeaveServerCommandValidator => _lazyLeaveServerCommandValidator.Value;
     public AbstractValidator<ChangeUsernameCommand> ChangeUsernameCommandValidator => _lazyChangeUsernameCommandValidator.Value;
     public AbstractValidator<AddModeratorCommand> AddModeratorCommandValidator => _lazyAddModeratorCommandValidator.Value;
+    public AbstractValidator<RemoveModeratorCommand> RemoveModeratorCommandValidator => _lazyRemoveModeratorCommandValidator.Value;
 }
