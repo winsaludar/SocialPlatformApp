@@ -38,7 +38,7 @@ public class ModeratorsControllerTests
         // Arrange
         SetUpNullUserIdentity();
         Guid serverId = Guid.NewGuid();
-        AddModeratorModel request = new() { UserId = Guid.NewGuid() };
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
 
         // Act & Assert
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.AddModeratorAsync(serverId, request));
@@ -50,7 +50,7 @@ public class ModeratorsControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
-        AddModeratorModel request = new() { UserId = Guid.NewGuid() };
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
         _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
 
@@ -65,7 +65,7 @@ public class ModeratorsControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
-        AddModeratorModel request = new() { UserId = Guid.NewGuid() };
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
         _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _addModeratorCommandValidator.RuleFor(x => x.UserId).Must(userId => false);
@@ -86,7 +86,7 @@ public class ModeratorsControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
-        AddModeratorModel request = new() { UserId = Guid.NewGuid() };
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
         _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _addModeratorCommandValidator.RuleFor(x => x.UserId).Must(userId => true);

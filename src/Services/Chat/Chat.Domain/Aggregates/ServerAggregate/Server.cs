@@ -89,4 +89,13 @@ public class Server : Entity, IAggregateRoot
     }
 
     public void AddModerator(Guid userId, DateTime dateStarted) => _moderators.Add(new Moderator(userId, dateStarted));
+
+    public void RemoveModerator(Guid userId)
+    {
+        Moderator? mod = _moderators.FirstOrDefault(x => x.UserId == userId);
+        if (mod is null)
+            return;
+
+        _moderators.Remove(mod);
+    }
 }
