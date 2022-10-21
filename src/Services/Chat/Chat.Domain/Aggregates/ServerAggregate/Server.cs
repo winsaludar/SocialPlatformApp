@@ -6,6 +6,7 @@ public class Server : Entity, IAggregateRoot
 {
     private readonly List<Channel> _channels;
     private readonly List<Member> _members;
+    private readonly List<Moderator> _moderators;
 
     public Server(string name, string shortDescription, string longDescription, string creatorEmail, string? thumbnail = "")
     {
@@ -16,6 +17,7 @@ public class Server : Entity, IAggregateRoot
         Thumbnail = thumbnail;
         _channels = new List<Channel>();
         _members = new List<Member>();
+        _moderators = new List<Moderator>();
     }
 
     public string Name { get; private set; }
@@ -25,6 +27,7 @@ public class Server : Entity, IAggregateRoot
     public string? Thumbnail { get; private set; }
     public IReadOnlyCollection<Channel> Channels => _channels;
     public IReadOnlyCollection<Member> Members => _members;
+    public IReadOnlyCollection<Moderator> Moderators => _moderators;
 
     public Guid AddChannel(Guid id, string name, Guid createdById, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
     {
@@ -84,4 +87,6 @@ public class Server : Entity, IAggregateRoot
         _members.Remove(member);
         _members.Add(new(userId, newUsername, member.DateJoined));
     }
+
+    public void AddModerator(Guid userId, DateTime dateStarted) => _moderators.Add(new Moderator(userId, dateStarted));
 }
