@@ -15,10 +15,10 @@ public class RemoveModeratorCommandValidator : AbstractValidator<RemoveModerator
         _repositoryManager = repositoryManager;
 
         RuleFor(x => x.TargetServer).MustAsync(BeExistingServer);
-        RuleFor(x => x.UserId).NotEmpty().MustAsync(BeExistingUser);
+        RuleFor(x => x.UserId).NotEmpty(); // Note: No need to check if user is valid, we just remove it from the list to avoid deadlock
 
         RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.RemoveById)).MustAsync(BeTheCreator);
-        RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.UserId)).MustAsync(BeExistingModerator);
+        RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.UserId)).MustAsync(BeExistingModerator); // Note: No need to check if user is still a member, we just remove it from the list to avoid deadlock
     }
 
     private async Task<bool> BeExistingServer(Server targetServer, CancellationToken cancellationToken)
@@ -26,15 +26,6 @@ public class RemoveModeratorCommandValidator : AbstractValidator<RemoveModerator
         var result = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
         if (result is null)
             throw new ServerNotFoundException(targetServer.Id.ToString());
-
-        return true;
-    }
-
-    private async Task<bool> BeExistingUser(Guid userId, CancellationToken cancellationToken)
-    {
-        var result = await _repositoryManager.UserRepository.GetByIdAsync(userId);
-        if (result is null)
-            throw new UserNotFoundException(userId.ToString());
 
         return true;
     }
