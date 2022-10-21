@@ -32,8 +32,8 @@ public class ModeratorsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-    [Route("{serverId}/moderators")]
-    public async Task<IActionResult> AddModeratorAsync(Guid serverId, [FromBody] AddModeratorModel request)
+    [Route("{serverId}/moderators/add")]
+    public async Task<IActionResult> AddModeratorAsync(Guid serverId, [FromBody] AddRemoveModeratorModel request)
     {
         User currentUser = await GetUserAsync();
         Server server = await GetServerAsync(serverId);
@@ -48,6 +48,29 @@ public class ModeratorsController : ControllerBase
         await _mediator.Send(command);
 
         return Ok("User is now a moderator of the server");
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(object))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+    [Route("{serverId}/moderators/remove")]
+    public async Task<IActionResult> RemoveModeratorAsync(Guid serverId, [FromBody] AddRemoveModeratorModel request)
+    {
+        User currentUser = await GetUserAsync();
+        Server server = await GetServerAsync(serverId);
+        RemoveModeratorCommand command = new(server, request.UserId, currentUser.Id);
+        ValidationResult validationResult = await _validatorManager.RemoveModeratorCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
+
+        await _mediator.Send(command);
+
+        return Ok("User has been downgraded to member");
     }
 
     private async Task<User> GetUserAsync()

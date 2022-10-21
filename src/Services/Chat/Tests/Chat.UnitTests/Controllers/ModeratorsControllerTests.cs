@@ -19,15 +19,18 @@ public class ModeratorsControllerTests
 {
     private readonly Mock<IMediator> _mockMediator;
     private readonly InlineValidator<AddModeratorCommand> _addModeratorCommandValidator;
+    private readonly InlineValidator<RemoveModeratorCommand> _removeModeratorCommandValidator;
     private readonly ModeratorsController _controller;
 
     public ModeratorsControllerTests()
     {
         _mockMediator = new Mock<IMediator>();
         _addModeratorCommandValidator = new InlineValidator<AddModeratorCommand>();
+        _removeModeratorCommandValidator = new InlineValidator<RemoveModeratorCommand>();
 
         Mock<IValidatorManager> validatorManager = new();
         validatorManager.Setup(x => x.AddModeratorCommandValidator).Returns(_addModeratorCommandValidator);
+        validatorManager.Setup(x => x.RemoveModeratorCommandValidator).Returns(_removeModeratorCommandValidator);
 
         _controller = new ModeratorsController(_mockMediator.Object, validatorManager.Object);
     }
@@ -38,7 +41,7 @@ public class ModeratorsControllerTests
         // Arrange
         SetUpNullUserIdentity();
         Guid serverId = Guid.NewGuid();
-        AddModeratorModel request = new() { UserId = Guid.NewGuid() };
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
 
         // Act & Assert
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.AddModeratorAsync(serverId, request));
@@ -50,7 +53,7 @@ public class ModeratorsControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
-        AddModeratorModel request = new() { UserId = Guid.NewGuid() };
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
         _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
 
@@ -65,7 +68,7 @@ public class ModeratorsControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
-        AddModeratorModel request = new() { UserId = Guid.NewGuid() };
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
         _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _addModeratorCommandValidator.RuleFor(x => x.UserId).Must(userId => false);
@@ -86,7 +89,7 @@ public class ModeratorsControllerTests
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
-        AddModeratorModel request = new() { UserId = Guid.NewGuid() };
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
         _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _addModeratorCommandValidator.RuleFor(x => x.UserId).Must(userId => true);
@@ -97,6 +100,74 @@ public class ModeratorsControllerTests
 
         // Assert
         _mockMediator.Verify(x => x.Send(It.IsAny<AddModeratorCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task RemoveModeratorAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.RemoveModeratorAsync(serverId, request));
+    }
+
+    [Fact]
+    public async Task RemoveModeratorAsync_ServerIdIsInvalid_ThrowsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.RemoveModeratorAsync(serverId, request));
+    }
+
+    [Fact]
+    public async Task RemoveModeratorAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _removeModeratorCommandValidator.RuleFor(x => x.UserId).Must(userId => false);
+
+        // Act
+        var result = await _controller.RemoveModeratorAsync(serverId, request);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<RemoveModeratorCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("UserId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task RemoveModeratorAsync_ValidationResultIsValid_ReturnsOkRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        AddRemoveModeratorModel request = new() { UserId = Guid.NewGuid() };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _removeModeratorCommandValidator.RuleFor(x => x.UserId).Must(userId => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<RemoveModeratorCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.RemoveModeratorAsync(serverId, request);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<RemoveModeratorCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
 

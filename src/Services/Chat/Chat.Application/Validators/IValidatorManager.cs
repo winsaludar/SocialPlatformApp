@@ -20,4 +20,5 @@ public interface IValidatorManager
     public AbstractValidator<LeaveServerCommand> LeaveServerCommandValidator { get; }
     public AbstractValidator<ChangeUsernameCommand> ChangeUsernameCommandValidator { get; }
     public AbstractValidator<AddModeratorCommand> AddModeratorCommandValidator { get; }
+    public AbstractValidator<RemoveModeratorCommand> RemoveModeratorCommandValidator { get; }
 }
