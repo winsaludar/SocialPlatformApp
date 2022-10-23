@@ -19,6 +19,7 @@ public class CreateChannelCommandValidator : AbstractValidator<CreateChannelComm
         RuleFor(x => x.CreatedById).NotEmpty();
 
         RuleFor(x => new Tuple<Server, string>(x.TargetServer, x.Name)).MustAsync(BeNotExistingName);
+        RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.CreatedById)).MustAsync(BeTheCreatorOrAModerator);
     }
 
     private async Task<bool> BeExistingServer(Server targetServer, CancellationToken cancellationToken)
@@ -40,6 +41,20 @@ public class CreateChannelCommandValidator : AbstractValidator<CreateChannelComm
 
         if (server.Channels.Any(x => x.Name.ToLower() == channelName.ToLower()))
             throw new ChannelNameAlreadyExistException(channelName);
+
+        return true;
+    }
+
+    private async Task<bool> BeTheCreatorOrAModerator(Tuple<Server, Guid> props, CancellationToken cancellationToken)
+    {
+        (Server targetServer, Guid createdById) = props;
+
+        var server = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
+        if (server is null)
+            throw new ServerNotFoundException(targetServer.Id.ToString());
+
+        if (server.CreatedById != createdById && !server.Moderators.Any(x => x.UserId == createdById))
+            throw new UnauthorizedUserException(createdById.ToString());
 
         return true;
     }
