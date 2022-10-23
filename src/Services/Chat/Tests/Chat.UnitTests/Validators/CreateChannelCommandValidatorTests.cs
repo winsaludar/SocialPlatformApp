@@ -37,7 +37,7 @@ public class CreateChannelCommandValidatorTests
     {
         // Arrange
         Server targetServer = GetTargetServer();
-        CreateChannelCommand command = new(targetServer, "", Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "", targetServer.CreatedById);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
 
@@ -55,7 +55,7 @@ public class CreateChannelCommandValidatorTests
         // Arrange
         Server targetServer = GetTargetServer();
         string name = "This is a long channel name that exceeds 50 characters in length 1234567890.";
-        CreateChannelCommand command = new(targetServer, name, Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, name, targetServer.CreatedById);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
 
@@ -72,7 +72,7 @@ public class CreateChannelCommandValidatorTests
     {
         // Arrange
         Server targetServer = GetTargetServer();
-        CreateChannelCommand command = new(targetServer, "Existing Channel", Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "Existing Channel", targetServer.CreatedById);
         targetServer.AddChannel(Guid.NewGuid(), "Existing Channel", Guid.NewGuid(), DateTime.UtcNow);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
@@ -85,6 +85,7 @@ public class CreateChannelCommandValidatorTests
     {
         // Arrange
         Server targetServer = GetTargetServer();
+        targetServer.AddModerator(Guid.Empty, DateTime.UtcNow);
         CreateChannelCommand command = new(targetServer, "Channel Name", Guid.Empty);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
@@ -94,6 +95,18 @@ public class CreateChannelCommandValidatorTests
         // Assert
         Assert.NotEmpty(result.Errors);
         Assert.True(result.Errors?.Any(x => x.PropertyName == "CreatedById"));
+    }
+
+    [Fact]
+    public async Task CreatedById_IsNotTheCreatorAndNotOneOfTheModerators_ThrowsUnauthorizedUserException()
+    {
+        // Arrange
+        Server targetServer = GetTargetServer();
+        CreateChannelCommand command = new(targetServer, "Channel Name", Guid.NewGuid());
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedUserException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
     }
 
     private static Server GetTargetServer()

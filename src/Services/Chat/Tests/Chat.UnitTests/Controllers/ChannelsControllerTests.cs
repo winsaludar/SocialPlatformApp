@@ -238,12 +238,25 @@ public class ChannelsControllerTests
     }
 
     [Fact]
+    public async Task DeleteChannelAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.DeleteChannelAsync(serverId, channelId));
+    }
+
+    [Fact]
     public async Task DeleteChannelAsync_TargetServerNotFound_ReturnsServerNotFoundException()
     {
         // Arrange
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -257,6 +270,7 @@ public class ChannelsControllerTests
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _deleteChannelCommandValidator.RuleFor(x => x.TargetChannelId).Must(name => false);
 
@@ -277,6 +291,7 @@ public class ChannelsControllerTests
         SetUpFakeUserIdentity();
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
         _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
         _deleteChannelCommandValidator.RuleFor(x => x.TargetChannelId).Must(name => true);
         _mockMediator.Setup(x => x.Send(It.IsAny<DeleteChannelCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
