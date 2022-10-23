@@ -16,8 +16,10 @@ public class DeleteChannelCommandValidator : AbstractValidator<DeleteChannelComm
 
         RuleFor(x => x.TargetServer).MustAsync(BeExistingServer);
         RuleFor(x => x.TargetChannelId).NotEmpty();
+        RuleFor(x => x.DeletedById).NotEmpty();
 
         RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.TargetChannelId)).MustAsync(BeExistingChannel);
+        RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.DeletedById)).MustAsync(BeTheCreatorOrAModerator);
     }
 
     private async Task<bool> BeExistingServer(Server targetServer, CancellationToken cancellationToken)
@@ -39,6 +41,20 @@ public class DeleteChannelCommandValidator : AbstractValidator<DeleteChannelComm
 
         if (!server.Channels.Any(x => x.Id == targetChannelId))
             throw new ChannelNotFoundException(targetChannelId.ToString());
+
+        return true;
+    }
+
+    private async Task<bool> BeTheCreatorOrAModerator(Tuple<Server, Guid> props, CancellationToken cancellationToken)
+    {
+        (Server targetServer, Guid createdById) = props;
+
+        var server = await _repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
+        if (server is null)
+            throw new ServerNotFoundException(targetServer.Id.ToString());
+
+        if (server.CreatedById != createdById && !server.Moderators.Any(x => x.UserId == createdById))
+            throw new UnauthorizedUserException(createdById.ToString());
 
         return true;
     }

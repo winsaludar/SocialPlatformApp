@@ -27,7 +27,7 @@ public class DeleteChannelCommandHandlerTests
         // Arrange
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "");
         Guid targetChannelId = Guid.NewGuid();
-        DeleteChannelCommand command = new(targetServer, targetChannelId);
+        DeleteChannelCommand command = new(targetServer, targetChannelId, targetServer.CreatedById);
 
         // Act
         var result = await _deleteChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());
