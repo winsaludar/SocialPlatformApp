@@ -13,6 +13,10 @@ public class LeaveServerCommandHandler : IRequestHandler<LeaveServerCommand, boo
     {
         request.TargetServer.RemoveMember(request.UserId);
 
+        // Remove member on all channels
+        foreach (var channel in request.TargetServer.Channels)
+            channel.RemoveMember(request.UserId);
+
         await _repositoryManager.ServerRepository.UpdateAsync(request.TargetServer);
 
         return true;

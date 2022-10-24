@@ -30,4 +30,12 @@ public class Channel : Entity
 
         _members.Add(userId);
     }
+
+    public void RemoveMember(Guid userId)
+    {
+        if (!_members.Any(x => x == userId))
+            return;
+
+        _members.Remove(userId);
+    }
 }
