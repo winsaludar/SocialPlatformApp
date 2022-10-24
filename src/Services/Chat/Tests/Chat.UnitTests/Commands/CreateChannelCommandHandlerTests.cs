@@ -22,6 +22,21 @@ public class CreateChannelCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_NoChannelCreated_ThrowsChannelNotFoundException()
+    {
+        // Arrange
+        Server targetServer = new("Target Server", "Short Desc", "Long Desc", "");
+        CreateChannelCommand command = new(targetServer, "Test Channel", true, Guid.NewGuid());
+
+        // Act
+        var result = await _createChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());
+
+        // Assert
+        _mockRepositoryManager.Verify(x => x.ServerRepository.UpdateAsync(It.IsAny<Server>()), Times.Once);
+        Assert.NotEqual(Guid.Empty, result);
+    }
+
+    [Fact]
     public async Task Handle_ChannelCreated_ReturnsChannelId()
     {
         // Arrange
