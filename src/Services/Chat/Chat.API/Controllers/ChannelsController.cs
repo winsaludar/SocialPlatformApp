@@ -78,7 +78,7 @@ public class ChannelsController : ControllerBase
     {
         User user = await GetUserAsync();
         Server server = await GetServerAsync(serverId);
-        UpdateChannelCommand command = new(server, channelId, request.Name, user.Id);
+        UpdateChannelCommand command = new(server, channelId, request.Name, request.IsPublic, user.Id);
         ValidationResult validationResult = await _validatorManager.UpdateChannelCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {

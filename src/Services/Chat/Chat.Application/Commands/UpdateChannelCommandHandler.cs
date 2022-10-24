@@ -13,7 +13,14 @@ public class UpdateChannelCommandHandler : IRequestHandler<UpdateChannelCommand,
     public async Task<bool> Handle(UpdateChannelCommand request, CancellationToken cancellationToken)
     {
         Server targetServer = request.TargetServer;
-        targetServer.UpdateChannel(request.TargetChannelId, request.Name, DateTime.UtcNow, request.UpdatedById);
+        Channel? updatedChannel = targetServer.UpdateChannel(request.TargetChannelId, request.Name, DateTime.UtcNow, request.UpdatedById);
+
+        // Add channel members
+        if (request.IsPublic && updatedChannel is not null)
+        {
+            foreach (var member in request.TargetServer.Members)
+                updatedChannel.AddMember(member.UserId);
+        }
 
         await _repositoryManager.ServerRepository.UpdateAsync(targetServer);
 
