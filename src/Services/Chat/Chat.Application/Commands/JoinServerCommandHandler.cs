@@ -13,6 +13,13 @@ public class JoinServerCommandHandler : IRequestHandler<JoinServerCommand, bool>
     {
         request.TargetServer.AddMember(request.UserId, request.Username, DateTime.UtcNow);
 
+        // Add member to all public channels
+        foreach (var channel in request.TargetServer.Channels)
+        {
+            if (channel.IsPublic)
+                channel.AddMember(request.UserId);
+        }
+
         await _repositoryManager.ServerRepository.UpdateAsync(request.TargetServer);
 
         return true;
