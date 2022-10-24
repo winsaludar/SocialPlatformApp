@@ -26,7 +26,7 @@ public class CreateChannelCommandHandlerTests
     {
         // Arrange
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "");
-        CreateChannelCommand command = new(targetServer, "Test Channel", Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "Test Channel", true, Guid.NewGuid());
 
         // Act
         var result = await _createChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());

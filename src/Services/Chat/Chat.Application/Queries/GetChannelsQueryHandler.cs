@@ -18,7 +18,15 @@ public class GetChannelsQueryHandler : IRequestHandler<GetChannelsQuery, IEnumer
 
         List<ChannelDto> channels = new();
         foreach (var item in result.Channels)
-            channels.Add(new() { Id = item.Id, Name = item.Name });
+        {
+            channels.Add(new()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                IsPublic = item.IsPublic,
+                Members = item.Members.ToList()
+            });
+        }
 
         return channels;
     }

@@ -53,7 +53,7 @@ public class GetChannelQueryHandlerTests
         // Arrange
         Guid channelId = Guid.NewGuid();
         Server server = GetTargetServer();
-        server.AddChannel(channelId, "channel", Guid.NewGuid(), DateTime.UtcNow);
+        server.AddChannel(channelId, "channel", true, Guid.NewGuid(), DateTime.UtcNow);
         GetChannelQuery query = new(Guid.NewGuid(), channelId);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(server);
 

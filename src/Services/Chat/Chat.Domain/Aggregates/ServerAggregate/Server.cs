@@ -29,9 +29,9 @@ public class Server : Entity, IAggregateRoot
     public IReadOnlyCollection<Member> Members => _members;
     public IReadOnlyCollection<Moderator> Moderators => _moderators;
 
-    public Guid AddChannel(Guid id, string name, Guid createdById, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
+    public Guid AddChannel(Guid id, string name, bool isPrivate, Guid createdById, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
     {
-        Channel newChannel = new(name);
+        Channel newChannel = new(name, isPrivate);
         newChannel.SetId(id);
         newChannel.SetDateCreated(dateCreated);
         newChannel.SetCreatedById(createdById);
