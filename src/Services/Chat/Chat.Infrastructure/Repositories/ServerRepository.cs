@@ -106,10 +106,12 @@ public class ServerRepository : IServerRepository
             {
                 Guid = item.Id.ToString(),
                 Name = item.Name,
+                IsPublic = item.IsPublic,
                 DateCreated = item.DateCreated,
                 CreatedById = item.CreatedById.ToString(),
                 LastModifiedById = item.LastModifiedById?.ToString(),
-                DateLastModified = item.DateLastModified
+                DateLastModified = item.DateLastModified,
+                Members = item.Members.ToList()
             };
             channels.Add(channel);
         }
@@ -170,7 +172,11 @@ public class ServerRepository : IServerRepository
                 Guid createdById = Guid.Parse(x.CreatedById);
                 Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
 
-                server.AddChannel(id, x.Name, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
+                server.AddChannel(id, x.Name, x.IsPublic, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
+
+                // Add channel members
+                Channel channel = server.Channels.FirstOrDefault(x => x.Id == id)!;
+                x.Members.ForEach(y => channel.AddMember(y));
             });
         }
 

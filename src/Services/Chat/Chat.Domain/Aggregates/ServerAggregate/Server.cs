@@ -29,9 +29,13 @@ public class Server : Entity, IAggregateRoot
     public IReadOnlyCollection<Member> Members => _members;
     public IReadOnlyCollection<Moderator> Moderators => _moderators;
 
-    public Guid AddChannel(Guid id, string name, Guid createdById, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
+    public Channel AddChannel(Guid id, string name, bool isPrivate, Guid createdById, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
     {
-        Channel newChannel = new(name);
+        Channel? existingChannel = _channels.FirstOrDefault(x => x.Id == id);
+        if (existingChannel is not null)
+            return existingChannel;
+
+        Channel newChannel = new(name, isPrivate);
         newChannel.SetId(id);
         newChannel.SetDateCreated(dateCreated);
         newChannel.SetCreatedById(createdById);
@@ -44,18 +48,20 @@ public class Server : Entity, IAggregateRoot
 
         _channels.Add(newChannel);
 
-        return newChannel.Id;
+        return newChannel;
     }
 
-    public void UpdateChannel(Guid channelId, string name, DateTime dateLastModified, Guid lastModifiedId)
+    public Channel? UpdateChannel(Guid channelId, string name, DateTime dateLastModified, Guid lastModifiedId)
     {
         Channel? channel = _channels.FirstOrDefault(x => x.Id == channelId);
         if (channel is null)
-            return;
+            return null;
 
         channel.SetName(name);
         channel.SetDateLastModified(dateLastModified);
         channel.SetLastModifiedById(lastModifiedId);
+
+        return channel;
     }
 
     public void RemoveChannel(Guid channelId)

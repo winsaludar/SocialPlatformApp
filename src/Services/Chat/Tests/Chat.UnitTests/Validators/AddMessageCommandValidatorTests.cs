@@ -26,9 +26,11 @@ public class AddMessageCommandValidatorTests
     {
         // Arrange
         Guid channelId = Guid.NewGuid();
+        Guid senderId = Guid.NewGuid();
         Server targetServer = GetTargetServer();
-        targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
-        AddMessageCommand command = new(Guid.Empty, channelId, Guid.NewGuid(), "user", "message");
+        Channel newChannel = targetServer.AddChannel(channelId, "Target Channel", true, Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
+        newChannel.AddMember(senderId);
+        AddMessageCommand command = new(Guid.Empty, channelId, senderId, "user", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -55,9 +57,11 @@ public class AddMessageCommandValidatorTests
     {
         // Arrange
         Guid channelId = Guid.NewGuid();
+        Guid senderId = Guid.NewGuid();
         Server targetServer = GetTargetServer();
-        targetServer.AddChannel(Guid.Empty, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
-        AddMessageCommand command = new(Guid.NewGuid(), Guid.Empty, Guid.NewGuid(), "user", "message");
+        Channel newChannel = targetServer.AddChannel(Guid.Empty, "Target Channel", true, Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
+        newChannel.AddMember(senderId);
+        AddMessageCommand command = new(Guid.NewGuid(), Guid.Empty, senderId, "user", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -73,7 +77,7 @@ public class AddMessageCommandValidatorTests
     {
         // Arrange
         Server targetServer = GetTargetServer();
-        targetServer.AddChannel(Guid.NewGuid(), "Different Channel", Guid.NewGuid(), DateTime.UtcNow);
+        targetServer.AddChannel(Guid.NewGuid(), "Different Channel", true, Guid.NewGuid(), DateTime.UtcNow);
         AddMessageCommand command = new(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "user", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
@@ -87,9 +91,11 @@ public class AddMessageCommandValidatorTests
         // Arrange
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
+        Guid senderId = Guid.Empty;
         Server targetServer = GetTargetServer();
-        targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
-        AddMessageCommand command = new(serverId, channelId, Guid.Empty, "user", "message");
+        Channel newChannel = targetServer.AddChannel(channelId, "Target Channel", true, Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
+        newChannel.AddMember(senderId);
+        AddMessageCommand command = new(serverId, channelId, senderId, "user", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -101,14 +107,31 @@ public class AddMessageCommandValidatorTests
     }
 
     [Fact]
-    public async Task Username_IsEmpty_ReturnsError()
+    public async Task SenderId_IsNotTheCreatorOrMemberOfTheChannel_ThrowsUnauthorizedUserException()
     {
         // Arrange
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
         Server targetServer = GetTargetServer();
-        targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
-        AddMessageCommand command = new(serverId, channelId, Guid.NewGuid(), "", "message");
+        targetServer.AddChannel(channelId, "Target Channel", true, Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
+        AddMessageCommand command = new(serverId, channelId, Guid.NewGuid(), "user", "message");
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedUserException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+    }
+
+    [Fact]
+    public async Task Username_IsEmpty_ReturnsError()
+    {
+        // Arrange
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        Guid senderId = Guid.NewGuid();
+        Server targetServer = GetTargetServer();
+        Channel newChannel = targetServer.AddChannel(channelId, "Target Channel", true, Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
+        newChannel.AddMember(senderId);
+        AddMessageCommand command = new(serverId, channelId, senderId, "", "message");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -125,9 +148,11 @@ public class AddMessageCommandValidatorTests
         // Arrange
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
+        Guid senderId = Guid.NewGuid();
         Server targetServer = GetTargetServer();
-        targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
-        AddMessageCommand command = new(serverId, channelId, Guid.NewGuid(), "user", "");
+        Channel newChannel = targetServer.AddChannel(channelId, "Target Channel", true, Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
+        newChannel.AddMember(senderId);
+        AddMessageCommand command = new(serverId, channelId, senderId, "user", "");
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -175,9 +200,11 @@ public class AddMessageCommandValidatorTests
             "convallis";
         Guid serverId = Guid.NewGuid();
         Guid channelId = Guid.NewGuid();
+        Guid senderId = Guid.NewGuid();
         Server targetServer = GetTargetServer();
-        targetServer.AddChannel(channelId, "Target Channel", Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
-        AddMessageCommand command = new(serverId, channelId, Guid.NewGuid(), "user", message);
+        Channel newChannel = targetServer.AddChannel(channelId, "Target Channel", true, Guid.NewGuid(), DateTime.UtcNow, Guid.NewGuid(), DateTime.UtcNow);
+        newChannel.AddMember(senderId);
+        AddMessageCommand command = new(serverId, channelId, senderId, "user", message);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act

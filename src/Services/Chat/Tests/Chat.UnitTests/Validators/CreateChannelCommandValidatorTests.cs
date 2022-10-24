@@ -25,7 +25,7 @@ public class CreateChannelCommandValidatorTests
     {
         // Arrange
         Server targetServer = GetTargetServer();
-        CreateChannelCommand command = new(targetServer, "Test Channel", Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "Test Channel", true, Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Server)null!);
 
         // Act & Assert
@@ -37,7 +37,7 @@ public class CreateChannelCommandValidatorTests
     {
         // Arrange
         Server targetServer = GetTargetServer();
-        CreateChannelCommand command = new(targetServer, "", targetServer.CreatedById);
+        CreateChannelCommand command = new(targetServer, "", true, targetServer.CreatedById);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
 
@@ -55,7 +55,7 @@ public class CreateChannelCommandValidatorTests
         // Arrange
         Server targetServer = GetTargetServer();
         string name = "This is a long channel name that exceeds 50 characters in length 1234567890.";
-        CreateChannelCommand command = new(targetServer, name, targetServer.CreatedById);
+        CreateChannelCommand command = new(targetServer, name, true, targetServer.CreatedById);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(
             new Server("Target Server", "Short Desc", "Long Desc", "user@example.com", ""));
 
@@ -72,8 +72,8 @@ public class CreateChannelCommandValidatorTests
     {
         // Arrange
         Server targetServer = GetTargetServer();
-        CreateChannelCommand command = new(targetServer, "Existing Channel", targetServer.CreatedById);
-        targetServer.AddChannel(Guid.NewGuid(), "Existing Channel", Guid.NewGuid(), DateTime.UtcNow);
+        CreateChannelCommand command = new(targetServer, "Existing Channel", true, targetServer.CreatedById);
+        targetServer.AddChannel(Guid.NewGuid(), "Existing Channel", true, Guid.NewGuid(), DateTime.UtcNow);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act & Assert
@@ -86,7 +86,7 @@ public class CreateChannelCommandValidatorTests
         // Arrange
         Server targetServer = GetTargetServer();
         targetServer.AddModerator(Guid.Empty, DateTime.UtcNow);
-        CreateChannelCommand command = new(targetServer, "Channel Name", Guid.Empty);
+        CreateChannelCommand command = new(targetServer, "Channel Name", true, Guid.Empty);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act
@@ -102,7 +102,7 @@ public class CreateChannelCommandValidatorTests
     {
         // Arrange
         Server targetServer = GetTargetServer();
-        CreateChannelCommand command = new(targetServer, "Channel Name", Guid.NewGuid());
+        CreateChannelCommand command = new(targetServer, "Channel Name", true, Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
 
         // Act & Assert

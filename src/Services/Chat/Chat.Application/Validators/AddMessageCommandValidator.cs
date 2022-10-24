@@ -16,5 +16,6 @@ public class AddMessageCommandValidator : AbstractValidator<AddMessageCommand>
         RuleFor(x => x.Content).NotEmpty().MaximumLength(1000);
 
         RuleFor(x => new Tuple<Guid, Guid>(x.ServerId, x.ChannelId)).MustBeExistingChannel(repositoryManager);
+        RuleFor(x => new Tuple<Guid, Guid, Guid>(x.ServerId, x.ChannelId, x.SenderId)).MustBeTheCreatorOrMemberOfTheChannel(repositoryManager);
     }
 }

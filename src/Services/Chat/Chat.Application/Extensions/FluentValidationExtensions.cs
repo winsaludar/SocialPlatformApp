@@ -242,4 +242,25 @@ public static class FluentValidationExtensions
             return true;
         });
     }
+
+    public static IRuleBuilderOptions<T, Tuple<Guid, Guid, Guid>> MustBeTheCreatorOrMemberOfTheChannel<T>(this IRuleBuilder<T, Tuple<Guid, Guid, Guid>> ruleBuilder, IRepositoryManager repositoryManager)
+    {
+        return ruleBuilder.MustAsync(async (props, cancellationToken) =>
+        {
+            (Guid serverId, Guid channelId, Guid senderId) = props;
+
+            var server = await repositoryManager.ServerRepository.GetByIdAsync(serverId);
+            if (server is null)
+                throw new ServerNotFoundException(serverId.ToString());
+
+            Channel? channel = server.Channels.FirstOrDefault(x => x.Id == channelId);
+            if (channel is null)
+                throw new ChannelNotFoundException(channelId.ToString());
+
+            if (server.CreatedById != senderId && !channel.Members.Any(x => x == senderId))
+                throw new UnauthorizedUserException(senderId.ToString());
+
+            return true;
+        });
+    }
 }

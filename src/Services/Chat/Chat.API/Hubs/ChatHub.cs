@@ -49,9 +49,17 @@ public class ChatHub : Hub
         User user = await GetUserAsync();
 
         AddMessageCommand command = new(server.Id, channelId, user.Id, user.Username, message);
-        ValidationResult validationResult = await _validatorManager.AddMessageCommandValidator.ValidateAsync(command);
-        if (!validationResult.IsValid)
-            validationResult.ThrowHubException();
+
+        try
+        {
+            ValidationResult validationResult = await _validatorManager.AddMessageCommandValidator.ValidateAsync(command);
+            if (!validationResult.IsValid)
+                validationResult.ThrowHubException();
+        }
+        catch (Exception ex)
+        {
+            throw new HubException(ex.Message);
+        }
 
         await _mediator.Send(command);
 

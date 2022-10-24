@@ -27,7 +27,7 @@ public class UpdateChannelCommandHandlerTests
         // Arrange
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "");
         Guid targetChannelId = Guid.NewGuid();
-        UpdateChannelCommand command = new(targetServer, targetChannelId, "Updated Name", Guid.NewGuid());
+        UpdateChannelCommand command = new(targetServer, targetChannelId, "Updated Name", true, Guid.NewGuid());
 
         // Act
         var result = await _updateChannelCommandHandler.Handle(command, It.IsAny<CancellationToken>());
