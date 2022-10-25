@@ -114,6 +114,23 @@ public class ChannelsController : ControllerBase
         return Ok("Channel deleted");
     }
 
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+    [Route("{serverId}/channels/{channelId}/members/add")]
+    public async Task<IActionResult> AddMemberAsync(Guid serverId, Guid channelId, [FromBody] AddRemoveChannelMemberModel request)
+    {
+        User user = await GetUserAsync();
+        Server server = await GetServerAsync(serverId);
+        AddChannelMemberCommand command = new(server, channelId, request.UserId, user.Id);
+
+        await _mediator.Send(command);
+
+        return Ok("User added");
+    }
+
     private async Task<User> GetUserAsync()
     {
         if (!User.IsValid())
