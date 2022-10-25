@@ -40,10 +40,11 @@ public class AddChannelMemberCommandValidatorTests
     {
         // Arrange
         Guid userId = Guid.NewGuid();
+        Guid channelId = Guid.Empty;
         Server targetServer = GetTargetServer();
-        targetServer.AddChannel(Guid.Empty, "notexisting", true, targetServer.CreatedById, DateTime.UtcNow);
+        targetServer.AddChannel(channelId, "notexisting", true, targetServer.CreatedById, DateTime.UtcNow);
         targetServer.AddMember(userId, "user", DateTime.UtcNow);
-        AddChannelMemberCommand command = new(targetServer, Guid.Empty, userId, targetServer.CreatedById);
+        AddChannelMemberCommand command = new(targetServer, channelId, userId, targetServer.CreatedById);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
         _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetUser(targetServer.CreatedById));
 
@@ -59,11 +60,12 @@ public class AddChannelMemberCommandValidatorTests
     public async Task UserId_IsEmpty_ReturnsAnError()
     {
         // Arrange
+        Guid userId = Guid.Empty;
         Guid channelId = Guid.NewGuid();
         Server targetServer = GetTargetServer();
         targetServer.AddChannel(channelId, "channel", true, targetServer.CreatedById, DateTime.UtcNow);
-        targetServer.AddMember(Guid.Empty, "notexisting", DateTime.UtcNow);
-        AddChannelMemberCommand command = new(targetServer, channelId, Guid.Empty, targetServer.CreatedById);
+        targetServer.AddMember(userId, "notexisting", DateTime.UtcNow);
+        AddChannelMemberCommand command = new(targetServer, channelId, userId, targetServer.CreatedById);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
         _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetUser(targetServer.CreatedById));
 
