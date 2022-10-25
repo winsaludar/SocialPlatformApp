@@ -22,4 +22,5 @@ public interface IValidatorManager
     public AbstractValidator<AddModeratorCommand> AddModeratorCommandValidator { get; }
     public AbstractValidator<RemoveModeratorCommand> RemoveModeratorCommandValidator { get; }
     public AbstractValidator<AddChannelMemberCommand> AddChannelMemberCommandValidator { get; }
+    public AbstractValidator<RemoveChannelMemberCommand> RemoveChannelMemberCommandValidator { get; }
 }

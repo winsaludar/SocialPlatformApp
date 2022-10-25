@@ -113,4 +113,13 @@ public class Server : Entity, IAggregateRoot
 
         channel.AddMember(userId);
     }
+
+    public void RemoveChannelMember(Guid channelId, Guid userId)
+    {
+        Channel? channel = _channels.FirstOrDefault(x => x.Id == channelId);
+        if (channel is null)
+            return;
+
+        channel.RemoveMember(userId);
+    }
 }
