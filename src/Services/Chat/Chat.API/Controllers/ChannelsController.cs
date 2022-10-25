@@ -125,6 +125,12 @@ public class ChannelsController : ControllerBase
         User user = await GetUserAsync();
         Server server = await GetServerAsync(serverId);
         AddChannelMemberCommand command = new(server, channelId, request.UserId, user.Id);
+        ValidationResult validationResult = await _validatorManager.AddChannelMemberCommandValidator.ValidateAsync(command);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
 
         await _mediator.Send(command);
 

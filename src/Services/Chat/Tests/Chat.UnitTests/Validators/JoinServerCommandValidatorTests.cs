@@ -100,6 +100,7 @@ public class JoinServerCommandValidatorTests
     private static Server GetTargetServer()
     {
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetCreatedById(Guid.NewGuid());
         targetServer.SetId(Guid.NewGuid());
 
         return targetServer;

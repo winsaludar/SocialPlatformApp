@@ -202,7 +202,7 @@ public static class FluentValidationExtensions
             if (server is null)
                 throw new ServerNotFoundException(targetServer.Id.ToString());
 
-            if (server.Members.Any(x => x.UserId == userId))
+            if (server.Members.Any(x => x.UserId == userId) || server.CreatedById == userId)
                 throw new UserIsAlreadyAMemberException(userId.ToString());
 
             return true;
@@ -219,7 +219,7 @@ public static class FluentValidationExtensions
             if (server is null)
                 throw new ServerNotFoundException(targetServer.Id.ToString());
 
-            if (server.Moderators.Any(x => x.UserId == userId))
+            if (server.Moderators.Any(x => x.UserId == userId) || server.CreatedById == userId)
                 throw new UserIsAlreadyAModeratorException(userId.ToString());
 
             return true;
@@ -259,6 +259,27 @@ public static class FluentValidationExtensions
 
             if (server.CreatedById != senderId && !channel.Members.Any(x => x == senderId))
                 throw new UnauthorizedUserException(senderId.ToString());
+
+            return true;
+        });
+    }
+
+    public static IRuleBuilderOptions<T, Tuple<Server, Guid, Guid>> MustNotBeExistingMemberOfTheChannel<T>(this IRuleBuilder<T, Tuple<Server, Guid, Guid>> ruleBuilder, IRepositoryManager repositoryManager)
+    {
+        return ruleBuilder.MustAsync(async (props, cancellationToken) =>
+        {
+            (Server targetServer, Guid targetChannelId, Guid userId) = props;
+
+            var server = await repositoryManager.ServerRepository.GetByIdAsync(targetServer.Id);
+            if (server is null)
+                throw new ServerNotFoundException(targetServer.Id.ToString());
+
+            Channel? channel = server.Channels.FirstOrDefault(x => x.Id == targetChannelId);
+            if (channel is null)
+                throw new ChannelNotFoundException(targetChannelId.ToString());
+
+            if (channel.Members.Any(x => x == userId) || server.CreatedById == userId)
+                throw new UserIsAlreadyAMemberException(userId.ToString());
 
             return true;
         });

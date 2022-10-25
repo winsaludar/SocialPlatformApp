@@ -43,7 +43,7 @@ public class AddModeratorCommandValidatorTests
         targetServer.AddMember(Guid.Empty, "notexisting", DateTime.UtcNow);
         AddModeratorCommand command = new(targetServer, Guid.Empty, targetServer.CreatedById);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
-        _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetUser());
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetUser(targetServer.CreatedById));
 
         // Act
         var result = await _validator.ValidateAsync(command, It.IsAny<CancellationToken>());
@@ -75,7 +75,7 @@ public class AddModeratorCommandValidatorTests
         targetServer.AddMember(moderatorId, "user", DateTime.UtcNow);
         AddModeratorCommand command = new(targetServer, Guid.NewGuid(), Guid.NewGuid());
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
-        _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetUser());
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(GetUser(Guid.NewGuid()));
 
         // Act & Assert
         await Assert.ThrowsAsync<UnauthorizedUserException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
@@ -85,7 +85,7 @@ public class AddModeratorCommandValidatorTests
     public async Task User_IsNotAMember_ThrowsUserIsNotAMemberException()
     {
         // Arrange
-        User existingUser = GetUser();
+        User existingUser = GetUser(Guid.NewGuid());
         Server targetServer = GetTargetServer();
         AddModeratorCommand command = new(targetServer, existingUser.Id, targetServer.CreatedById);
         _mockRepositoryManager.Setup(x => x.ServerRepository.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(targetServer);
@@ -99,7 +99,7 @@ public class AddModeratorCommandValidatorTests
     public async Task User_IsAlreadyAModerator_ThrowsUserIsAlreadyAModeratorException()
     {
         // Arrange
-        User moderator = GetUser();
+        User moderator = GetUser(Guid.NewGuid());
         Server targetServer = GetTargetServer();
         targetServer.AddMember(moderator.Id, moderator.Username, DateTime.UtcNow);
         targetServer.AddModerator(moderator.Id, DateTime.UtcNow);
@@ -114,15 +114,16 @@ public class AddModeratorCommandValidatorTests
     private static Server GetTargetServer()
     {
         Server targetServer = new("Target Server", "Short Desc", "Long Desc", "creator@example.com", "");
+        targetServer.SetCreatedById(Guid.NewGuid());
         targetServer.SetId(Guid.NewGuid());
 
         return targetServer;
     }
 
-    private static User GetUser()
+    private static User GetUser(Guid userId)
     {
         User user = new(Guid.NewGuid(), "user", "user@example.com");
-        user.SetId(Guid.NewGuid());
+        user.SetId(userId);
 
         return user;
     }

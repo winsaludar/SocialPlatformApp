@@ -17,7 +17,7 @@ public class CreateChannelCommandHandler : IRequestHandler<CreateChannelCommand,
         // Add channel members
         if (request.IsPublic)
         {
-            foreach (var member in request.TargetServer.Members)
+            foreach (var member in request.TargetServer.Members.Where(x => x.UserId != request.TargetServer.CreatedById))
                 newChannel.AddMember(member.UserId);
         }
         if (request.TargetServer.CreatedById != request.CreatedById)
