@@ -104,4 +104,22 @@ public class Server : Entity, IAggregateRoot
 
         _moderators.Remove(mod);
     }
+
+    public void AddChannelMember(Guid channelId, Guid userId)
+    {
+        Channel? channel = _channels.FirstOrDefault(x => x.Id == channelId);
+        if (channel is null)
+            return;
+
+        channel.AddMember(userId);
+    }
+
+    public void RemoveChannelMember(Guid channelId, Guid userId)
+    {
+        Channel? channel = _channels.FirstOrDefault(x => x.Id == channelId);
+        if (channel is null)
+            return;
+
+        channel.RemoveMember(userId);
+    }
 }

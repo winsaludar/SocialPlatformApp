@@ -18,7 +18,7 @@ public class UpdateChannelCommandHandler : IRequestHandler<UpdateChannelCommand,
         // Add channel members
         if (request.IsPublic && updatedChannel is not null)
         {
-            foreach (var member in request.TargetServer.Members)
+            foreach (var member in request.TargetServer.Members.Where(x => x.UserId != targetServer.CreatedById))
                 updatedChannel.AddMember(member.UserId);
         }
 

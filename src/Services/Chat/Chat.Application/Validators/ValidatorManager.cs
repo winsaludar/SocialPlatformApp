@@ -22,6 +22,8 @@ public class ValidatorManager : IValidatorManager
     private readonly Lazy<ChangeUsernameCommandValidator> _lazyChangeUsernameCommandValidator;
     private readonly Lazy<AddModeratorCommandValidator> _lazyAddModeratorCommandValidator;
     private readonly Lazy<RemoveModeratorCommandValidator> _lazyRemoveModeratorCommandValidator;
+    private readonly Lazy<AddChannelMemberCommandValidator> _lazyAddChannelMemberCommandValidator;
+    private readonly Lazy<RemoveChannelMemberCommandValidator> _lazyRemoveChannelMemberCommandValidator;
 
     public ValidatorManager(IRepositoryManager repositoryManager)
     {
@@ -40,6 +42,8 @@ public class ValidatorManager : IValidatorManager
         _lazyChangeUsernameCommandValidator = new Lazy<ChangeUsernameCommandValidator>(() => new ChangeUsernameCommandValidator(repositoryManager));
         _lazyAddModeratorCommandValidator = new Lazy<AddModeratorCommandValidator>(() => new AddModeratorCommandValidator(repositoryManager));
         _lazyRemoveModeratorCommandValidator = new Lazy<RemoveModeratorCommandValidator>(() => new RemoveModeratorCommandValidator(repositoryManager));
+        _lazyAddChannelMemberCommandValidator = new Lazy<AddChannelMemberCommandValidator>(() => new AddChannelMemberCommandValidator(repositoryManager));
+        _lazyRemoveChannelMemberCommandValidator = new Lazy<RemoveChannelMemberCommandValidator>(() => new RemoveChannelMemberCommandValidator(repositoryManager));
     }
 
     public AbstractValidator<CreateServerCommand> CreateServerCommandValidator => _lazyCreateServerCommandValidator.Value;
@@ -57,4 +61,6 @@ public class ValidatorManager : IValidatorManager
     public AbstractValidator<ChangeUsernameCommand> ChangeUsernameCommandValidator => _lazyChangeUsernameCommandValidator.Value;
     public AbstractValidator<AddModeratorCommand> AddModeratorCommandValidator => _lazyAddModeratorCommandValidator.Value;
     public AbstractValidator<RemoveModeratorCommand> RemoveModeratorCommandValidator => _lazyRemoveModeratorCommandValidator.Value;
+    public AbstractValidator<AddChannelMemberCommand> AddChannelMemberCommandValidator => _lazyAddChannelMemberCommandValidator.Value;
+    public AbstractValidator<RemoveChannelMemberCommand> RemoveChannelMemberCommandValidator => _lazyRemoveChannelMemberCommandValidator.Value;
 }

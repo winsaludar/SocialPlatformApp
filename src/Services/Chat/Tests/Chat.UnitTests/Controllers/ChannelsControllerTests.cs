@@ -23,6 +23,8 @@ public class ChannelsControllerTests
     private readonly InlineValidator<CreateChannelCommand> _createChannelCommandValidator;
     private readonly InlineValidator<UpdateChannelCommand> _updateChannelCommandValidator;
     private readonly InlineValidator<DeleteChannelCommand> _deleteChannelCommandValidator;
+    private readonly InlineValidator<AddChannelMemberCommand> _addChannelMemberCommandValidator;
+    private readonly InlineValidator<RemoveChannelMemberCommand> _removeChannelMemberCommandValidator;
     private readonly ChannelsController _controller;
 
     public ChannelsControllerTests()
@@ -32,12 +34,16 @@ public class ChannelsControllerTests
         _createChannelCommandValidator = new InlineValidator<CreateChannelCommand>();
         _updateChannelCommandValidator = new InlineValidator<UpdateChannelCommand>();
         _deleteChannelCommandValidator = new InlineValidator<DeleteChannelCommand>();
+        _addChannelMemberCommandValidator = new InlineValidator<AddChannelMemberCommand>();
+        _removeChannelMemberCommandValidator = new InlineValidator<RemoveChannelMemberCommand>();
 
         Mock<IValidatorManager> mockValidatorManager = new();
         mockValidatorManager.Setup(x => x.GetChannelsQueryValidator).Returns(_getChannelsQueryValidator);
         mockValidatorManager.Setup(x => x.CreateChannelCommandValidator).Returns(_createChannelCommandValidator);
         mockValidatorManager.Setup(x => x.UpdateChannelCommandValidator).Returns(_updateChannelCommandValidator);
         mockValidatorManager.Setup(x => x.DeleteChannelCommandValidator).Returns(_deleteChannelCommandValidator);
+        mockValidatorManager.Setup(x => x.AddChannelMemberCommandValidator).Returns(_addChannelMemberCommandValidator);
+        mockValidatorManager.Setup(x => x.RemoveChannelMemberCommandValidator).Returns(_removeChannelMemberCommandValidator);
 
         _controller = new ChannelsController(_mockMediator.Object, mockValidatorManager.Object);
     }
@@ -303,6 +309,149 @@ public class ChannelsControllerTests
         _mockMediator.Verify(x => x.Send(It.IsAny<DeleteChannelCommand>(), It.IsAny<CancellationToken>()), Times.Once);
         Assert.IsType<OkObjectResult>(result);
     }
+
+    [Fact]
+    public async Task AddMemberAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        AddRemoveChannelMemberModel request = new() { UserId = Guid.NewGuid() };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.AddMemberAsync(serverId, channelId, request));
+    }
+
+    [Fact]
+    public async Task AddMemberAsync_TargetServerNotFound_ReturnsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        AddRemoveChannelMemberModel request = new() { UserId = Guid.NewGuid() };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.AddMemberAsync(serverId, channelId, request));
+    }
+
+    [Fact]
+    public async Task AddMemberAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        AddRemoveChannelMemberModel request = new() { UserId = Guid.NewGuid() };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _addChannelMemberCommandValidator.RuleFor(x => x.UserId).Must(userId => false);
+
+        // Act
+        var result = await _controller.AddMemberAsync(serverId, channelId, request);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<AddChannelMemberCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("UserId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task AddMemberAsync_ValidationResultIsValid_ReturnsOkObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        AddRemoveChannelMemberModel request = new() { UserId = Guid.NewGuid() };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _addChannelMemberCommandValidator.RuleFor(x => x.UserId).Must(userId => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<AddChannelMemberCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
+
+        // Act
+        var result = await _controller.AddMemberAsync(serverId, channelId, request);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<AddChannelMemberCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task RemoveMemberAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        AddRemoveChannelMemberModel request = new() { UserId = Guid.NewGuid() };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.RemoveMemberAsync(serverId, channelId, request));
+    }
+
+    [Fact]
+    public async Task RemoveMemberAsync_TargetServerNotFound_ReturnsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        AddRemoveChannelMemberModel request = new() { UserId = Guid.NewGuid() };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.RemoveMemberAsync(serverId, channelId, request));
+    }
+
+    [Fact]
+    public async Task RemoveMemberAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        AddRemoveChannelMemberModel request = new() { UserId = Guid.NewGuid() };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _removeChannelMemberCommandValidator.RuleFor(x => x.UserId).Must(userId => false);
+
+        // Act
+        var result = await _controller.RemoveMemberAsync(serverId, channelId, request);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<RemoveChannelMemberCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("UserId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task RemoveMemberAsync_ValidationResultIsValid_ReturnsOkObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        Guid serverId = Guid.NewGuid();
+        Guid channelId = Guid.NewGuid();
+        AddRemoveChannelMemberModel request = new() { UserId = Guid.NewGuid() };
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _removeChannelMemberCommandValidator.RuleFor(x => x.UserId).Must(userId => true);
+        _mockMediator.Setup(x => x.Send(It.IsAny<RemoveChannelMemberCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(It.IsAny<bool>());
+
+        // Act
+        var result = await _controller.RemoveMemberAsync(serverId, channelId, request);
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<RemoveChannelMemberCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
 
     private void SetUpNullUserIdentity()
     {
