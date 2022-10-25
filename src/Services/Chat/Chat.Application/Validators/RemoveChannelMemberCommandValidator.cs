@@ -12,7 +12,7 @@ public class RemoveChannelMemberCommandValidator : AbstractValidator<RemoveChann
     {
         RuleFor(x => x.TargetServer).MustBeExistingServer(repositoryManager);
         RuleFor(x => x.ChannelId).NotEmpty();
-        RuleFor(x => x.UserId).NotEmpty().MustBeExistingUser(repositoryManager);
+        RuleFor(x => x.UserId).NotEmpty(); // Note: No need to check if user is valid to avoid deadlock
 
         RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.RemovedById)).MustBeTheCreatorOrAModerator(repositoryManager);
         RuleFor(x => new Tuple<Server, Guid>(x.TargetServer, x.ChannelId)).MustBeExistingChannel(repositoryManager);
