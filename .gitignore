@@ -108,37 +108,37 @@
 /src/Archive/Services/Space/Tests/Space.UnitTests/bin/Debug/net6.0
 /src/Archive/Services/Space/Tests/Space.UnitTests/obj
 
-# dependencies
+# nextjs dependencies
 /client/app-spa/node_modules
 /client/app-spa/.pnp
 /client/app-spa/.pnp.js
 
-# testing
+# nextjs testing
 /client/app-spa/coverage
 
 # next.js
 /client/app-spa/.next/
 /client/app-spa/out/
 
-# production
+# nextjs production
 /client/app-spa/build
 
-# misc
+# nextjs misc
 /client/app-spa/.DS_Store
 /client/app-spa/*.pem
 
-# debug
+# nextjs debug
 /client/app-spa/npm-debug.log*
 /client/app-spa/yarn-debug.log*
 /client/app-spa/yarn-error.log*
 /client/app-spa/.pnpm-debug.log*
 
-# local env files
+# nextjs local env files
 /client/app-spa/.env*.local
 
 # vercel
 /client/app-spa/.vercel
 
-# typescript
+# nextjs typescript
 /client/app-spa/*.tsbuildinfo
 /client/app-spa/next-env.d.ts
