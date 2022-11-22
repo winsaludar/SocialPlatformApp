@@ -55,9 +55,9 @@ export default function Login({ title }) {
             </div>
           </form>
 
-          <p class={styles.text}>
+          <p className={styles.text}>
             Not a member? <a href="#">Sign up now</a>{" "}
-            <svg class={styles.icon}>
+            <svg className={styles.icon}>
               <use href="#icon-arrow-right"></use>
             </svg>
           </p>

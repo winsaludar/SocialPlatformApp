@@ -109,36 +109,36 @@
 /src/Archive/Services/Space/Tests/Space.UnitTests/obj
 
 # nextjs dependencies
-/client/app-spa/node_modules
-/client/app-spa/.pnp
-/client/app-spa/.pnp.js
+/client/webapp/node_modules
+/client/webapp/.pnp
+/client/webapp/.pnp.js
 
 # nextjs testing
-/client/app-spa/coverage
+/client/webapp/coverage
 
 # next.js
-/client/app-spa/.next/
-/client/app-spa/out/
+/client/webapp/.next/
+/client/webapp/out/
 
 # nextjs production
-/client/app-spa/build
+/client/webapp/build
 
 # nextjs misc
-/client/app-spa/.DS_Store
-/client/app-spa/*.pem
+/client/webapp/.DS_Store
+/client/webapp/*.pem
 
 # nextjs debug
-/client/app-spa/npm-debug.log*
-/client/app-spa/yarn-debug.log*
-/client/app-spa/yarn-error.log*
-/client/app-spa/.pnpm-debug.log*
+/client/webapp/npm-debug.log*
+/client/webapp/yarn-debug.log*
+/client/webapp/yarn-error.log*
+/client/webapp/.pnpm-debug.log*
 
 # nextjs local env files
-/client/app-spa/.env*.local
+/client/webapp/.env*.local
 
 # vercel
-/client/app-spa/.vercel
+/client/webapp/.vercel
 
 # nextjs typescript
-/client/app-spa/*.tsbuildinfo
-/client/app-spa/next-env.d.ts
+/client/webapp/*.tsbuildinfo
+/client/webapp/next-env.d.ts
