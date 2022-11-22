@@ -13,19 +13,19 @@ export default function Login({ title }) {
         <div className={styles.grid}>
           <form action="#" method="POST" className={styles.form}>
             <div className={styles.field}>
-              <label htmlFor="username" className={styles.label}>
+              <label htmlFor="Email" className={styles.label}>
                 <svg className={styles.icon}>
                   <use href="#icon-user"></use>
                 </svg>
-                <span className={utilStyles.hidden}>Username</span>
+                <span className={utilStyles.hidden}>Email</span>
               </label>
               <input
-                autoComplete="username"
-                id="username"
-                type="text"
-                name="username"
+                autoComplete="Email"
+                id="Email"
+                type="email"
+                name="Email"
                 className={styles.input}
-                placeholder="Username"
+                placeholder="Email"
                 required
               />
             </div>
@@ -38,7 +38,7 @@ export default function Login({ title }) {
                 <span className={utilStyles.hidden}>Password</span>
               </label>
               <input
-                autoComplete="username"
+                autoComplete="Email"
                 id="password"
                 type="password"
                 name="password"
