@@ -1,14 +1,14 @@
-import Head from "next/head";
 import { useState } from "react";
+import Head from "next/head";
+import Link from "next/link";
+import AlertBox from "../utils/AlertBox";
 import styles from "../../styles/authentication.module.css";
 import utilStyles from "../../styles/utils.module.css";
-import Link from "next/link";
-import { useRouter } from "next/router";
 
 export default function Registration({ title }) {
   const [formData, setFormData] = useState({});
-  const [registrationErrors, setRegistrationErrors] = useState([]);
-  const router = useRouter();
+  const [alertMessages, setAlertMessages] = useState([]);
+  const [isRegisterSuccessful, setIsRegisterSuccessful] = useState(null);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -26,10 +26,14 @@ export default function Registration({ title }) {
     const response = await fetch(endpoint, options);
     const result = await response.json();
 
-    if (response.status !== 200) {
-      setRegistrationErrors(result.errors);
+    if (!response.ok) {
+      setAlertMessages(result.errors);
+      setIsRegisterSuccessful(false);
     } else {
-      router.push("/");
+      setAlertMessages([
+        "Registration successful. You may now use your account to login",
+      ]);
+      setIsRegisterSuccessful(true);
     }
   }
 
@@ -41,7 +45,15 @@ export default function Registration({ title }) {
 
       <div className={styles.container}>
         <div className={styles.grid}>
-          <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          {alertMessages && alertMessages.length > 0 && (
+            <AlertBox
+              type={isRegisterSuccessful ? "success" : "error"}
+              messages={alertMessages}
+              onCloseButtonClick={() => setAlertMessages([])}
+            />
+          )}
+
+          <form className={styles.form} onSubmit={handleSubmit}>
             {/* First Name */}
             <div className={styles.field}>
               <label htmlFor="firstName" className={styles.label}>

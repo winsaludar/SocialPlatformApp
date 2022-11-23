@@ -1,5 +1,5 @@
 .alert {
-  padding: 0.25em;
+  padding: 0.5em 2em 0.5em 0.5em;
   margin-bottom: 1rem;
   background-color: var(--baseColor);
   border-radius: 4px;
