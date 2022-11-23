@@ -1,12 +1,14 @@
 .container {
+  /* Position the container at the center of the viewport */
   display: grid;
   place-items: center;
   min-height: 100vh;
 }
 
 .grid {
+  /* Set the center grid item's width to 90% of the screen
+  but limit the max size to 25rem  */
   inline-size: 90%;
-  margin-inline: auto;
   max-inline-size: 25rem;
 }
 
