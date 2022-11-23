@@ -14,3 +14,21 @@ export function parseServerErrors(result) {
 
   return errors;
 }
+
+export async function sendServerRequest(api, fetchOptions, res) {
+  try {
+    const response = await fetch(api, fetchOptions);
+    const result = await response.json();
+    if (!response.ok) {
+      return res
+        .status(response.status)
+        .json({ errors: parseServerErrors(result), data: {} });
+    }
+
+    return res.status(200).json({ data: result, errors: [] });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ errors: [`Error processing request: ${err}`], data: {} });
+  }
+}
