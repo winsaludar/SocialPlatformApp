@@ -27,8 +27,11 @@ export async function sendServerRequest(api, fetchOptions, res) {
 
     return res.status(200).json({ data: result, errors: [] });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ errors: [`Error processing request: ${err}`], data: {} });
+    return res.status(500).json({
+      errors: [
+        "Unable to process request at this moment, please try again later",
+      ],
+      data: {},
+    });
   }
 }
