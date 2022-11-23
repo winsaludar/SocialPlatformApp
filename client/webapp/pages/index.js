@@ -1,8 +1,8 @@
 import Login from "../components/authentication/Login";
 
-export default function Home() {
-  const appName = "App Name";
+const appName = process.env.NEXT_PUBLIC_APP_NAME;
 
+export default function Home() {
   return (
     <>
       <Login title={`Login | ${appName}`} />

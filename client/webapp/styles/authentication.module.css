@@ -12,8 +12,8 @@
 
 .form {
   display: grid;
-  gap: var(--loginFormGap);
-  color: var(--loginColor);
+  gap: var(--authFormGap);
+  color: var(--authColor);
 }
 
 .field {
@@ -36,31 +36,31 @@
 .label,
 .input,
 .submit {
-  border-radius: var(--loginBorderRadius);
+  border-radius: var(--authBorderRadius);
   padding: 1rem;
 }
 
 .label {
-  background-color: var(--loginLabelBackgroundColor);
+  background-color: var(--authLabelBackgroundColor);
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
   padding-inline: 1.25rem;
 }
 
 .input {
-  background-color: var(--loginInputBackgroundColor);
+  background-color: var(--authInputBackgroundColor);
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 }
 
 .input:focus,
 .input:hover {
-  background-color: var(--loginInputHoverBackgroundColor);
+  background-color: var(--authInputHoverBackgroundColor);
 }
 
 .submit {
-  background-color: var(--loginSubmitBackgroundColor);
-  color: var(--loginSubmitColor);
+  background-color: var(--authSubmitBackgroundColor);
+  color: var(--authSubmitColor);
   font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
@@ -68,7 +68,7 @@
 
 .submit:focus,
 .submit:hover {
-  background-color: var(--loginSubmitHoverBackgroundColor);
+  background-color: var(--authSubmitHoverBackgroundColor);
 }
 
 .icons {
@@ -78,7 +78,7 @@
 .icon {
   block-size: 1em;
   display: inline-block;
-  fill: var(--loginIconFill);
+  fill: var(--authIconFill);
   inline-size: 1em;
   vertical-align: middle;
 }
