@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useState } from "react";
 import styles from "../../styles/authentication.module.css";
 import utilStyles from "../../styles/utils.module.css";
+import Link from "next/link";
 
 export default function Registration({ title }) {
   const [formData, setFormData] = useState({});
@@ -155,7 +156,7 @@ export default function Registration({ title }) {
           </form>
 
           <p className={styles.text}>
-            Already have an account? <a href="#">Login here</a>{" "}
+            Already have an account? <Link href="/">Login here</Link>{" "}
             <svg className={styles.icon}>
               <use href="#icon-arrow-right"></use>
             </svg>
