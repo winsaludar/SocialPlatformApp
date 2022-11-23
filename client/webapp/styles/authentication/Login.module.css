@@ -1,0 +1,89 @@
+.container {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+.grid {
+  inline-size: 90%;
+  margin-inline: auto;
+  max-inline-size: 20rem;
+}
+
+.form {
+  display: grid;
+  gap: var(--loginFormGap);
+  color: var(--loginColor);
+}
+
+.field {
+  display: flex;
+}
+
+.input,
+.submit {
+  background-image: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  margin: 0;
+  outline: 0;
+  transition: background-color 0.3s;
+  inline-size: 100%;
+  flex: 1;
+}
+
+.label,
+.input,
+.submit {
+  border-radius: var(--loginBorderRadius);
+  padding: 1rem;
+}
+
+.label {
+  background-color: var(--loginLabelBackgroundColor);
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  padding-inline: 1.25rem;
+}
+
+.input {
+  background-color: var(--loginInputBackgroundColor);
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.input:focus,
+.input:hover {
+  background-color: var(--loginInputHoverBackgroundColor);
+}
+
+.submit {
+  background-color: var(--loginSubmitBackgroundColor);
+  color: var(--loginSubmitColor);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.submit:focus,
+.submit:hover {
+  background-color: var(--loginSubmitHoverBackgroundColor);
+}
+
+.icons {
+  display: none;
+}
+
+.icon {
+  block-size: 1em;
+  display: inline-block;
+  fill: var(--loginIconFill);
+  inline-size: 1em;
+  vertical-align: middle;
+}
+
+.text {
+  margin-block: 1.5rem;
+  text-align: center;
+}

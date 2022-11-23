@@ -69,6 +69,16 @@ void AddAuthentication(WebApplicationBuilder builder)
 
 void AddMiddlewares(WebApplicationBuilder builder)
 {
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(builder.Configuration["CORSPolicy:Name"], policy =>
+        {
+            policy.WithOrigins(builder.Configuration["CORSPolicy:Origins"])
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    });
+
     builder.Services.AddRouting(options => options.LowercaseUrls = true);
     builder.Services.AddControllers();
 
@@ -134,6 +144,8 @@ void EnableMiddlewares(WebApplication app)
     }
 
     app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+    app.UseCors(builder.Configuration["CORSPolicy:Name"]);
 
     app.UseHttpsRedirection();
 

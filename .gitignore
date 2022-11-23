@@ -107,3 +107,38 @@
 /src/Archive/Services/Space/Space.API/obj
 /src/Archive/Services/Space/Tests/Space.UnitTests/bin/Debug/net6.0
 /src/Archive/Services/Space/Tests/Space.UnitTests/obj
+
+# nextjs dependencies
+/client/webapp/node_modules
+/client/webapp/.pnp
+/client/webapp/.pnp.js
+
+# nextjs testing
+/client/webapp/coverage
+
+# next.js
+/client/webapp/.next/
+/client/webapp/out/
+
+# nextjs production
+/client/webapp/build
+
+# nextjs misc
+/client/webapp/.DS_Store
+/client/webapp/*.pem
+
+# nextjs debug
+/client/webapp/npm-debug.log*
+/client/webapp/yarn-debug.log*
+/client/webapp/yarn-error.log*
+/client/webapp/.pnpm-debug.log*
+
+# nextjs local env files
+/client/webapp/.env*.local
+
+# vercel
+/client/webapp/.vercel
+
+# nextjs typescript
+/client/webapp/*.tsbuildinfo
+/client/webapp/next-env.d.ts
