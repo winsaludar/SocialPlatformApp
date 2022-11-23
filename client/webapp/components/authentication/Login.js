@@ -1,11 +1,14 @@
-import Head from "next/head";
 import { useState } from "react";
+import Head from "next/head";
+import Link from "next/link";
+import AlertBox from "../utils/AlertBox";
 import styles from "../../styles/authentication.module.css";
 import utilStyles from "../../styles/utils.module.css";
-import Link from "next/link";
 
 export default function Login({ title }) {
   const [formData, setFormData] = useState({});
+  const [alertMessages, setAlertMessages] = useState([]);
+  const [isLoginSuccessful, setIsLoginSuccessful] = useState(null);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -24,6 +27,13 @@ export default function Login({ title }) {
     const result = await response.json();
 
     // TODO: DO SOMETHING AFTER LOGIN IS SUCCESSFUL
+    if (!response.ok) {
+      setIsLoginSuccessful(false);
+      setAlertMessages(result.errors);
+    } else {
+      setIsLoginSuccessful(true);
+      setAlertMessages(["Login successful"]);
+    }
   }
 
   return (
@@ -34,6 +44,14 @@ export default function Login({ title }) {
 
       <div className={styles.container}>
         <div className={styles.grid}>
+          {alertMessages && alertMessages.length > 0 && (
+            <AlertBox
+              type={isLoginSuccessful ? "success" : "error"}
+              messages={alertMessages}
+              onCloseButtonClick={() => setAlertMessages([])}
+            />
+          )}
+
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.field}>
               <label htmlFor="Email" className={styles.label}>
