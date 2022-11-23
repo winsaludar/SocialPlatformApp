@@ -1,8 +1,30 @@
 import Head from "next/head";
+import { useState } from "react";
 import styles from "../../styles/authentication/Login.module.css";
 import utilStyles from "../../styles/utils.module.css";
 
 export default function Login({ title }) {
+  const [formData, setFormData] = useState({});
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const payload = JSON.stringify({ ...formData });
+    const endpoint = "https://localhost:7059/api/auth/login";
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: payload,
+    };
+
+    const response = await fetch(endpoint, options);
+    const result = await response.json();
+
+    console.log("From API: ", result);
+  }
+
   return (
     <>
       <Head>
@@ -11,7 +33,7 @@ export default function Login({ title }) {
 
       <div className={styles.container}>
         <div className={styles.grid}>
-          <form action="#" method="POST" className={styles.form}>
+          <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.field}>
               <label htmlFor="Email" className={styles.label}>
                 <svg className={styles.icon}>
@@ -20,13 +42,16 @@ export default function Login({ title }) {
                 <span className={utilStyles.hidden}>Email</span>
               </label>
               <input
-                autoComplete="Email"
-                id="Email"
                 type="email"
-                name="Email"
                 className={styles.input}
+                id="Email"
+                name="Email"
                 placeholder="Email"
+                autoComplete="on"
                 required
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
               />
             </div>
 
@@ -38,13 +63,16 @@ export default function Login({ title }) {
                 <span className={utilStyles.hidden}>Password</span>
               </label>
               <input
-                autoComplete="Email"
-                id="password"
                 type="password"
-                name="password"
                 className={styles.input}
+                id="password"
+                name="password"
                 placeholder="Password"
+                autoComplete="off"
                 required
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
               />
             </div>
 
