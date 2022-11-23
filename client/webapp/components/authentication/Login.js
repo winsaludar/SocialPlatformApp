@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useState } from "react";
-import styles from "../../styles/authentication/Login.module.css";
+import styles from "../../styles/authentication.module.css";
 import utilStyles from "../../styles/utils.module.css";
 
 export default function Login({ title }) {

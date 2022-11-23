@@ -12,16 +12,16 @@
 
   --anchorColor: #eee;
 
-  --loginIconFill: var(--baseColor);
-  --loginFormGap: 0.875rem;
-  --loginBorderRadius: 0.25rem;
-  --loginColor: #eee;
-  --loginInputBackgroundColor: #3b4148;
-  --loginInputHoverBackgroundColor: #434a52;
-  --loginLabelBackgroundColor: #363b41;
-  --loginSubmitBackgroundColor: #ea4c88;
-  --loginSubmitColor: #eee;
-  --loginSubmitHoverBackgroundColor: #d44179;
+  --authIconFill: var(--baseColor);
+  --authFormGap: 0.875rem;
+  --authBorderRadius: 0.25rem;
+  --authColor: #eee;
+  --authInputBackgroundColor: #3b4148;
+  --authInputHoverBackgroundColor: #434a52;
+  --authLabelBackgroundColor: #363b41;
+  --authSubmitBackgroundColor: #ea4c88;
+  --authSubmitColor: #eee;
+  --authSubmitHoverBackgroundColor: #d44179;
 }
 
 * {
