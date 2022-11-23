@@ -10,7 +10,7 @@ export default function Login({ title }) {
     e.preventDefault();
 
     const payload = JSON.stringify({ ...formData });
-    const endpoint = "https://localhost:7059/api/auth/login";
+    const endpoint = "api/login";
     const options = {
       method: "POST",
       headers: {
@@ -22,7 +22,8 @@ export default function Login({ title }) {
     const response = await fetch(endpoint, options);
     const result = await response.json();
 
-    console.log("From API: ", result);
+    // TODO: DO SOMETHING AFTER LOGIN IS SUCCESSFUL
+    console.log(result);
   }
 
   return (

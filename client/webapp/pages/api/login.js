@@ -1,16 +1,16 @@
-import https from "https";
+import { parseServerErrors } from "../../utils/serverUtils";
 
 export default async function handler(req, res) {
   if (req.method !== "POST")
     return res
       .status(405)
-      .json({ error: "Unsupported request method", data: {} });
+      .json({ errors: ["Unsupported request method"], data: {} });
 
   const body = req.body;
   if (!body.email || !body.password) {
     return res
       .status(400)
-      .json({ error: "Required fields cannot be empty", data: {} });
+      .json({ errors: ["Required fields cannot be empty"], data: {} });
   }
 
   try {
@@ -20,24 +20,21 @@ export default async function handler(req, res) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: body,
-      agent: new https.Agent({ rejectUnauthorized: false }),
+      body: JSON.stringify(body),
     };
 
-    console.log(api);
-
     const response = await fetch(api, options);
-    console.log("Response: ", response);
-
     const result = await response.json();
-    console.log("Result ", result);
+    if (!response.ok) {
+      return res
+        .status(response.status)
+        .json({ errors: parseServerErrors(result), data: {} });
+    }
 
-    return res.status(200).json({ data: result, error: null });
+    return res.status(200).json({ data: result, errors: [] });
   } catch (err) {
-    console.log("Err ", err);
-
     return res
       .status(500)
-      .json({ error: `Error processing request: ${err}`, data: {} });
+      .json({ errors: [`Error processing request: ${err}`], data: {} });
   }
 }
