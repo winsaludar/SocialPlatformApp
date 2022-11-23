@@ -1,0 +1,43 @@
+.alert {
+  padding: 0.25em;
+  margin-bottom: 1rem;
+  background-color: var(--baseColor);
+  border-radius: 4px;
+  color: #000;
+  position: relative;
+}
+
+.alertSuccess {
+  background: var(--alertBoxSuccessBackgroundColor);
+  border-color: var(--alertBoxSuccessBorderColor);
+  color: var(--alertBoxSuccessTextColor);
+}
+
+.alertError {
+  background: var(--alertBoxErrorBackgroundColor);
+  border-color: var(--alertBoxErrorBorderColor);
+  color: var(--alertBoxErrorTextColor);
+}
+
+.closeButton {
+  position: absolute;
+  border: 0;
+  top: 2px;
+  right: 2px;
+  background: none;
+  color: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.closeButton:active,
+.closeButton:focus {
+  outline: 0;
+}
+
+.text {
+  margin: 0;
+}

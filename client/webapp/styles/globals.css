@@ -1,10 +1,12 @@
+@import url("https://fonts.googleapis.com/css?family=Maven+Pro:regular,bold,italic&subset=latin,latin-ext");
+
 :root {
   --baseColor: #606468;
 
   --htmlFontSize: 100%;
   --bodyBackgroundColor: #2c3338;
   --bodyColor: var(--baseColor);
-  --bodyFontFamily: "Open Sans";
+  --bodyFontFamily: "Maven Pro", "Open Sans";
   --bodyFontFamilyFallback: sans-serif;
   --bodyFontSize: 0.875rem;
   --bodyFontWeight: 400;
@@ -22,6 +24,13 @@
   --authSubmitBackgroundColor: #ea4c88;
   --authSubmitColor: #eee;
   --authSubmitHoverBackgroundColor: #d44179;
+
+  --alertBoxSuccessBackgroundColor: #ddf0d7;
+  --alertBoxSuccessBorderColor: #a4cd98;
+  --alertBoxSuccessTextColor: #1c652c;
+  --alertBoxErrorBackgroundColor: #f6ddde;
+  --alertBoxErrorBorderColor: #000;
+  --alertBoxErrorTextColor: #972a3d;
 }
 
 * {
