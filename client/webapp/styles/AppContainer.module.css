@@ -1,7 +1,6 @@
 .hero {
   background-blend-mode: multiply;
   background-color: var(--bodyBackgroundColor);
-  background-image: url("https://unsplash.it/1680/1050");
   background-size: cover;
   border-bottom: 1px solid var(--bodyBackgroundColor);
   box-shadow: 0 0px 20px 5px rgba(0, 0, 0, 0.7);
@@ -45,6 +44,7 @@
 }
 
 .cardImage img {
+  cursor: pointer;
   object-fit: cover;
 }
 
