@@ -1,4 +1,4 @@
-import styles from "../../styles/AlertBox.module.css";
+import styles from "../styles/AlertBox.module.css";
 
 export default function AlertBox({ type, messages, onCloseButtonClick }) {
   let alertTypeClass = "";
@@ -18,7 +18,9 @@ export default function AlertBox({ type, messages, onCloseButtonClick }) {
       {messages && (
         <ul>
           {messages.map((item) => (
-            <li key={item}>{item}</li>
+            <li key={item} className={styles.text}>
+              {item}
+            </li>
           ))}
         </ul>
       )}

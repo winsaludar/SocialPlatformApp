@@ -1,11 +1,11 @@
-import { useState } from "react";
-import Head from "next/head";
 import Link from "next/link";
-import AlertBox from "../utils/AlertBox";
+import { useState } from "react";
+
 import styles from "../../styles/authentication.module.css";
 import utilStyles from "../../styles/utils.module.css";
+import AlertBox from "../AlertBox";
 
-export default function Login({ title }) {
+export default function Login() {
   const [formData, setFormData] = useState({});
   const [alertMessages, setAlertMessages] = useState([]);
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(null);
@@ -38,10 +38,6 @@ export default function Login({ title }) {
 
   return (
     <>
-      <Head>
-        <title>{title}</title>
-      </Head>
-
       <div className={styles.container}>
         <div className={styles.grid}>
           {alertMessages && alertMessages.length > 0 && (
