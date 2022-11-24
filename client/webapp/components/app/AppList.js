@@ -1,5 +1,5 @@
+import styles from "../../styles/AppContainer.module.css";
 import AppListItem from "./AppListItem";
-import styles from "../../styles/AppList.module.css";
 
 export default function AppList({ title }) {
   return (

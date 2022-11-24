@@ -1,8 +1,8 @@
 .container {
   /* Position the container at the center of the viewport */
   display: grid;
-  place-items: center;
   min-height: 100vh;
+  place-items: center;
 }
 
 .grid {
@@ -13,9 +13,9 @@
 }
 
 .form {
+  color: var(--authColor);
   display: grid;
   gap: var(--authFormGap);
-  color: var(--authColor);
 }
 
 .field {
@@ -27,12 +27,12 @@
   background-image: none;
   border: 0;
   color: inherit;
+  flex: 1;
   font: inherit;
+  inline-size: 100%;
   margin: 0;
   outline: 0;
   transition: background-color 0.3s;
-  inline-size: 100%;
-  flex: 1;
 }
 
 .label,
@@ -63,9 +63,9 @@
 .submit {
   background-color: var(--authSubmitBackgroundColor);
   color: var(--authSubmitColor);
+  cursor: pointer;
   font-weight: 700;
   text-transform: uppercase;
-  cursor: pointer;
 }
 
 .submit:focus,

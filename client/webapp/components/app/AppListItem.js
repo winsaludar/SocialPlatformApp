@@ -1,10 +1,8 @@
 import Image from "next/image";
-import styles from "../../styles/AppList.module.css";
-import utilStyles from "../../styles/utils.module.css";
 
-function loader({ src, width, quality }) {
-  return `${src}?w=${width}&q=${quality || 75}`;
-}
+import styles from "../../styles/AppContainer.module.css";
+import utilStyles from "../../styles/utils.module.css";
+import { unsplashLoader } from "../../utils/imageUtils.js";
 
 export default function AppListItem({
   imageSrc,
@@ -16,7 +14,7 @@ export default function AppListItem({
   return (
     <div className={`${styles.card} ${utilStyles.stacked}`}>
       <Image
-        loader={loader}
+        loader={unsplashLoader}
         src={imageSrc}
         className={styles.cardImage}
         width={imageWidth}

@@ -1,8 +1,9 @@
-import { useState } from "react";
 import Link from "next/link";
-import AlertBox from "../utils/AlertBox";
+import { useState } from "react";
+
 import styles from "../../styles/authentication.module.css";
 import utilStyles from "../../styles/utils.module.css";
+import AlertBox from "../AlertBox";
 
 export default function Login() {
   const [formData, setFormData] = useState({});

@@ -1,10 +1,10 @@
-import AppBanner from "./AppBanner";
+import AppHero from "./AppHero";
 import AppList from "./AppList";
 
 export default function AppContainer() {
   return (
     <>
-      <AppBanner />
+      <AppHero />
       <AppList />
     </>
   );
