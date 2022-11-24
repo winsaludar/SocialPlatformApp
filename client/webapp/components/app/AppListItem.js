@@ -1,7 +1,5 @@
 import Image from "next/image";
-
 import styles from "../../styles/AppContainer.module.css";
-import { unsplashLoader } from "../../utils/imageUtils.js";
 
 export default function AppListItem({
   imageSrc,
@@ -17,13 +15,7 @@ export default function AppListItem({
       onClick={() => onClick(title, description, imageSrc)}
     >
       <div className={styles.cardImage}>
-        <Image
-          loader={unsplashLoader}
-          src={imageSrc}
-          width={imageWidth}
-          height={imageHeight}
-          alt=""
-        />
+        <Image src={imageSrc} width={imageWidth} height={imageHeight} alt="" />
       </div>
       <div className={styles.cardContent}>
         <h2 className={styles.cardTitle}>{title}</h2>

@@ -9,9 +9,9 @@ export default function AppList({ onItemClick }) {
           return (
             <AppListItem
               key={i}
-              imageSrc={`https://unsplash.it/1650/1080?q=${i}`}
-              imageWidth={600}
-              imageHeight={400}
+              imageSrc={`/images/placeholder/ali-${i + 1}.jpg`}
+              imageWidth={1680}
+              imageHeight={1050}
               title={`App Title ${i + 1}`}
               description="Nullam posuere nibh augue, nec sagittis ex eleifend sed. Curabitur tristique porta consequat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos."
               onClick={onItemClick}
