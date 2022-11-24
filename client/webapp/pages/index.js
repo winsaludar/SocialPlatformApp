@@ -1,6 +1,5 @@
-import Head from "next/head";
-import Login from "../components/authentication/Login";
 import AppContainer from "../components/app/AppContainer";
+import Login from "../components/authentication/Login";
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME;
 const isLoggedIn = true; // TODO: USE REAL LOGIN SESSION

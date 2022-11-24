@@ -1,4 +1,3 @@
-import Head from "next/head";
 import AppListItem from "./AppListItem";
 import styles from "../../styles/AppList.module.css";
 
