@@ -10,5 +10,11 @@ export async function getStaticProps() {
 }
 
 export default function Home() {
-  return isLoggedIn ? <AppContainer /> : <Login />;
+  return isLoggedIn ? (
+    <AppContainer />
+  ) : (
+    <section>
+      <Login />
+    </section>
+  );
 }

@@ -7,7 +7,7 @@ export default function Layout({ children }) {
         <title>{children.props.title}</title>
       </Head>
 
-      {children}
+      <main>{children}</main>
     </>
   );
 }

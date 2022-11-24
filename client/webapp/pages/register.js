@@ -7,5 +7,9 @@ export async function getStaticProps() {
 }
 
 export default function Register() {
-  return <Registration />;
+  return (
+    <section>
+      <Registration />
+    </section>
+  );
 }
