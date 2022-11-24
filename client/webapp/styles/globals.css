@@ -12,7 +12,7 @@
   --bodyFontWeight: 400;
   --bodyLineHeight: 1.5;
 
-  --anchorColor: #eee;
+  --anchorColor: white;
 
   --authIconFill: var(--baseColor);
   --authFormGap: 0.875rem;
@@ -31,6 +31,16 @@
   --alertBoxErrorBackgroundColor: #f6ddde;
   --alertBoxErrorBorderColor: #000;
   --alertBoxErrorTextColor: #972a3d;
+
+  --appTextColor: white;
+  --appListItemBackgroundColor: white;
+  --appListItemContentBackground: linear-gradient(
+    to bottom left,
+    #ef8d9c 40%,
+    #ffc39e 100%
+  );
+  --appListItemButtonBackgroundColor: transparent;
+  --appListItemButtonHoverBackgroundColor: rgba(255, 255, 255, 0.12);
 }
 
 /* Box sizing rules */
