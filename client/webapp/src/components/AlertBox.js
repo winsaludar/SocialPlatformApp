@@ -1,4 +1,4 @@
-import styles from "../styles/AlertBox.module.css";
+import styles from "../../styles/AlertBox.module.css";
 
 export default function AlertBox({ type, messages, onCloseButtonClick }) {
   let alertTypeClass = "";
