@@ -17,7 +17,6 @@ export default function LoginPage() {
       <Login
         registerLink="/register"
         onSubmitSuccessfulCallback={(response) => {
-          console.log(response);
           Cookies.set("currentUser", JSON.stringify(response));
           router.push("/");
         }}
