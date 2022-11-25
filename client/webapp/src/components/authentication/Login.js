@@ -1,18 +1,21 @@
-import Cookies from "js-cookie";
 import Link from "next/link";
 import { useState } from "react";
 
 import styles from "../../../styles/authentication.module.css";
 import utilStyles from "../../../styles/utils.module.css";
 import AlertBox from "../AlertBox";
+import Loader from "../Loader";
 
 export default function Login({ registerLink, onSubmitSuccessfulCallback }) {
   const [formData, setFormData] = useState({});
   const [alertMessages, setAlertMessages] = useState([]);
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(null);
+  const [showLoader, setShowLoader] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setAlertMessages([]);
+    setShowLoader(true);
 
     const payload = JSON.stringify({ ...formData });
     const endpoint = "api/login";
@@ -30,16 +33,20 @@ export default function Login({ registerLink, onSubmitSuccessfulCallback }) {
     if (!response.ok) {
       setIsLoginSuccessful(false);
       setAlertMessages(result.errors);
+      setShowLoader(false);
       return;
     }
 
     setIsLoginSuccessful(true);
     setAlertMessages(["Login successful"]);
+    setShowLoader(false);
     if (onSubmitSuccessfulCallback) onSubmitSuccessfulCallback(result.data);
   }
 
   return (
     <>
+      {showLoader && <Loader />}
+
       <div className={styles.container}>
         <div className={styles.grid}>
           {alertMessages && alertMessages.length > 0 && (

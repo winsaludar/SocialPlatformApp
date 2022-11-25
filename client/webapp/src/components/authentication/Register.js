@@ -4,14 +4,18 @@ import { useState } from "react";
 import styles from "../../../styles/authentication.module.css";
 import utilStyles from "../../../styles/utils.module.css";
 import AlertBox from "../AlertBox";
+import Loader from "../Loader";
 
 export default function Register({ loginLink }) {
   const [formData, setFormData] = useState({});
   const [alertMessages, setAlertMessages] = useState([]);
   const [isRegisterSuccessful, setIsRegisterSuccessful] = useState(null);
+  const [showLoader, setShowLoader] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setAlertMessages([]);
+    setShowLoader(true);
 
     const payload = JSON.stringify({ ...formData });
     const endpoint = "api/register";
@@ -34,11 +38,23 @@ export default function Register({ loginLink }) {
         "Registration successful. You may now use your account to login",
       ]);
       setIsRegisterSuccessful(true);
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        retypeEmail: "",
+        password: "",
+        retypePassword: "",
+      });
     }
+
+    setShowLoader(false);
   }
 
   return (
     <>
+      {showLoader && <Loader />}
+
       <div className={styles.container}>
         <div className={styles.grid}>
           {alertMessages && alertMessages.length > 0 && (
@@ -66,6 +82,7 @@ export default function Register({ loginLink }) {
                 placeholder="First Name"
                 autoComplete="on"
                 required
+                value={formData.firstName}
                 onChange={(e) =>
                   setFormData({ ...formData, firstName: e.target.value })
                 }
@@ -88,6 +105,7 @@ export default function Register({ loginLink }) {
                 placeholder="Last Name"
                 autoComplete="on"
                 required
+                value={formData.lastName}
                 onChange={(e) =>
                   setFormData({ ...formData, lastName: e.target.value })
                 }
@@ -110,6 +128,7 @@ export default function Register({ loginLink }) {
                 placeholder="Email"
                 autoComplete="on"
                 required
+                value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
@@ -132,6 +151,7 @@ export default function Register({ loginLink }) {
                 placeholder="Re-type Email"
                 autoComplete="on"
                 required
+                value={formData.retypeEmail}
                 onChange={(e) =>
                   setFormData({ ...formData, retypeEmail: e.target.value })
                 }
@@ -154,6 +174,7 @@ export default function Register({ loginLink }) {
                 placeholder="Password"
                 autoComplete="off"
                 required
+                value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
@@ -176,6 +197,7 @@ export default function Register({ loginLink }) {
                 placeholder="Re-type Password"
                 autoComplete="off"
                 required
+                value={formData.retypePassword}
                 onChange={(e) =>
                   setFormData({ ...formData, retypePassword: e.target.value })
                 }

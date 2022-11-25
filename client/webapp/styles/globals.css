@@ -41,6 +41,12 @@
   );
   --appListItemButtonBackgroundColor: transparent;
   --appListItemButtonHoverBackgroundColor: rgba(255, 255, 255, 0.12);
+
+  --loaderBackgroundColor1: #93eee4;
+  --loaderBackgroundColor2: #52e2d9;
+  --loaderBackgroundColor3: #4ebdc2;
+  --loaderBackgroundColor4: #f74f8c;
+  --loaderBackgroundColor5: #d53d70;
 }
 
 /* Box sizing rules */
