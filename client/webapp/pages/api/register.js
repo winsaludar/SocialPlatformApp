@@ -1,4 +1,4 @@
-import { sendServerRequest } from "../../utils/serverUtils";
+import { sendServerRequest } from "../../src/utils/server.util";
 
 export default async function handler(req, res) {
   if (req.method !== "POST")

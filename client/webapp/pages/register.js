@@ -1,4 +1,4 @@
-import Registration from "../components/authentication/Registration";
+import Register from "../src/components/authentication/Register";
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME;
 
@@ -6,10 +6,10 @@ export async function getStaticProps() {
   return { props: { title: `Register | ${appName}` } };
 }
 
-export default function Register() {
+export default function RegisterPage() {
   return (
     <section>
-      <Registration />
+      <Register loginLink="/login" />
     </section>
   );
 }

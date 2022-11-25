@@ -1,4 +1,4 @@
-import styles from "../../styles/AppContainer.module.css";
+import styles from "../../../styles/AppContainer.module.css";
 import AppListItem from "./AppListItem";
 
 export default function AppList({ onItemClick }) {

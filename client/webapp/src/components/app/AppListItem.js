@@ -1,5 +1,5 @@
 import Image from "next/image";
-import styles from "../../styles/AppContainer.module.css";
+import styles from "../../../styles/AppContainer.module.css";
 
 export default function AppListItem({
   imageSrc,

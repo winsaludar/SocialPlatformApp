@@ -1,17 +1,21 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import styles from "../../styles/authentication.module.css";
-import utilStyles from "../../styles/utils.module.css";
+import styles from "../../../styles/authentication.module.css";
+import utilStyles from "../../../styles/utils.module.css";
 import AlertBox from "../AlertBox";
+import Loader from "../Loader";
 
-export default function Login() {
+export default function Login({ registerLink, onSubmitSuccessfulCallback }) {
   const [formData, setFormData] = useState({});
   const [alertMessages, setAlertMessages] = useState([]);
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(null);
+  const [showLoader, setShowLoader] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setAlertMessages([]);
+    setShowLoader(true);
 
     const payload = JSON.stringify({ ...formData });
     const endpoint = "api/login";
@@ -26,18 +30,23 @@ export default function Login() {
     const response = await fetch(endpoint, options);
     const result = await response.json();
 
-    // TODO: DO SOMETHING AFTER LOGIN IS SUCCESSFUL
     if (!response.ok) {
       setIsLoginSuccessful(false);
       setAlertMessages(result.errors);
-    } else {
-      setIsLoginSuccessful(true);
-      setAlertMessages(["Login successful"]);
+      setShowLoader(false);
+      return;
     }
+
+    setIsLoginSuccessful(true);
+    setAlertMessages(["Login successful"]);
+    setShowLoader(false);
+    if (onSubmitSuccessfulCallback) onSubmitSuccessfulCallback(result.data);
   }
 
   return (
     <>
+      {showLoader && <Loader />}
+
       <div className={styles.container}>
         <div className={styles.grid}>
           {alertMessages && alertMessages.length > 0 && (
@@ -99,7 +108,7 @@ export default function Login() {
           </form>
 
           <p className={styles.text}>
-            Not a member? <Link href="/register">Sign up now</Link>{" "}
+            Not a member? <Link href={registerLink}>Sign up now</Link>{" "}
             <svg className={styles.icon}>
               <use href="#icon-arrow-right"></use>
             </svg>

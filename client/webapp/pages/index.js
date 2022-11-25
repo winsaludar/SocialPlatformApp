@@ -1,20 +1,38 @@
-import AppContainer from "../components/app/AppContainer";
-import Login from "../components/authentication/Login";
+import { useRef, useState } from "react";
+
+import initialBanner from "../public/images/placeholder/initial-banner.jpg";
+import AppHero from "../src/components/app/AppHero";
+import AppList from "../src/components/app/AppList";
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME;
-const isLoggedIn = true; // TODO: USE REAL LOGIN SESSION
 
 export async function getStaticProps() {
-  const title = isLoggedIn ? "Homepage" : "Login";
-  return { props: { title: `${title} | ${appName}` } };
+  return { props: { title: `Home | ${appName}` } };
 }
 
-export default function Home() {
-  return isLoggedIn ? (
-    <AppContainer />
-  ) : (
-    <section>
-      <Login />
-    </section>
+export default function HomePage() {
+  const [heroData, setHeroData] = useState({
+    title: "Some really interesting text here",
+    description:
+      "Donec eleifend erat lacus, ac porttitor purus ultrices at. Proin sagittis interdum ex in sollicitudin. Integer et nibh fringilla, vehicula velit quis, blandit lorem. Morbi id tortor ante. Quisque inest egestas, posuere magna feugiat, iaculis purus.",
+    backgroundImage: initialBanner.src,
+  });
+  const myHeaderRef = useRef(null);
+
+  function handleItemClick(title, description, backgroundImage) {
+    setHeroData({ title, description, backgroundImage });
+    myHeaderRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  return (
+    <>
+      <header ref={myHeaderRef}>
+        <AppHero data={heroData} />
+      </header>
+
+      <section>
+        <AppList onItemClick={handleItemClick} />
+      </section>
+    </>
   );
 }
