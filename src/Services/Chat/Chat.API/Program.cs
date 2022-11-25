@@ -127,11 +127,8 @@ void RegisterEventBus(WebApplicationBuilder builder)
 
         var factory = new ConnectionFactory()
         {
-            HostName = builder.Configuration["EventBus:Hostname"],
-            DispatchConsumersAsync = true,
-            Port = int.Parse(builder.Configuration["EventBus:Port"]),
-            UserName = builder.Configuration["EventBus:Username"],
-            Password = builder.Configuration["EventBus:Password"],
+            Uri = new Uri(builder.Configuration["EventBus:Url"]),
+            DispatchConsumersAsync = true
         };
 
         int retryCount = int.Parse(builder.Configuration["EventBus:RetryCount"]);
