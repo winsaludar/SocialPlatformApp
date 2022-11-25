@@ -1,3 +1,6 @@
+import Cookies from "js-cookie";
+import { useRouter } from "next/router";
+
 import Login from "../src/components/authentication/Login";
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME;
@@ -7,9 +10,18 @@ export async function getStaticProps() {
 }
 
 export default function LoginPage() {
+  const router = useRouter();
+
   return (
     <section>
-      <Login />
+      <Login
+        registerLink="/register"
+        onSubmitSuccessfulCallback={(response) => {
+          console.log(response);
+          Cookies.set("currentUser", JSON.stringify(response));
+          router.push("/");
+        }}
+      />
     </section>
   );
 }

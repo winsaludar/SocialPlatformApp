@@ -1,10 +1,11 @@
-import { sendServerRequest } from "../../src/utils/serverUtils";
+import { sendServerRequest } from "../../src/utils/server.util";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST")
+  if (req.method !== "POST") {
     return res
       .status(405)
       .json({ errors: ["Unsupported request method"], data: {} });
+  }
 
   const body = req.body;
   if (!body.email || !body.password) {

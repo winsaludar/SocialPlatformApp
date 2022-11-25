@@ -5,7 +5,7 @@ import styles from "../../../styles/authentication.module.css";
 import utilStyles from "../../../styles/utils.module.css";
 import AlertBox from "../AlertBox";
 
-export default function Register() {
+export default function Register({ loginLink }) {
   const [formData, setFormData] = useState({});
   const [alertMessages, setAlertMessages] = useState([]);
   const [isRegisterSuccessful, setIsRegisterSuccessful] = useState(null);
@@ -190,7 +190,7 @@ export default function Register() {
           </form>
 
           <p className={styles.text}>
-            Already have an account? <Link href="/">Sign in here</Link>{" "}
+            Already have an account? <Link href={loginLink}>Sign in here</Link>{" "}
             <svg className={styles.icon}>
               <use href="#icon-arrow-right"></use>
             </svg>

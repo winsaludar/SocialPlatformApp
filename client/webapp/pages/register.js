@@ -9,7 +9,7 @@ export async function getStaticProps() {
 export default function RegisterPage() {
   return (
     <section>
-      <Register />
+      <Register loginLink="/login" />
     </section>
   );
 }

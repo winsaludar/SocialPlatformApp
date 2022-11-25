@@ -1,8 +1,8 @@
+import { useRef, useState } from "react";
+
+import initialBanner from "../public/images/placeholder/initial-banner.jpg";
 import AppHero from "../src/components/app/AppHero";
 import AppList from "../src/components/app/AppList";
-import { useState, useRef } from "react";
-import initialBanner from "../public/images/placeholder/initial-banner.jpg";
-import Cookies from "js-cookie";
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME;
 

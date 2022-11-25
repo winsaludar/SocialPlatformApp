@@ -6,7 +6,7 @@ import styles from "../../../styles/authentication.module.css";
 import utilStyles from "../../../styles/utils.module.css";
 import AlertBox from "../AlertBox";
 
-export default function Login() {
+export default function Login({ registerLink, onSubmitSuccessfulCallback }) {
   const [formData, setFormData] = useState({});
   const [alertMessages, setAlertMessages] = useState([]);
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(null);
@@ -27,16 +27,15 @@ export default function Login() {
     const response = await fetch(endpoint, options);
     const result = await response.json();
 
-    // TODO: DO SOMETHING AFTER LOGIN IS SUCCESSFUL
     if (!response.ok) {
       setIsLoginSuccessful(false);
       setAlertMessages(result.errors);
-    } else {
-      setIsLoginSuccessful(true);
-      setAlertMessages(["Login successful"]);
-
-      setTimeout;
+      return;
     }
+
+    setIsLoginSuccessful(true);
+    setAlertMessages(["Login successful"]);
+    if (onSubmitSuccessfulCallback) onSubmitSuccessfulCallback(result.data);
   }
 
   return (
@@ -102,7 +101,7 @@ export default function Login() {
           </form>
 
           <p className={styles.text}>
-            Not a member? <Link href="/register">Sign up now</Link>{" "}
+            Not a member? <Link href={registerLink}>Sign up now</Link>{" "}
             <svg className={styles.icon}>
               <use href="#icon-arrow-right"></use>
             </svg>
