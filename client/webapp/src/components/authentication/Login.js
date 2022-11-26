@@ -4,18 +4,22 @@ import { useState } from "react";
 import styles from "../../../styles/authentication.module.css";
 import utilStyles from "../../../styles/utils.module.css";
 import AlertBox from "../AlertBox";
-import Loader from "../Loader";
 
-export default function Login({ registerLink, onSubmitSuccessfulCallback }) {
+export default function Login({
+  registerLink,
+  onPreSubmitCallback,
+  onFailCallback,
+  onSuccessCallback,
+}) {
   const [formData, setFormData] = useState({});
   const [alertMessages, setAlertMessages] = useState([]);
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(null);
-  const [showLoader, setShowLoader] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setAlertMessages([]);
-    setShowLoader(true);
+
+    if (onPreSubmitCallback) onPreSubmitCallback();
 
     const payload = JSON.stringify({ ...formData });
     const endpoint = "api/login";
@@ -27,26 +31,39 @@ export default function Login({ registerLink, onSubmitSuccessfulCallback }) {
       body: payload,
     };
 
-    const response = await fetch(endpoint, options);
-    const result = await response.json();
-
-    if (!response.ok) {
+    let response;
+    let result;
+    try {
+      response = await fetch(endpoint, options);
+      result = await response.json();
+    } catch (err) {
       setIsLoginSuccessful(false);
-      setAlertMessages(result.errors);
-      setShowLoader(false);
+      setAlertMessages([
+        "The server is currently busy right now, please try again later",
+      ]);
       return;
     }
 
-    setIsLoginSuccessful(true);
-    setAlertMessages(["Login successful"]);
-    setShowLoader(false);
-    if (onSubmitSuccessfulCallback) onSubmitSuccessfulCallback(result.data);
+    // Fail
+    if (!response.ok) {
+      if (onFailCallback) onFailCallback();
+
+      setIsLoginSuccessful(false);
+      setAlertMessages(result.errors);
+      return;
+    }
+
+    // Success
+    if (onSuccessCallback) {
+      onSuccessCallback(result.data);
+    } else {
+      setIsLoginSuccessful(true);
+      setAlertMessages(["Login successful"]);
+    }
   }
 
   return (
     <>
-      {showLoader && <Loader />}
-
       <div className={styles.container}>
         <div className={styles.grid}>
           {alertMessages && alertMessages.length > 0 && (
