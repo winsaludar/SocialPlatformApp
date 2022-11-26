@@ -4,18 +4,22 @@ import { useState } from "react";
 import styles from "../../../styles/authentication.module.css";
 import utilStyles from "../../../styles/utils.module.css";
 import AlertBox from "../AlertBox";
-import Loader from "../Loader";
 
-export default function Register({ loginLink }) {
+export default function Register({
+  loginLink,
+  onPreSubmitCallback,
+  onFailCallback,
+  onSuccessCallback,
+}) {
   const [formData, setFormData] = useState({});
   const [alertMessages, setAlertMessages] = useState([]);
   const [isRegisterSuccessful, setIsRegisterSuccessful] = useState(null);
-  const [showLoader, setShowLoader] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setAlertMessages([]);
-    setShowLoader(true);
+
+    if (onPreSubmitCallback) onPreSubmitCallback();
 
     const payload = JSON.stringify({ ...formData });
     const endpoint = "api/register";
@@ -27,34 +31,49 @@ export default function Register({ loginLink }) {
       body: payload,
     };
 
-    const response = await fetch(endpoint, options);
-    const result = await response.json();
+    let response;
+    let result;
+    try {
+      response = await fetch(endpoint, options);
+      result = await response.json();
+    } catch (err) {
+      if (onFailCallback) onFailCallback();
 
-    if (!response.ok) {
-      setAlertMessages(result.errors);
-      setIsRegisterSuccessful(false);
-    } else {
+      setIsLoginSuccessful(false);
       setAlertMessages([
-        "Registration successful. You may now use your account to login",
+        "The server is currently busy right now, please try again later",
       ]);
-      setIsRegisterSuccessful(true);
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        retypeEmail: "",
-        password: "",
-        retypePassword: "",
-      });
+      return;
     }
 
-    setShowLoader(false);
+    // Fail
+    if (!response.ok) {
+      if (onFailCallback) onFailCallback();
+
+      setAlertMessages(result.errors);
+      setIsRegisterSuccessful(false);
+      return;
+    }
+
+    // Success
+    if (onSuccessCallback) onSuccessCallback();
+
+    setAlertMessages([
+      "Registration successful. You may now use your account to login",
+    ]);
+    setIsRegisterSuccessful(true);
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      retypeEmail: "",
+      password: "",
+      retypePassword: "",
+    });
   }
 
   return (
     <>
-      {showLoader && <Loader />}
-
       <div className={styles.container}>
         <div className={styles.grid}>
           {alertMessages && alertMessages.length > 0 && (
