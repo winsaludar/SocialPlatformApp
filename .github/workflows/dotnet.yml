@@ -51,7 +51,7 @@ jobs:
         run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} -f ./Services/Authentication/Authentication.API/Dockerfile .
 
       - name: Tag Image (Authenticaton.API)
-        run: docker tag ${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} registry.heroku.cmo/${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }}/web
+        run: docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} registry.heroku.cmo/${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }}/web
 
       - name: Push to Docker Hub (Authenticaton.API)
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}
