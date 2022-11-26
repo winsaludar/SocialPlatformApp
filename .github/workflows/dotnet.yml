@@ -59,6 +59,12 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+      - name: Login to Docker Hub
+          uses: docker/login-action@v2
+          with:
+            username: ${{ secrets.DOCKER_HUB_USERNAME }}
+            password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -66,4 +72,4 @@ jobs:
           app-name: "mxah0d1gcu7dce10grwzaf34"
           slot-name: "production"
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_41318e37f99146ceb1705f3076fb1e84 }}
-          images: "index.docker.io/${{ secrets.AzureAppService_ContainerUsername_cea339f50c0748039f93fa83e5804e60 }}/winsaludar/socialplatformapp:authentication-api"
+          images: "index.docker.io/${{ secrets.DOCKER_HUB_USERNAME }}/socialplatformapp:authentication-api"
