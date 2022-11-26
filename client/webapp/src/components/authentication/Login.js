@@ -37,6 +37,8 @@ export default function Login({
       response = await fetch(endpoint, options);
       result = await response.json();
     } catch (err) {
+      if (onFailCallback) onFailCallback();
+
       setIsLoginSuccessful(false);
       setAlertMessages([
         "The server is currently busy right now, please try again later",
