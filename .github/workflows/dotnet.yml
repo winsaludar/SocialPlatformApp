@@ -1,4 +1,4 @@
-name: Build & Test
+name: Build & Test .NET
 
 on:
   push:
@@ -7,19 +7,23 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-    name: Build & Test
+  build_and_test:
+    name: Build & Test .NET
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore ./src/SocialPlatformApp.sln
-    - name: Build
-      run: dotnet build ./src/SocialPlatformApp.sln --no-restore 
-    - name: Test
-      run: dotnet test ./src/SocialPlatformApp.sln --no-build --verbosity normal    
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore ./src/SocialPlatformApp.sln
+
+      - name: Build
+        run: dotnet build ./src/SocialPlatformApp.sln --no-restore 
+
+      - name: Test
+        run: dotnet test ./src/SocialPlatformApp.sln --no-build --verbosity normal    
