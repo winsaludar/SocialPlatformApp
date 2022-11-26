@@ -26,6 +26,7 @@ jobs:
         working-directory: src
         run: |
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} -f ./Services/Authentication/Authentication.API/Dockerfile .
+
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}
 
   azure:
@@ -48,4 +49,4 @@ jobs:
           app-name: ${{ secrets.AZURE_APP_NAME }}
           slot-name: "production"
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_41318e37f99146ceb1705f3076fb1e84 }}
-          images: "index.docker.io/${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}"
+          images: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}"
