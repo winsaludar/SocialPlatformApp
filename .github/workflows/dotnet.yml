@@ -46,22 +46,19 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       # Authentication.API Deployment
-      - name: Build Image (Authenticaton.API)
+      - name: Build & Push to Docker (Authenticaton.API)
         working-directory: src
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} -f ./Services/Authentication/Authentication.API/Dockerfile .
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} -f ./Services/Authentication/Authentication.API/Dockerfile .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}
 
-      - name: Tag Image (Authenticaton.API)
-        run: docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} registry.heroku.cmo/${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }}/web
-
-      - name: Push to Docker Hub (Authenticaton.API)
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}
-
-      - name: Push to Heroku Container Registry (Authenticaton.API)
+      - name: Build & Push to Heroku (Authenticaton.API)
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
+          docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} registry.heroku.cmo/${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }}/web
           heroku container:login
-          heroku container:push -a ${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }} web
+          heroku container:push -a ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }} web
 
   publish:
     runs-on: ubuntu-latest
