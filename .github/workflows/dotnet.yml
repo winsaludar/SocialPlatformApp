@@ -63,6 +63,7 @@ jobs:
       - name: Deploy Authentication.API
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
+          appdir: "src/Services/Authentication/Authentication.API"
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: ${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }}
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
