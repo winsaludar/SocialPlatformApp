@@ -14,7 +14,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
         
-      - name: Build the Authentication.API Docker Image
+      - name: Build Docker Images
         working-directory:  src
         run:  docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/socialplatformapp:authentication-api -f ./Services/Authentication/Authentication.API/Dockerfile .
       
@@ -23,3 +23,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          
+      - name: Push Images to Docker Hub
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/socialplatformapp:authentication-api
