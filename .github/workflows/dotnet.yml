@@ -69,7 +69,7 @@ jobs:
       - name: Release (Authentication.API)
         run: |
           docker login --username=_ --password=${{ secrets.HEROKU_API_KEY }} registry.heroku.com
-          heroku container:release -a ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} web
+          heroku container:release -a ${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }} web
 
     # environment:
     #   name: "production"
