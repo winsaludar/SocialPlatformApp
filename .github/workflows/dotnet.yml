@@ -10,64 +10,68 @@ on:
   workflow_dispatch:
 
 jobs:
-  # dotnet:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Check out the repo
-  #       uses: actions/checkout@v3
-
-  #     - name: Setup .NET
-  #       uses: actions/setup-dotnet@v2
-  #       with:
-  #         dotnet-version: 6.0.x
-
-  #     - name: Restore Dependencies
-  #       run: dotnet restore ./src/SocialPlatformApp.sln
-
-  #     - name: Build Solution
-  #       run: dotnet build ./src/SocialPlatformApp.sln --no-restore
-
-  #     - name: Run Test Cases
-  #       run: dotnet test ./src/SocialPlatformApp.sln --no-build --verbosity normal
-
-  # docker:
-  #   runs-on: ubuntu-latest
-  #   needs: dotnet
-
-  #   steps:
-  #     - name: Check out the repo
-  #       uses: actions/checkout@v3
-
-  #     - name: Build Images
-  #       working-directory: src
-  #       run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} -f ./Services/Authentication/Authentication.API/Dockerfile .
-
-  #     - name: Login to Docker Hub
-  #       uses: docker/login-action@v2
-  #       with:
-  #         username: ${{ secrets.DOCKER_HUB_USERNAME }}
-  #         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-  #     - name: Push to Docker Hub
-  #       run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}
-
-  heroku:
+  build:
     runs-on: ubuntu-latest
-    # needs: docker
 
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Deploy Authentication.API
-        uses: akhileshns/heroku-deploy@v3.12.12
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
         with:
-          appdir: "src"
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: ${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }}
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          usedocker: true
+          dotnet-version: 6.0.x
+
+      - name: Restore Dependencies
+        run: dotnet restore ./src/SocialPlatformApp.sln
+
+      - name: Build Solution
+        run: dotnet build ./src/SocialPlatformApp.sln --no-restore
+
+      - name: Run Test Cases
+        run: dotnet test ./src/SocialPlatformApp.sln --no-build --verbosity normal
+
+  deployment:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build & Tag Images
+        working-directory: src
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} -f ./Services/Authentication/Authentication.API/Dockerfile .
+        run: docker tag ${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} registry.heroku.cmo/${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }}/web      
+
+      - name: Push to Docker Hub
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}
+
+      - name: Push to Heroku Container Registry
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:login
+        run: heroku container:push -a ${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }} web
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: deployment
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Release
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:login
+        run: heroku container:release -a ${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }} web
 
     # environment:
     #   name: "production"
