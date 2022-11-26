@@ -38,9 +38,11 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
-      - name: Build Docker Images
+      - name: Build Images
         working-directory: src
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/socialplatformapp:authentication-api -f ./Services/Authentication/Authentication.API/Dockerfile .
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} -f ./Services/Authentication/Authentication.API/Dockerfile .
+          docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} registry.heroku.cmo/${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }}/web
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -48,10 +50,12 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Push Docker Hub
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/socialplatformapp:authentication-api
+      - name: Push to Hubs
+        run: |
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}
+          docker push registry.heroku.cmo/${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }}/web
 
-  azure:
+  cloud:
     runs-on: ubuntu-latest
     needs: docker
     environment:
@@ -59,11 +63,14 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: "mxah0d1gcu7dce10grwzaf34"
-          slot-name: "production"
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_41318e37f99146ceb1705f3076fb1e84 }}
-          images: "index.docker.io/${{ secrets.DOCKER_HUB_USERNAME }}/socialplatformapp:authentication-api"
+      - name: Deploy to Heroku
+        run: heroku container:release -a ${{ secrets.HEROKU_AUTHENTICATION_API_APP_NAME }} web
+
+      # - name: Deploy to Azure Web App
+      #   id: deploy-to-webapp
+      #   uses: azure/webapps-deploy@v2
+      #   with:
+      #     app-name: "mxah0d1gcu7dce10grwzaf34"
+      #     slot-name: "production"
+      #     publish-profile: ${{ secrets.AzureAppService_PublishProfile_41318e37f99146ceb1705f3076fb1e84 }}
+      #     images: "index.docker.io/${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}"
