@@ -49,4 +49,4 @@ jobs:
           app-name: ${{ secrets.AZURE_APP_NAME }}
           slot-name: "production"
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_41318e37f99146ceb1705f3076fb1e84 }}
-          images: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}"
+          images: index.docker.io/v1/${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}"
