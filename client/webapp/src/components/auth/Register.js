@@ -88,7 +88,7 @@ export default function Register({
             {/* First Name */}
             <div className={styles.field}>
               <label htmlFor="firstName" className={styles.label}>
-                <svg className={styles.icon}>
+                <svg className={utilStyles.icon}>
                   <use href="#icon-user"></use>
                 </svg>
                 <span className={utilStyles.hidden}>First Name</span>
@@ -111,7 +111,7 @@ export default function Register({
             {/* Last Name */}
             <div className={styles.field}>
               <label htmlFor="lastName" className={styles.label}>
-                <svg className={styles.icon}>
+                <svg className={utilStyles.icon}>
                   <use href="#icon-user"></use>
                 </svg>
                 <span className={utilStyles.hidden}>Last Name</span>
@@ -134,7 +134,7 @@ export default function Register({
             {/* Email */}
             <div className={styles.field}>
               <label htmlFor="Email" className={styles.label}>
-                <svg className={styles.icon}>
+                <svg className={utilStyles.icon}>
                   <use href="#icon-mail"></use>
                 </svg>
                 <span className={utilStyles.hidden}>Email</span>
@@ -157,7 +157,7 @@ export default function Register({
             {/* Re-type Email */}
             <div className={styles.field}>
               <label htmlFor="retypeEmail" className={styles.label}>
-                <svg className={styles.icon}>
+                <svg className={utilStyles.icon}>
                   <use href="#icon-mail"></use>
                 </svg>
                 <span className={utilStyles.hidden}>Re-type Email</span>
@@ -180,7 +180,7 @@ export default function Register({
             {/* Password */}
             <div className={styles.field}>
               <label htmlFor="password" className={styles.label}>
-                <svg className={styles.icon}>
+                <svg className={utilStyles.icon}>
                   <use href="#icon-lock"></use>
                 </svg>
                 <span className={utilStyles.hidden}>Password</span>
@@ -203,7 +203,7 @@ export default function Register({
             {/* Re-type Password */}
             <div className={styles.field}>
               <label htmlFor="retypePassword" className={styles.label}>
-                <svg className={styles.icon}>
+                <svg className={utilStyles.icon}>
                   <use href="#icon-lock"></use>
                 </svg>
                 <span className={utilStyles.hidden}>Re-type Password</span>
@@ -232,13 +232,13 @@ export default function Register({
 
           <p className={styles.text}>
             Already have an account? <Link href={loginLink}>Sign in here</Link>{" "}
-            <svg className={styles.icon}>
+            <svg className={utilStyles.icon}>
               <use href="#icon-arrow-right"></use>
             </svg>
           </p>
         </div>
 
-        <svg xmlns="http://www.w3.org/2000/svg" className={styles.icons}>
+        <svg xmlns="http://www.w3.org/2000/svg" className={utilStyles.icons}>
           <symbol id="icon-user" viewBox="0 0 1792 1792">
             <path d="M1600 1405q0 120-73 189.5t-194 69.5H459q-121 0-194-69.5T192 1405q0-53 3.5-103.5t14-109T236 1084t43-97.5 62-81 85.5-53.5T538 832q9 0 42 21.5t74.5 48 108 48T896 971t133.5-21.5 108-48 74.5-48 42-21.5q61 0 111.5 20t85.5 53.5 62 81 43 97.5 26.5 108.5 14 109 3.5 103.5zm-320-893q0 159-112.5 271.5T896 896 624.5 783.5 512 512t112.5-271.5T896 128t271.5 112.5T1280 512z" />
           </symbol>

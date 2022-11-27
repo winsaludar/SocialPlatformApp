@@ -73,18 +73,6 @@
   background-color: var(--authSubmitHoverBackgroundColor);
 }
 
-.icons {
-  display: none;
-}
-
-.icon {
-  block-size: 1em;
-  display: inline-block;
-  fill: var(--authIconFill);
-  inline-size: 1em;
-  vertical-align: middle;
-}
-
 .text {
   margin-block: 1.5rem;
   text-align: center;

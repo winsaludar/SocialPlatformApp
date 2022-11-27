@@ -1,3 +1,5 @@
+@import url(https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css);
+
 .container {
   display: grid;
   grid-auto-flow: row;
@@ -7,6 +9,8 @@
     "header"
     "content";
 }
+
+/* MAIN NAV */
 
 .mainNav {
   background-color: rgba(0, 0, 0, 0.3);
@@ -39,16 +43,45 @@
   flex: 0 0 auto;
 }
 
-.header {
-  grid-area: header;
-}
+/* SIDEBAR */
 
 .sidebar {
   background-color: rgba(0, 0, 0, 0.1);
   grid-area: sidebar;
   max-height: 10em;
   overflow-y: scroll;
+  padding: 1em;
 }
+
+.sidebar h2 {
+  color: white;
+  padding-bottom: 0.5em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.sidebar div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  justify-content: center;
+}
+
+.sidebar button {
+  background-color: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--baseColor);
+  color: white;
+  cursor: pointer;
+}
+
+/* HEADER */
+
+.header {
+  grid-area: header;
+}
+
+/* CONTENT */
 
 .content {
   grid-area: content;
@@ -63,17 +96,22 @@
     grid-template-rows: 35vh 65vh;
   }
 
-  .mainNav {
+  /* MAIN NAV */
+
+  .mainNav,
+  .sidebar {
     max-height: 100vh;
     overflow-y: auto;
     scrollbar-width: none;
   }
 
-  .mainNav::-webkit-scrollbar {
+  .mainNav::-webkit-scrollbar,
+  .sidebar::-webkit-scrollbar {
     display: none;
   }
 
-  .mainNav ul {
+  .mainNav ul,
+  .sidebar div {
     flex-direction: column;
   }
 
@@ -107,7 +145,26 @@
     width: 100%;
   }
 
+  /* SIDEBAR */
+
   .sidebar {
     padding: 1em 1.5em;
+  }
+
+  .sidebar h2 {
+    font-size: 1.5rem;
+    text-align: left;
+  }
+
+  .sidebar div {
+    gap: 0;
+  }
+
+  .sidebar button {
+    background-color: transparent;
+    border: 0;
+    color: white;
+    padding: 0.5em 1em;
+    text-align: left;
   }
 }

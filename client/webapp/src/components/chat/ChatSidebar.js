@@ -1,42 +1,19 @@
 import styles from "../../../styles/ChatComponent.module.css";
+import utilStyles from "../../../styles/utils.module.css";
 
 export default function ChatSidebar() {
   return (
     <aside className={styles.sidebar}>
       <h2>Discover</h2>
 
-      <ul>
-        <li>Home</li>
-        <li>Gaming</li>
-        <li>Education</li>
-        <li>Science & Tech</li>
-        <li>Entertainment</li>
-        <li>Others</li>
-        <li>Home</li>
-        <li>Gaming</li>
-        <li>Education</li>
-        <li>Science & Tech</li>
-        <li>Entertainment</li>
-        <li>Others</li>
-        <li>Home</li>
-        <li>Gaming</li>
-        <li>Education</li>
-        <li>Science & Tech</li>
-        <li>Entertainment</li>
-        <li>Others</li>
-        <li>Home</li>
-        <li>Gaming</li>
-        <li>Education</li>
-        <li>Science & Tech</li>
-        <li>Entertainment</li>
-        <li>Others</li>
-        <li>Home</li>
-        <li>Gaming</li>
-        <li>Education</li>
-        <li>Science & Tech</li>
-        <li>Entertainment</li>
-        <li>Others</li>
-      </ul>
+      <div>
+        <button type="button">Home</button>
+        <button type="button">Gaming</button>
+        <button type="button">Education</button>
+        <button type="button">Science & Technology</button>
+        <button type="button">Entertainment</button>
+        <button type="button">Others</button>
+      </div>
     </aside>
   );
 }
