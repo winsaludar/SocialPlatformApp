@@ -27,7 +27,7 @@ export default function LoginPage() {
   };
 
   return (
-    <section>
+    <main>
       {showLoader && <Loader />}
 
       <Login
@@ -36,6 +36,6 @@ export default function LoginPage() {
         onFailCallback={failCallback}
         onSuccessCallback={successCallback}
       />
-    </section>
+    </main>
   );
 }

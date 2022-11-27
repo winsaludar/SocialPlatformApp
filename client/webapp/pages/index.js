@@ -28,9 +28,9 @@ export default function HomePage() {
         <AppHero data={heroData} />
       </header>
 
-      <section>
+      <main>
         <AppList onItemClick={handleItemClick} />
-      </section>
+      </main>
     </>
   );
 }

@@ -11,7 +11,7 @@ export default function RegisterPage() {
   const [showLoader, setShowLoader] = useState(false);
 
   return (
-    <section>
+    <main>
       {showLoader && <Loader />}
 
       <Register
@@ -20,6 +20,6 @@ export default function RegisterPage() {
         onFailCallback={() => setShowLoader(false)}
         onSuccessCallback={() => setShowLoader(false)}
       />
-    </section>
+    </main>
   );
 }
