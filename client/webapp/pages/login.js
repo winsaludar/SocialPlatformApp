@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import Login from "../src/components/authentication/Login";
+import Login from "../src/components/auth/Login";
 import Loader from "../src/components/Loader";
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME;
