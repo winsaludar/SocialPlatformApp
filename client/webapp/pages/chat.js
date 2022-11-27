@@ -1,7 +1,7 @@
-import ChatContent from "../src/components/chat/ChatContent";
-import ChatHeader from "../src/components/chat/ChatHeader";
-import ChatNav from "../src/components/chat/ChatNav";
-import ChatSidebar from "../src/components/chat/ChatSidebar";
+import ExploreList from "../src/components/chat/ExploreList";
+import ExploreHeader from "../src/components/chat/ExploreHeader";
+import MainNav from "../src/components/chat/MainNav";
+import Sidebar from "../src/components/chat/Sidebar";
 import styles from "../styles/ChatComponent.module.css";
 
 export async function getStaticProps() {
@@ -12,10 +12,10 @@ export default function ChatPage() {
   return (
     <>
       <div className={styles.container}>
-        <ChatNav />
-        <ChatHeader />
-        <ChatSidebar />
-        <ChatContent />
+        <MainNav />
+        <ExploreHeader />
+        <Sidebar />
+        <ExploreList />
       </div>
     </>
   );
