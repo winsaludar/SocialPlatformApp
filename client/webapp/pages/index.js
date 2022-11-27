@@ -4,10 +4,8 @@ import initialBanner from "../public/images/placeholder/initial-banner.jpg";
 import AppHero from "../src/components/app/AppHero";
 import AppList from "../src/components/app/AppList";
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME;
-
 export async function getStaticProps() {
-  return { props: { title: `Home | ${appName}` } };
+  return { props: { title: "Home" } };
 }
 
 export default function HomePage() {
