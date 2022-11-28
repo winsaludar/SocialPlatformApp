@@ -8,6 +8,9 @@ export default function AppListItem({
   description,
   onClick,
   styles,
+  hasButton,
+  buttonTitle,
+  buttonOnClick,
 }) {
   return (
     <div
@@ -20,9 +23,15 @@ export default function AppListItem({
       <div className={styles.cardContent}>
         <h2 className={styles.cardTitle}>{title}</h2>
         <p className={styles.cardDescription}>{description}</p>
-        <button type="button" className={styles.cardButton}>
-          Open App
-        </button>
+        {hasButton && buttonTitle && buttonOnClick && (
+          <button
+            type="button"
+            className={styles.cardButton}
+            onClick={buttonOnClick}
+          >
+            {buttonTitle}
+          </button>
+        )}
       </div>
     </div>
   );

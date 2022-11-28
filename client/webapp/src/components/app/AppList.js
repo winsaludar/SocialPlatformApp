@@ -16,6 +16,9 @@ export default function AppList({ onItemClick }) {
               description="Nullam posuere nibh augue, nec sagittis ex eleifend sed. Curabitur tristique porta consequat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos."
               onClick={onItemClick}
               styles={styles}
+              hasButton={true}
+              buttonTitle="Open App"
+              buttonOnClick={() => {}}
             />
           );
         })}

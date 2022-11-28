@@ -17,7 +17,7 @@ export default function ChatPage() {
 
         <div className={styles.content}>
           <ExploreHeader />
-          {/* <ExploreList /> */}
+          <ExploreList />
         </div>
       </div>
     </>
