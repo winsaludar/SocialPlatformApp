@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import styles from "../../../styles/AppComponent.module.css";
-
 export default function AppListItem({
   imageSrc,
   imageWidth,
@@ -9,6 +7,7 @@ export default function AppListItem({
   title,
   description,
   onClick,
+  styles,
 }) {
   return (
     <div

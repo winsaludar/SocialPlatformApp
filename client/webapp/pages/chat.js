@@ -13,9 +13,12 @@ export default function ChatPage() {
     <>
       <div className={styles.container}>
         <MainNav />
-        <ExploreHeader />
         <Sidebar />
-        <ExploreList />
+
+        <div className={styles.content}>
+          <ExploreHeader />
+          {/* <ExploreList /> */}
+        </div>
       </div>
     </>
   );

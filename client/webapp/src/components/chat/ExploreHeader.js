@@ -1,6 +1,6 @@
 import styles from "../../../styles/ChatComponent.module.css";
 
-export default function ChatHeader() {
+export default function ExploreHeader() {
   return (
     <header className={styles.header}>
       <div>

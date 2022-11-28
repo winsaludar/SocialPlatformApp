@@ -1,6 +1,7 @@
 import styles from "../../../styles/ChatComponent.module.css";
 import Image from "next/image";
-export default function ChatNav() {
+
+export default function MainNav() {
   return (
     <nav className={styles.mainNav}>
       <ul>

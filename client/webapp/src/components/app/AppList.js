@@ -1,5 +1,5 @@
 import styles from "../../../styles/AppComponent.module.css";
-import AppListItem from "./AppListItem";
+import Card from "../Card";
 
 export default function AppList({ onItemClick }) {
   return (
@@ -7,7 +7,7 @@ export default function AppList({ onItemClick }) {
       <div className={styles.grid}>
         {[...Array(12)].map((x, i) => {
           return (
-            <AppListItem
+            <Card
               key={i}
               imageSrc={`/images/placeholder/ali-${i + 1}.jpg`}
               imageWidth={1680}
@@ -15,6 +15,7 @@ export default function AppList({ onItemClick }) {
               title={`App Title ${i + 1}`}
               description="Nullam posuere nibh augue, nec sagittis ex eleifend sed. Curabitur tristique porta consequat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos."
               onClick={onItemClick}
+              styles={styles}
             />
           );
         })}
