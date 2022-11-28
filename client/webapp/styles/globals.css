@@ -35,12 +35,13 @@
   --alertBoxErrorTextColor: #972a3d;
 
   --appTextColor: white;
-  --appListItemBackgroundColor: #000;
+  --appListItemBackgroundColor: #f05f57;
   --appListItemContentBackground: linear-gradient(
-    62deg,
-    #000 0%,
-    var(--primaryColor1) 100%
+    135deg,
+    #f05f57 10%,
+    #360940 100%
   );
+
   --appListItemButtonBackgroundColor: transparent;
   --appListItemButtonHoverBackgroundColor: rgba(0, 0, 0, 0.3);
 

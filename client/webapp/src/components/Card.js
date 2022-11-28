@@ -2,7 +2,6 @@ import Image from "next/image";
 import utilStyles from "../../styles/utils.module.css";
 
 export default function AppListItem({
-  cssBacgroundImage,
   imageSrc,
   imageWidth,
   imageHeight,
@@ -18,10 +17,14 @@ export default function AppListItem({
   return (
     <div
       className={`${styles.card} ${isDisabled ? utilStyles.cardDisabled : ""}`}
-      onClick={!isDisabled ? () => onClick(title, description, imageSrc) : null}
     >
       {imageSrc && imageWidth && imageHeight && (
-        <div className={styles.cardImage}>
+        <div
+          className={styles.cardImage}
+          onClick={
+            !isDisabled ? () => onClick(title, description, imageSrc) : null
+          }
+        >
           <Image
             src={imageSrc}
             width={imageWidth}
