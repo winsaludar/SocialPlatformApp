@@ -1,19 +1,17 @@
 import { useState } from "react";
 
-import Register from "../src/components/authentication/Register";
+import Register from "../src/components/auth/Register";
 import Loader from "../src/components/Loader";
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME;
-
 export async function getStaticProps() {
-  return { props: { title: `Register | ${appName}` } };
+  return { props: { title: "Register" } };
 }
 
 export default function RegisterPage() {
   const [showLoader, setShowLoader] = useState(false);
 
   return (
-    <section>
+    <main>
       {showLoader && <Loader />}
 
       <Register
@@ -22,6 +20,6 @@ export default function RegisterPage() {
         onFailCallback={() => setShowLoader(false)}
         onSuccessCallback={() => setShowLoader(false)}
       />
-    </section>
+    </main>
   );
 }

@@ -2,13 +2,11 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import Login from "../src/components/authentication/Login";
+import Login from "../src/components/auth/Login";
 import Loader from "../src/components/Loader";
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME;
-
 export async function getStaticProps() {
-  return { props: { title: `Login | ${appName}` } };
+  return { props: { title: "Login" } };
 }
 
 export default function LoginPage() {
@@ -29,7 +27,7 @@ export default function LoginPage() {
   };
 
   return (
-    <section>
+    <main>
       {showLoader && <Loader />}
 
       <Login
@@ -38,6 +36,6 @@ export default function LoginPage() {
         onFailCallback={failCallback}
         onSuccessCallback={successCallback}
       />
-    </section>
+    </main>
   );
 }

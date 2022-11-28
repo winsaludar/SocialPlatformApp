@@ -2,6 +2,8 @@
 
 :root {
   --baseColor: #606468;
+  --primaryColor1: #ea4c88;
+  --primaryColor2: #d44179;
 
   --htmlFontSize: 100%;
   --bodyBackgroundColor: #2c3338;
@@ -21,9 +23,9 @@
   --authInputBackgroundColor: #3b4148;
   --authInputHoverBackgroundColor: #434a52;
   --authLabelBackgroundColor: #363b41;
-  --authSubmitBackgroundColor: #ea4c88;
+  --authSubmitBackgroundColor: var(--primaryColor1);
   --authSubmitColor: #eee;
-  --authSubmitHoverBackgroundColor: #d44179;
+  --authSubmitHoverBackgroundColor: var(--primaryColor2);
 
   --alertBoxSuccessBackgroundColor: #ddf0d7;
   --alertBoxSuccessBorderColor: #a4cd98;
@@ -33,20 +35,21 @@
   --alertBoxErrorTextColor: #972a3d;
 
   --appTextColor: white;
-  --appListItemBackgroundColor: white;
+  --appListItemBackgroundColor: #f05f57;
   --appListItemContentBackground: linear-gradient(
-    to bottom left,
-    #ef8d9c 40%,
-    #ffc39e 100%
+    135deg,
+    #f05f57 10%,
+    #360940 100%
   );
+
   --appListItemButtonBackgroundColor: transparent;
-  --appListItemButtonHoverBackgroundColor: rgba(255, 255, 255, 0.12);
+  --appListItemButtonHoverBackgroundColor: rgba(0, 0, 0, 0.3);
 
   --loaderBackgroundColor1: #93eee4;
   --loaderBackgroundColor2: #52e2d9;
   --loaderBackgroundColor3: #4ebdc2;
-  --loaderBackgroundColor4: #f74f8c;
-  --loaderBackgroundColor5: #d53d70;
+  --loaderBackgroundColor4: var(--primaryColor1);
+  --loaderBackgroundColor5: var(--primaryColor2);
 }
 
 /* Box sizing rules */

@@ -17,3 +17,25 @@
   grid-column: 1 / 2;
   grid-row: 1/ 2;
 }
+
+.icons {
+  display: none;
+}
+
+.icon {
+  block-size: 1em;
+  display: inline-block;
+  fill: var(--authIconFill);
+  inline-size: 1em;
+  vertical-align: middle;
+}
+
+.cardDisabled:after {
+  background-color: rgba(0, 0, 0, 0.9);
+  content: "";
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
