@@ -39,7 +39,7 @@ export default function Register({
     } catch (err) {
       if (onFailCallback) onFailCallback();
 
-      setIsLoginSuccessful(false);
+      setIsRegisterSuccessful(false);
       setAlertMessages([
         "The server is currently busy right now, please try again later",
       ]);
