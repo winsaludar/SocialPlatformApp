@@ -29,7 +29,7 @@ app.Run();
 void AddDatabase(WebApplicationBuilder builder)
 {
     string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    builder.Services.AddDbContext<AuthenticationDbContext>(options => options.UseSqlServer(connectionString));
+    builder.Services.AddDbContext<AuthenticationDbContext>(options => options.UseNpgsql(connectionString));
 }
 
 void AddAuthentication(WebApplicationBuilder builder)
