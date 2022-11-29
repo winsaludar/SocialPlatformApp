@@ -1,6 +1,7 @@
+import { useRouter } from "next/router";
+
 import styles from "../../../styles/AppComponent.module.css";
 import Card from "../Card";
-import { useRouter } from "next/router";
 
 export default function AppList({ onItemClick }) {
   const route = useRouter(null);
@@ -9,9 +10,9 @@ export default function AppList({ onItemClick }) {
     <>
       <div className={styles.grid}>
         <Card
-          imageSrc={`/images/placeholder/ali-1.jpg`}
-          imageWidth={1680}
-          imageHeight={1050}
+          imageSrc={`/images/placeholder/ali-12.jpg`}
+          imageWidth={600}
+          imageHeight={400}
           title={`Chat`}
           description="Nullam posuere nibh augue, nec sagittis ex eleifend sed. Curabitur tristique porta consequat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos."
           onClick={onItemClick}
@@ -23,13 +24,13 @@ export default function AppList({ onItemClick }) {
           }}
         />
 
-        {[...Array(11)].map((x, i) => {
+        {[...Array(10)].map((x, i) => {
           return (
             <Card
               key={i}
               imageSrc={`/images/placeholder/ali-${i + 1}.jpg`}
-              imageWidth={1680}
-              imageHeight={1050}
+              imageWidth={600}
+              imageHeight={400}
               title={`App Title ${i + 1}`}
               description="Nullam posuere nibh augue, nec sagittis ex eleifend sed. Curabitur tristique porta consequat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos."
               onClick={onItemClick}
