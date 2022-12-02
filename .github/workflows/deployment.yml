@@ -28,6 +28,13 @@ jobs:
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }} -f ./Services/Authentication/Authentication.API/Dockerfile .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}
 
+      # Chat.API Deployment
+      - name: Build & Push to Docker Hub (Chat.API)
+        working-directory: src
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_CHAT_API_IMAGE_NAME }} -f ./Services/Chat/Chat.API/Dockerfile .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_CHAT_API_IMAGE_NAME }}
+
   azure:
     runs-on: ubuntu-latest
     needs: docker
@@ -46,7 +53,15 @@ jobs:
       - name: Publish to Azure App Service (Authentication.API)
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ secrets.AZURE_APP_NAME }}
+          app-name: ${{ secrets.AZURE_AUTHENTICATION_APP_NAME }}
           slot-name: "production"
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_AUTHENTICATION_PUBLISHPROFILE }}
           images: index.docker.io/${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_AUTHENTICATION_API_IMAGE_NAME }}
+
+      - name: Publish to Azure App Service (Chat.API)
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_CHAT_APP_NAME }}
+          slot-name: "production"
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_CHAT_PUBLISHPROFILE }}
+          images: index.docker.io/${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_CHAT_API_IMAGE_NAME }}
