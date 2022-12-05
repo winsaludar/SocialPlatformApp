@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import utilStyles from "../../styles/utils.module.css";
 
 export default function AppListItem({
@@ -13,6 +14,7 @@ export default function AppListItem({
   buttonTitle,
   buttonOnClick,
   isDisabled,
+  customImageLoader,
 }) {
   return (
     <div
@@ -26,6 +28,7 @@ export default function AppListItem({
           }
         >
           <Image
+            loader={customImageLoader}
             src={imageSrc}
             width={imageWidth}
             height={imageHeight}
