@@ -1,6 +1,6 @@
 import styles from "../../../styles/ChatComponent.module.css";
 
-export default function ExploreHeader() {
+export default function ExploreHeader({ onTextChange }) {
   return (
     <header className={styles.header}>
       <div>
@@ -8,11 +8,15 @@ export default function ExploreHeader() {
         <p>
           From gaming, to music, to learning, there is always a place for you
         </p>
-        <form className={styles.headerForm}>
+        <form
+          className={styles.headerForm}
+          onSubmit={(e) => e.preventDefault()}
+        >
           <input
             type="text"
             placeholder="Explore communities"
             autoComplete="off"
+            onChange={onTextChange}
           />
         </form>
       </div>

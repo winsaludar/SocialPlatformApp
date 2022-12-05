@@ -123,17 +123,18 @@
 /* LIST */
 
 .serverList {
-  cursor: pointer;
   display: grid;
-  gap: 1em;
-  grid-template-columns: repeat(auto-fit, minmax(25em, 1fr));
+  gap: 0.8em;
+  grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
   padding: 1em;
+  position: relative;
 }
 
 .card {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   box-shadow: 0 0.25em 0.25em rgba(0, 0, 0, 0.2), 0 0 1em rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 .cardImage {
@@ -192,7 +193,7 @@
   background-color: var(--appListItemButtonHoverBackgroundColor);
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 1366px) {
   .container {
     grid-template-areas: "nav sidebar content";
     grid-template-columns: 6em 15em 1fr;
@@ -293,9 +294,8 @@
   .serverList {
     display: grid;
     gap: 2em;
-    grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(20em, 0.33fr));
     padding: 0;
-    position: relative;
   }
 }
 

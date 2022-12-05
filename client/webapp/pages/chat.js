@@ -13,12 +13,18 @@ export async function getStaticProps() {
 export default function ChatPage() {
   const [servers, setServers] = useState([]);
   const [showLoader, setShowLoader] = useState(false);
+  const [serverFilter, setServerFilter] = useState(null);
 
   useEffect(() => {
-    async function fetchData() {
-      setShowLoader(true);
+    let ignore = false;
 
-      const endpoint = "api/getAllServers";
+    (async function () {
+      setShowLoader(true);
+      setServers([]);
+
+      let endpoint = "api/getAllServers";
+      if (serverFilter) endpoint += `?name=${serverFilter}`;
+
       const options = {
         method: "GET",
         headers: {
@@ -29,14 +35,16 @@ export default function ChatPage() {
       try {
         const response = await fetch(endpoint, options);
         const result = await response.json();
-        setServers(result.data);
-      } catch (err) {}
+        if (!ignore) setServers(result.data);
+      } catch {}
 
       setShowLoader(false);
-    }
+    })();
 
-    fetchData();
-  }, []);
+    return () => {
+      ignore = true;
+    };
+  }, [serverFilter]);
 
   return (
     <>
@@ -45,7 +53,11 @@ export default function ChatPage() {
         <Sidebar />
 
         <div className={styles.content}>
-          <ExploreHeader />
+          <ExploreHeader
+            onTextChange={(e) => {
+              setServerFilter(e.target.value);
+            }}
+          />
           <ExploreList servers={servers} showLoader={showLoader} />
         </div>
       </div>
