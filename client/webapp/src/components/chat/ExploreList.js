@@ -1,23 +1,33 @@
 import styles from "../../../styles/ChatComponent.module.css";
 import Card from "../Card";
+import Loader from "../Loader";
 
-export default function ExploreList() {
+const loader = ({ src, width, quality }) => {
+  return src;
+};
+
+export default function ExploreList({ servers, showLoader }) {
   return (
     <main className={styles.serverList}>
-      {[...Array(30)].map((x, i) => {
-        return (
-          <Card
-            key={i}
-            imageSrc={`/images/placeholder/ali-${(i % 12) + 1}.jpg`}
-            imageWidth={300}
-            imageHeight={300}
-            title={`Server ${i + 1}`}
-            description="Nullam posuere nibh augue, nec sagittis ex eleifend sed. Curabitur tristique porta consequat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos."
-            onClick={() => {}}
-            styles={styles}
-          />
-        );
-      })}
+      {showLoader && <Loader height="50vh" />}
+      {/* <Loader height="50vh" /> */}
+
+      {Array.isArray(servers) &&
+        servers.map((server) => {
+          return (
+            <Card
+              key={server.id}
+              imageSrc={decodeURIComponent(server.thumbnail)}
+              imageWidth={640}
+              imageHeight={360}
+              title={server.name}
+              description={server.shortDescription}
+              onClick={() => {}}
+              styles={styles}
+              customImageLoader={loader}
+            />
+          );
+        })}
     </main>
   );
 }
