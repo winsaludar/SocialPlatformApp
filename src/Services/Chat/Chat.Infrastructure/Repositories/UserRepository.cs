@@ -1,4 +1,5 @@
-﻿using Chat.Domain.Aggregates.UserAggregate;
+﻿using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.Aggregates.UserAggregate;
 using Chat.Infrastructure.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -8,12 +9,14 @@ namespace Chat.Infrastructure.Repositories;
 public class UserRepository : IUserRepository
 {
     private readonly IMongoCollection<UserDbModel> _usersCollection;
+    private readonly IMongoCollection<ServerDbModel> _serversCollection;
 
     public UserRepository(IOptions<ChatDbSettings> chatDbSettings)
     {
         MongoClient mongoClient = new(chatDbSettings.Value.DefaultConnection);
         IMongoDatabase mongoDatabase = mongoClient.GetDatabase(chatDbSettings.Value.DatabaseName);
         _usersCollection = mongoDatabase.GetCollection<UserDbModel>(chatDbSettings.Value.UsersCollectionName);
+        _serversCollection = mongoDatabase.GetCollection<ServerDbModel>(chatDbSettings.Value.ServersCollectionName);
     }
 
     public async Task<User?> GetByUsernameAsync(string username)
@@ -59,6 +62,19 @@ public class UserRepository : IUserRepository
         await _usersCollection.InsertOneAsync(model);
 
         return newId;
+    }
+
+    public async Task<IEnumerable<Server>> GetUserServers(Guid id)
+    {
+        var result = await _serversCollection.Find(x => x.CreatedById.ToLower() == id.ToString().ToLower() ||
+            x.Members.Any(y => y.UserId == id)).ToListAsync();
+
+        if (result == null || !result.Any())
+            return Enumerable.Empty<Server>();
+
+        List<Server> servers = new();
+        result.ForEach(x => servers.Add(x.CreateServerFromDbModel()));
+        return servers;
     }
 
     private static User CreateUserFromDbModel(UserDbModel dbModel)

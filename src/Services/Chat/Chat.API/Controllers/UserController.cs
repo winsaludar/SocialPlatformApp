@@ -1,6 +1,7 @@
 ﻿using Chat.API.Extensions;
 using Chat.API.Models;
 using Chat.Application.Commands;
+using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
 using Chat.Domain.Aggregates.ServerAggregate;
@@ -25,6 +26,19 @@ public class UserController : ControllerBase
     {
         _mediator = mediator;
         _validatorManager = validatorManager;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ServerDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [Route("servers")]
+    public async Task<IActionResult> GetAllUserServersAsync(int page = 1, int size = 10, string? name = null)
+    {
+        User user = await GetUserAsync();
+        GetUserServersQuery query = new(user.Id);
+
+        var result = await _mediator.Send(query);
+        return Ok(result);
     }
 
     [HttpPost]

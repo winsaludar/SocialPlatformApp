@@ -36,7 +36,7 @@ public class ServerRepository : IServerRepository
             return Enumerable.Empty<Server>();
 
         List<Server> servers = new();
-        result.ForEach(x => servers.Add(CreateServerFromDbModel(x, includeChannels: false, includeMembers: false)));
+        result.ForEach(x => servers.Add(x.CreateServerFromDbModel(includeChannels: false, includeMembers: false)));
 
         return servers;
     }
@@ -47,7 +47,7 @@ public class ServerRepository : IServerRepository
         if (result == null)
             return null;
 
-        return CreateServerFromDbModel(result);
+        return result.CreateServerFromDbModel();
     }
 
     public async Task<Server?> GetByIdAsync(Guid id)
@@ -56,7 +56,7 @@ public class ServerRepository : IServerRepository
         if (result == null)
             return null;
 
-        return CreateServerFromDbModel(result);
+        return result.CreateServerFromDbModel();
     }
 
     public async Task<Guid> CreateAsync(Server newServer)
@@ -150,48 +150,5 @@ public class ServerRepository : IServerRepository
     public async Task DeleteAsync(Guid id)
     {
         await _serversCollection.DeleteOneAsync(x => x.Guid.ToLower() == id.ToString().ToLower());
-    }
-
-    private static Server CreateServerFromDbModel(ServerDbModel dbModel, bool includeChannels = true, bool includeMembers = true, bool includeModerators = true)
-    {
-        Server server = new(dbModel.Name, dbModel.ShortDescription, dbModel.LongDescription, dbModel.CreatorEmail, dbModel.Thumbnail);
-        server.SetId(Guid.Parse(dbModel.Guid));
-        server.SetCreatedById(Guid.Parse(dbModel.CreatedById));
-        server.SetDateCreated(dbModel.DateCreated);
-        if (!string.IsNullOrEmpty(dbModel.LastModifiedById))
-            server.SetLastModifiedById(Guid.Parse(dbModel.LastModifiedById));
-        if (dbModel.DateLastModified.HasValue)
-            server.SetDateLastModified(dbModel.DateLastModified.Value);
-
-        // Add channels
-        if (includeChannels)
-        {
-            dbModel.Channels.ForEach(x =>
-            {
-                Guid id = Guid.Parse(x.Guid);
-                Guid createdById = Guid.Parse(x.CreatedById);
-                Guid? lastModifiedById = !string.IsNullOrEmpty(x.LastModifiedById) ? Guid.Parse(x.LastModifiedById) : null;
-
-                server.AddChannel(id, x.Name, x.IsPublic, createdById, x.DateCreated, lastModifiedById, x.DateLastModified);
-
-                // Add channel members
-                Channel channel = server.Channels.FirstOrDefault(x => x.Id == id)!;
-                x.Members.ForEach(y => channel.AddMember(y));
-            });
-        }
-
-        // Add members
-        if (includeMembers)
-        {
-            dbModel.Members.ForEach(x => server.AddMember(x.UserId, x.Username, x.DateJoined));
-        }
-
-        // Add moderators
-        if (includeModerators)
-        {
-            dbModel.Moderators.ForEach(x => server.AddModerator(x.UserId, x.DateStarted));
-        }
-
-        return server;
     }
 }
