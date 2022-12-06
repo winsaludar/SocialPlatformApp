@@ -17,7 +17,7 @@ public class GetServersQueryValidatorTests
     public async Task Page_IsLessThan1_ReturnsAnError()
     {
         // Arrange
-        GetServersQuery query = new(0, 10, "");
+        GetServersQuery query = new(0, 10, "", "");
 
         // Act
         var result = await _validator.ValidateAsync(query, It.IsAny<CancellationToken>());
@@ -31,7 +31,7 @@ public class GetServersQueryValidatorTests
     public async Task Size_IsLessThan1_ReturnsAnError()
     {
         // Arrange
-        GetServersQuery query = new(1, 0, "");
+        GetServersQuery query = new(1, 0, "", "");
 
         // Act
         var result = await _validator.ValidateAsync(query, It.IsAny<CancellationToken>());
@@ -45,7 +45,7 @@ public class GetServersQueryValidatorTests
     public async Task Size_IsGreaterThan100_ReturnsAnError()
     {
         // Arrange
-        GetServersQuery query = new(1, 101, "");
+        GetServersQuery query = new(1, 101, "", "");
 
         // Act
         var result = await _validator.ValidateAsync(query, It.IsAny<CancellationToken>());

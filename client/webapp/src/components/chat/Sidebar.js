@@ -7,9 +7,9 @@ export default function Sidebar({ selectedCategory, onButtonClick }) {
 
       <div>
         <button
-          className={selectedCategory === "home" ? styles.buttonActive : null}
+          className={selectedCategory === null ? styles.buttonActive : null}
           type="button"
-          onClick={() => onButtonClick("home")}
+          onClick={() => onButtonClick(null)}
         >
           Home
         </button>
@@ -31,10 +31,12 @@ export default function Sidebar({ selectedCategory, onButtonClick }) {
         </button>
         <button
           className={
-            selectedCategory === "science" ? styles.buttonActive : null
+            selectedCategory === "scienceandtechnology"
+              ? styles.buttonActive
+              : null
           }
           type="button"
-          onClick={() => onButtonClick("science")}
+          onClick={() => onButtonClick("scienceandtechnology")}
         >
           Science & Technology
         </button>

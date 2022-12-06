@@ -23,8 +23,9 @@ export default async function handler(req, res) {
     return res.status(404).json({ errors: [err], data: {} });
   }
 
-  let api = `${process.env.CHAT_BASE_URL}/${process.env.CHAT_GET_ALL_SERVERS_ENDPOINT}`;
-  if (req.query && req.query.name) api += `?name=${req.query.name}`;
+  let api = `${process.env.CHAT_BASE_URL}/${process.env.CHAT_GET_ALL_SERVERS_ENDPOINT}?name=`;
+  if (req.query && req.query.name) api += `${req.query.name}`;
+  if (req.query && req.query.category) api += `&category=${req.query.category}`;
 
   const options = {
     method: "GET",

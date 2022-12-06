@@ -15,7 +15,7 @@ public class GetServersQueryHandler : IRequestHandler<GetServersQuery, IEnumerab
     {
         int skip = (request.Page - 1) * request.Size;
 
-        var result = await _repositoryManager.ServerRepository.GetAllAsync(skip, request.Size, request.Name);
+        var result = await _repositoryManager.ServerRepository.GetAllAsync(skip, request.Size, request.Name, request.Category);
         if (!result.Any())
             return Enumerable.Empty<ServerDto>();
 

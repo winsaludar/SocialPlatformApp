@@ -53,7 +53,7 @@ public class ServersControllerTests
     public async Task GetAllServersAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
     {
         // Arrange
-        GetServersQuery query = new(0, 10, "");
+        GetServersQuery query = new(0, 10, "", "");
         _getServersQueryValidator.RuleFor(x => x.Page).Must(page => false);
 
         // Act
@@ -70,7 +70,7 @@ public class ServersControllerTests
     public async Task GetAllServersAsync_ResultIsEmpty_ReturnsOkObjectResultWithEmptyData()
     {
         // Arrange
-        GetServersQuery query = new(1, 10, "");
+        GetServersQuery query = new(1, 10, "", "");
         _mockMediator.Setup(x => x.Send(query, It.IsAny<CancellationToken>())).ReturnsAsync(Enumerable.Empty<ServerDto>());
 
         // Act
@@ -87,7 +87,7 @@ public class ServersControllerTests
     public async Task GetAllServersAsync_ResultIsNotEmpty_ReturnsOkObjectResultWithData()
     {
         // Arrange
-        GetServersQuery query = new(1, 10, "");
+        GetServersQuery query = new(1, 10, "", "");
         _mockMediator.Setup(x => x.Send(query, It.IsAny<CancellationToken>())).ReturnsAsync(
             new List<ServerDto>()
             {
