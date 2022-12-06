@@ -1,6 +1,7 @@
 ﻿using Chat.API.Controllers;
 using Chat.API.Models;
 using Chat.Application.Commands;
+using Chat.Application.DTOs;
 using Chat.Application.Queries;
 using Chat.Application.Validators;
 using Chat.Domain.Aggregates.ServerAggregate;
@@ -18,18 +19,92 @@ namespace Chat.UnitTests.Controllers;
 public class UserControllerTests
 {
     private readonly Mock<IMediator> _mockMediator;
+    private readonly InlineValidator<GetUserServersQuery> _getUserServersQueryValidator;
     private readonly InlineValidator<ChangeUsernameCommand> _changeUserCommandValidator;
     private readonly UserController _controller;
 
     public UserControllerTests()
     {
         _mockMediator = new Mock<IMediator>();
+        _getUserServersQueryValidator = new InlineValidator<GetUserServersQuery>();
         _changeUserCommandValidator = new InlineValidator<ChangeUsernameCommand>();
 
         Mock<IValidatorManager> mockValidatorManager = new();
+        mockValidatorManager.Setup(x => x.GetUserServersQueryValidator).Returns(_getUserServersQueryValidator);
         mockValidatorManager.Setup(x => x.ChangeUsernameCommandValidator).Returns(_changeUserCommandValidator);
 
         _controller = new UserController(_mockMediator.Object, mockValidatorManager.Object);
+    }
+
+    [Fact]
+    public async Task GetAllUserServersAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.GetAllUserServersAsync());
+    }
+
+    [Fact]
+    public async Task GetAllUserServersAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _getUserServersQueryValidator.RuleFor(x => x.UserId).Must(userId => false);
+
+        // Act
+        var result = await _controller.GetAllUserServersAsync();
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<GetUserServersQuery>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("UserId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task GetAllUserServersAsync_ResultIsEmpty_ReturnsOkObjectResultWithEmptyData()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserServersQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(Enumerable.Empty<ServerDto>());
+
+        // Act
+        var result = await _controller.GetAllUserServersAsync();
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<GetUserServersQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var servers = Assert.IsAssignableFrom<IEnumerable<ServerDto>>(okResult.Value);
+        Assert.Empty(servers);
+    }
+
+    [Fact]
+    public async Task GetAllUserServersAsync_ResultIsNotEmpty_ReturnsOkObjectResultWithData()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserServersQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(
+            new List<ServerDto>()
+            {
+                new ServerDto(),
+                new ServerDto(),
+                new ServerDto()
+            });
+
+        // Act
+        var result = await _controller.GetAllUserServersAsync();
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<GetUserServersQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var servers = Assert.IsAssignableFrom<IEnumerable<ServerDto>>(okResult.Value);
+        Assert.NotEmpty(servers);
+        Assert.Equal(3, servers.Count());
     }
 
     [Fact]
@@ -71,7 +146,7 @@ public class UserControllerTests
         var result = await _controller.ChangeUsernameAsync(request);
 
         // Assert
-        _mockMediator.Verify(x => x.Send(It.IsAny<JoinServerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockMediator.Verify(x => x.Send(It.IsAny<ChangeUsernameCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         var badResult = Assert.IsType<BadRequestObjectResult>(result);
         var errors = Assert.IsType<SerializableError>(badResult.Value);
         Assert.Equal("UserId", errors.FirstOrDefault().Key);
