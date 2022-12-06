@@ -74,7 +74,7 @@ public class ServersControllerTests
         _mockMediator.Setup(x => x.Send(query, It.IsAny<CancellationToken>())).ReturnsAsync(Enumerable.Empty<ServerDto>());
 
         // Act
-        var result = await _controller.GetAllServersAsync(1, 10, "");
+        var result = await _controller.GetAllServersAsync(1, 10, "", "");
 
         // Assert
         _mockMediator.Verify(x => x.Send(query, It.IsAny<CancellationToken>()), Times.Once);
@@ -97,7 +97,7 @@ public class ServersControllerTests
             });
 
         // Act
-        var result = await _controller.GetAllServersAsync(1, 10, "");
+        var result = await _controller.GetAllServersAsync(1, 10, "", "");
 
         // Assert
         _mockMediator.Verify(x => x.Send(query, It.IsAny<CancellationToken>()), Times.Once);
