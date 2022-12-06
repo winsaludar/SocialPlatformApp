@@ -72,8 +72,12 @@ public class ServerRepository : IServerRepository
             CreatorEmail = newServer.CreatorEmail,
             Thumbnail = newServer.Thumbnail,
             CreatedById = newServer.CreatedById.ToString(),
-            DateCreated = DateTime.UtcNow
+            DateCreated = DateTime.UtcNow,
         };
+
+        // Add categories
+        foreach (var item in newServer.Categories)
+            model.Categories.Add(new CategoryDbModel { Id = item.Id, Name = item.Name });
 
         await _serversCollection.InsertOneAsync(model);
 

@@ -15,6 +15,8 @@ public class CreateServerCommandHandler : IRequestHandler<CreateServerCommand, G
         Server newServer = new(request.Name, request.ShortDescription, request.LongDescription, request.CreatorEmail, request.Thumbnail);
         newServer.SetCreatedById(request.CreatedById);
 
+        request.Categories.ForEach(x => newServer.AddCategory(x));
+
         var newId = await _repositoryManager.ServerRepository.CreateAsync(newServer);
 
         return newId;

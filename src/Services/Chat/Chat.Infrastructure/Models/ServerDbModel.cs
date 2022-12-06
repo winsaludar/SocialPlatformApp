@@ -26,6 +26,9 @@ public class ServerDbModel : EntityDbModel
     [BsonElement("thumbnail")]
     public string? Thumbnail { get; set; }
 
+    [BsonElement("categories")]
+    public List<CategoryDbModel> Categories { get; set; } = new();
+
     [BsonElement("channels")]
     public List<ChannelDbModel> Channels { get; set; } = new();
 
@@ -45,6 +48,8 @@ public class ServerDbModel : EntityDbModel
             server.SetLastModifiedById(System.Guid.Parse(LastModifiedById));
         if (DateLastModified.HasValue)
             server.SetDateLastModified(DateLastModified.Value);
+
+        Categories.ForEach(x => server.AddCategory(new Category(x.Name, x.Id)));
 
         // Add channels
         if (includeChannels)

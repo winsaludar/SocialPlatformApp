@@ -7,6 +7,7 @@ public class Server : Entity, IAggregateRoot
     private readonly List<Channel> _channels;
     private readonly List<Member> _members;
     private readonly List<Moderator> _moderators;
+    private readonly List<Category> _categories;
 
     public Server(string name, string shortDescription, string longDescription, string creatorEmail, string? thumbnail = "")
     {
@@ -18,6 +19,7 @@ public class Server : Entity, IAggregateRoot
         _channels = new List<Channel>();
         _members = new List<Member>();
         _moderators = new List<Moderator>();
+        _categories = new List<Category>();
     }
 
     public string Name { get; private set; }
@@ -28,6 +30,7 @@ public class Server : Entity, IAggregateRoot
     public IReadOnlyCollection<Channel> Channels => _channels;
     public IReadOnlyCollection<Member> Members => _members;
     public IReadOnlyCollection<Moderator> Moderators => _moderators;
+    public IReadOnlyCollection<Category> Categories => _categories;
 
     public Channel AddChannel(Guid id, string name, bool isPrivate, Guid createdById, DateTime dateCreated, Guid? lastModifiedById = null, DateTime? dateLastModified = null)
     {
@@ -121,5 +124,23 @@ public class Server : Entity, IAggregateRoot
             return;
 
         channel.RemoveMember(userId);
+    }
+
+    public void AddCategory(Category category)
+    {
+        Category? existing = _categories.FirstOrDefault(x => x == category);
+        if (existing is not null)
+            return;
+
+        _categories.Add(category);
+    }
+
+    public void RemoveCategory(Category category)
+    {
+        Category? existing = _categories.FirstOrDefault(x => x == category);
+        if (existing is null)
+            return;
+
+        _categories.Remove(existing);
     }
 }
