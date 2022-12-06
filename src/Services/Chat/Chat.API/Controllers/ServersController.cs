@@ -31,9 +31,9 @@ public class ServersController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ServerDto>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-    public async Task<IActionResult> GetAllServersAsync(int page = 1, int size = 10, string? name = null)
+    public async Task<IActionResult> GetAllServersAsync(int page = 1, int size = 10, string? name = null, string? category = null)
     {
-        GetServersQuery query = new(page, size, name);
+        GetServersQuery query = new(page, size, name, category);
         ValidationResult validationResult = await _validatorManager.GetServersQueryValidator.ValidateAsync(query);
         if (!validationResult.IsValid)
         {
@@ -52,7 +52,7 @@ public class ServersController : ControllerBase
     public async Task<IActionResult> CreateServerAsync([FromBody] CreateUpdateServerModel request)
     {
         User user = await GetUserAsync();
-        CreateServerCommand command = new(request.Name, request.ShortDescription, request.LongDescription, User.Identity!.Name!, user.Id, request.Thumbnail);
+        CreateServerCommand command = new(request.Name, request.ShortDescription, request.LongDescription, User.Identity!.Name!, user.Id, request.Categories, request.Thumbnail);
         ValidationResult validationResult = await _validatorManager.CreateServerCommandValidator.ValidateAsync(command);
         if (!validationResult.IsValid)
         {

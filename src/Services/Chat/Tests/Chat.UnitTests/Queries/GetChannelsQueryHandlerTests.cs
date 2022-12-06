@@ -24,7 +24,7 @@ public class GetChannelsQueryHandlerTests
     {
         // Arrange
         GetChannelsQuery query = new(Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.ServerRepository.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync(Enumerable.Empty<Server>());
+        _mockRepositoryManager.Setup(x => x.ServerRepository.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(Enumerable.Empty<Server>());
 
         // Act
         var result = await _getChannelsQueryHandler.Handle(query, It.IsAny<CancellationToken>());

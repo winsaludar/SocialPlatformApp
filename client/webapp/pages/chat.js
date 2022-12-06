@@ -48,6 +48,7 @@ export default function ChatPage({ userServers }) {
   const [servers, setServers] = useState([]);
   const [showLoader, setShowLoader] = useState(false);
   const [serverFilter, setServerFilter] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState(null);
 
   useEffect(() => {
     let ignore = false;
@@ -56,8 +57,9 @@ export default function ChatPage({ userServers }) {
       setShowLoader(true);
       setServers([]);
 
-      let endpoint = "api/getAllServers";
-      if (serverFilter) endpoint += `?name=${serverFilter}`;
+      let endpoint = "api/getAllServers?name=";
+      if (serverFilter) endpoint += `${serverFilter}`;
+      if (categoryFilter) endpoint += `&category=${categoryFilter}`;
 
       const options = {
         method: "GET",
@@ -78,13 +80,16 @@ export default function ChatPage({ userServers }) {
     return () => {
       ignore = true;
     };
-  }, [serverFilter]);
+  }, [serverFilter, categoryFilter]);
 
   return (
     <>
       <div className={styles.container}>
         <MainNav userServers={userServers} />
-        <Sidebar />
+        <Sidebar
+          selectedCategory={categoryFilter}
+          onButtonClick={(item) => setCategoryFilter(item)}
+        />
 
         <div className={styles.content}>
           <ExploreHeader

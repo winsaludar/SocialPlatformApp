@@ -1,4 +1,5 @@
 ﻿using Chat.Domain.Aggregates.ServerAggregate;
+using Chat.Domain.SeedWork;
 using Chat.Infrastructure.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -16,14 +17,30 @@ public class ServerRepository : IServerRepository
         _serversCollection = mongoDatabase.GetCollection<ServerDbModel>(chatDbSettings.Value.ServersCollectionName);
     }
 
-    public async Task<IEnumerable<Server>> GetAllAsync(int? skip = null, int? limit = null, string? nameFilter = null)
+    public async Task<IEnumerable<Server>> GetAllAsync(int? skip = null, int? limit = null, string? nameFilter = null, string? categoryFilter = null)
     {
 
         IFindFluent<ServerDbModel, ServerDbModel> query;
-        if (!string.IsNullOrEmpty(nameFilter))
-            query = _serversCollection.Find(x => x.Name.ToLower().Contains(nameFilter.ToLower()));
+
+
+        if (!string.IsNullOrEmpty(categoryFilter) && categoryFilter.ToLower() != "others")
+        {
+            query = _serversCollection.Find(x =>
+                x.Name.ToLower().Contains(nameFilter ?? "") &&
+                x.Categories.Any(y => y.Name.ToLower() == categoryFilter.ToLower()));
+        }
+        else if (!string.IsNullOrEmpty(categoryFilter) && categoryFilter.ToLower() == "others")
+        {
+            List<string> validCategories = Enumeration.GetAll<Category>().Select(x => x.Name).ToList();
+
+            query = _serversCollection.Find(x =>
+                x.Name.ToLower().Contains(nameFilter ?? "") &&
+                !x.Categories.Any(y => validCategories.Contains(y.Name)));
+        }
         else
-            query = _serversCollection.Find(_ => true);
+        {
+            query = _serversCollection.Find(x => x.Name.ToLower().Contains(nameFilter ?? ""));
+        }
 
         if (limit.HasValue)
             query = query.Limit(limit.Value);
@@ -72,8 +89,12 @@ public class ServerRepository : IServerRepository
             CreatorEmail = newServer.CreatorEmail,
             Thumbnail = newServer.Thumbnail,
             CreatedById = newServer.CreatedById.ToString(),
-            DateCreated = DateTime.UtcNow
+            DateCreated = DateTime.UtcNow,
         };
+
+        // Add categories
+        foreach (var item in newServer.Categories)
+            model.Categories.Add(new CategoryDbModel { Id = item.Id, Name = item.Name });
 
         await _serversCollection.InsertOneAsync(model);
 

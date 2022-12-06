@@ -131,6 +131,7 @@
 }
 
 .card {
+  background: rgba(0, 0, 0, 0.1);
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   box-shadow: 0 0.25em 0.25em rgba(0, 0, 0, 0.2), 0 0 1em rgba(0, 0, 0, 0.2);
@@ -150,7 +151,6 @@
 }
 
 .cardContent {
-  background: rgba(0, 0, 0, 0.1);
   background-blend-mode: multiply, multiply;
   padding: 1em;
 }
