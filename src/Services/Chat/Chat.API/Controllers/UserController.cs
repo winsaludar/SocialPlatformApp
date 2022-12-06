@@ -31,11 +31,18 @@ public class UserController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ServerDto>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
     [Route("servers")]
-    public async Task<IActionResult> GetAllUserServersAsync(int page = 1, int size = 10, string? name = null)
+    public async Task<IActionResult> GetAllUserServersAsync()
     {
         User user = await GetUserAsync();
         GetUserServersQuery query = new(user.Id);
+        ValidationResult validationResult = await _validatorManager.GetUserServersQueryValidator.ValidateAsync(query);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
 
         var result = await _mediator.Send(query);
         return Ok(result);
