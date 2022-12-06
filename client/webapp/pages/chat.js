@@ -48,6 +48,7 @@ export default function ChatPage({ userServers }) {
   const [servers, setServers] = useState([]);
   const [showLoader, setShowLoader] = useState(false);
   const [serverFilter, setServerFilter] = useState(null);
+  const [category, setCategory] = useState("home");
 
   useEffect(() => {
     let ignore = false;
@@ -84,7 +85,10 @@ export default function ChatPage({ userServers }) {
     <>
       <div className={styles.container}>
         <MainNav userServers={userServers} />
-        <Sidebar />
+        <Sidebar
+          selectedCategory={category}
+          onButtonClick={(item) => setCategory(item)}
+        />
 
         <div className={styles.content}>
           <ExploreHeader
