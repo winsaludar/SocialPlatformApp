@@ -83,7 +83,7 @@ export default function ChatPage({ userServers }) {
   return (
     <>
       <div className={styles.container}>
-        <MainNav />
+        <MainNav userServers={userServers} />
         <Sidebar />
 
         <div className={styles.content}>
