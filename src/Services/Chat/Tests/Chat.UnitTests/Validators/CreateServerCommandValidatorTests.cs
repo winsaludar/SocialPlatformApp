@@ -149,4 +149,17 @@ public class CreateServerCommandValidatorTests
         Assert.NotEmpty(result.Errors);
         Assert.True(result.Errors?.Any(x => x.PropertyName == "CreatedById"));
     }
+
+    [Theory]
+    [InlineData("Gaming", 0)] // Invalid Id
+    [InlineData("Fake Category", 1)]
+    public async Task Categories_ContainsInvalidCategory_ThrowsInvalidCategoryException(string name, int id)
+    {
+        // Arrange
+        Category category = new(name, id);
+        CreateServerCommand command = new("Name", "Short Description", "Long Description", "user@example.com", Guid.Empty, new List<Category> { category }, "Thumbnail");
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidCategoryException>(() => _validator.ValidateAsync(command, It.IsAny<CancellationToken>()));
+    }
 }
