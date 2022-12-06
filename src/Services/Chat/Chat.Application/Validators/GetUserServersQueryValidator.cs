@@ -7,5 +7,10 @@ namespace Chat.Application.Validators;
 
 public class GetUserServersQueryValidator : AbstractValidator<GetUserServersQuery>
 {
-    public GetUserServersQueryValidator(IRepositoryManager repositoryManager) => RuleFor(x => x.UserId).NotNull().MustBeExistingUser(repositoryManager);
+    public GetUserServersQueryValidator(IRepositoryManager repositoryManager)
+    {
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .MustBeExistingUser(repositoryManager);
+    }
 }
