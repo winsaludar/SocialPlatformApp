@@ -1,7 +1,8 @@
-import styles from "../../../styles/ChatComponent.module.css";
 import Image from "next/image";
 
-export default function MainNav({ userServers }) {
+import styles from "../../../styles/ChatComponent.module.css";
+
+export default function MainNav({ userServers, onServerClick }) {
   return (
     <nav className={styles.mainNav}>
       <ul>
@@ -17,7 +18,7 @@ export default function MainNav({ userServers }) {
         {Array.isArray(userServers) &&
           userServers.map((server) => {
             return (
-              <li key={server.id}>
+              <li key={server.id} onClick={() => onServerClick(server)}>
                 <Image
                   src={server.thumbnail}
                   width={50}
@@ -28,7 +29,7 @@ export default function MainNav({ userServers }) {
             );
           })}
 
-        <li>
+        <li onClick={() => onServerClick(null)}>
           <Image
             src="/images/placeholder/csi-explore.jpg"
             width={50}

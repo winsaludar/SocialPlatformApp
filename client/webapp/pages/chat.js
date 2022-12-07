@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 
 import ExploreHeader from "../src/components/chat/ExploreHeader";
 import ExploreList from "../src/components/chat/ExploreList";
+import ExploreSidebar from "../src/components/chat/ExploreSidebar";
 import MainNav from "../src/components/chat/MainNav";
-import Sidebar from "../src/components/chat/Sidebar";
+import ServerSidebar from "../src/components/chat/ServerSidebar";
 import styles from "../styles/ChatComponent.module.css";
 
 export async function getServerSideProps(context) {
@@ -49,6 +50,7 @@ export default function ChatPage({ userServers }) {
   const [showLoader, setShowLoader] = useState(false);
   const [serverFilter, setServerFilter] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState(null);
+  const [selectedServer, setSelectedServer] = useState(null);
 
   useEffect(() => {
     let ignore = false;
@@ -85,19 +87,36 @@ export default function ChatPage({ userServers }) {
   return (
     <>
       <div className={styles.container}>
-        <MainNav userServers={userServers} />
-        <Sidebar
-          selectedCategory={categoryFilter}
-          onButtonClick={(item) => setCategoryFilter(item)}
+        <MainNav
+          userServers={userServers}
+          onServerClick={(server) => {
+            setSelectedServer(server);
+            setCategoryFilter(null);
+          }}
         />
 
-        <div className={styles.content}>
-          <ExploreHeader
-            onTextChange={(e) => {
-              setServerFilter(e.target.value);
+        {selectedServer ? (
+          <ServerSidebar serverName={selectedServer.name} />
+        ) : (
+          <ExploreSidebar
+            selectedCategory={categoryFilter}
+            onButtonClick={(item) => {
+              setCategoryFilter(item);
             }}
           />
-          <ExploreList servers={servers} showLoader={showLoader} />
+        )}
+
+        <div className={styles.content}>
+          {selectedServer ? null : (
+            <>
+              <ExploreHeader
+                onTextChange={(e) => {
+                  setServerFilter(e.target.value);
+                }}
+              />
+              <ExploreList servers={servers} showLoader={showLoader} />)
+            </>
+          )}
         </div>
       </div>
     </>
