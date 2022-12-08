@@ -20,6 +20,7 @@ public class UserControllerTests
 {
     private readonly Mock<IMediator> _mockMediator;
     private readonly InlineValidator<GetUserServersQuery> _getUserServersQueryValidator;
+    private readonly InlineValidator<GetUserServerChannelsQuery> _getUserServerChannelsQueryValidator;
     private readonly InlineValidator<ChangeUsernameCommand> _changeUserCommandValidator;
     private readonly UserController _controller;
 
@@ -27,10 +28,12 @@ public class UserControllerTests
     {
         _mockMediator = new Mock<IMediator>();
         _getUserServersQueryValidator = new InlineValidator<GetUserServersQuery>();
+        _getUserServerChannelsQueryValidator = new InlineValidator<GetUserServerChannelsQuery>();
         _changeUserCommandValidator = new InlineValidator<ChangeUsernameCommand>();
 
         Mock<IValidatorManager> mockValidatorManager = new();
         mockValidatorManager.Setup(x => x.GetUserServersQueryValidator).Returns(_getUserServersQueryValidator);
+        mockValidatorManager.Setup(x => x.GetUserServerChannelsQueryValidator).Returns(_getUserServerChannelsQueryValidator);
         mockValidatorManager.Setup(x => x.ChangeUsernameCommandValidator).Returns(_changeUserCommandValidator);
 
         _controller = new UserController(_mockMediator.Object, mockValidatorManager.Object);
@@ -105,6 +108,91 @@ public class UserControllerTests
         var servers = Assert.IsAssignableFrom<IEnumerable<ServerDto>>(okResult.Value);
         Assert.NotEmpty(servers);
         Assert.Equal(3, servers.Count());
+    }
+
+    [Fact]
+    public async Task GetAllUserServerChannelsAsync_UserIdentityIsNull_ThrowsUnauthorizedAccessException()
+    {
+        // Arrange
+        SetUpNullUserIdentity();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.GetAllUserServerChannelsAsync(Guid.NewGuid()));
+    }
+
+    [Fact]
+    public async Task GetAllUserServerChannelsAsync_ServerIdIsInvalid_ThrowsServerNotFoundException()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync((Server)null!);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ServerNotFoundException>(() => _controller.GetAllUserServerChannelsAsync(Guid.NewGuid()));
+    }
+
+    [Fact]
+    public async Task GetAllUserServerChannelsAsync_ValidationResultIsInvalid_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _getUserServerChannelsQueryValidator.RuleFor(x => x.UserId).Must(userId => false);
+
+        // Act
+        var result = await _controller.GetAllUserServerChannelsAsync(Guid.NewGuid());
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<ChangeUsernameCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        var badResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errors = Assert.IsType<SerializableError>(badResult.Value);
+        Assert.Equal("UserId", errors.FirstOrDefault().Key);
+    }
+
+    [Fact]
+    public async Task GetAllUserServerChannelsAsync_ResultIsEmpty_ReturnsOkObjectResultWithEmptyData()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserServerChannelsQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(Enumerable.Empty<ChannelDto>());
+
+        // Act
+        var result = await _controller.GetAllUserServerChannelsAsync(Guid.NewGuid());
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<GetUserServerChannelsQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var channels = Assert.IsAssignableFrom<IEnumerable<ChannelDto>>(okResult.Value);
+        Assert.Empty(channels);
+    }
+
+    [Fact]
+    public async Task GetAllUserServerChannelsAsync_ResultIsNotEmpty_ReturnsOkObjectResultWithData()
+    {
+        // Arrange
+        SetUpFakeUserIdentity();
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserByEmailQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetUser());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetServerQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(GetTargetServer());
+        _mockMediator.Setup(x => x.Send(It.IsAny<GetUserServerChannelsQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new List<ChannelDto>()
+        {
+            new ChannelDto(),
+            new ChannelDto(),
+            new ChannelDto()
+        });
+
+        // Act
+        var result = await _controller.GetAllUserServerChannelsAsync(Guid.NewGuid());
+
+        // Assert
+        _mockMediator.Verify(x => x.Send(It.IsAny<GetUserServerChannelsQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var channels = Assert.IsAssignableFrom<IEnumerable<ChannelDto>>(okResult.Value);
+        Assert.NotEmpty(channels);
+        Assert.Equal(3, channels.Count());
     }
 
     [Fact]
