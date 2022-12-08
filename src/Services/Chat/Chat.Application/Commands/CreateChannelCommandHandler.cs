@@ -14,16 +14,16 @@ public class CreateChannelCommandHandler : IRequestHandler<CreateChannelCommand,
     {
         Channel newChannel = request.TargetServer.AddChannel(Guid.NewGuid(), request.Name, request.IsPublic, request.CreatedById, DateTime.UtcNow);
 
-        // Add channel members
+        // All server members are automatically a channel member if public
         if (request.IsPublic)
         {
             foreach (var member in request.TargetServer.Members.Where(x => x.UserId != request.TargetServer.CreatedById))
                 newChannel.AddMember(member.UserId);
         }
-        if (request.TargetServer.CreatedById != request.CreatedById)
-        {
-            newChannel.AddMember(request.CreatedById);
-        }
+
+        // Server creator and channel creator is also automatically a member of the channel
+        newChannel.AddMember(request.TargetServer.CreatedById);
+        newChannel.AddMember(request.CreatedById);
 
         await _repositoryManager.ServerRepository.UpdateAsync(request.TargetServer);
 
