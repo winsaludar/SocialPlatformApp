@@ -8,6 +8,7 @@ using Chat.Domain.Aggregates.ServerAggregate;
 using Chat.Domain.Aggregates.UserAggregate;
 using Chat.Domain.Exceptions;
 using FluentValidation.Results;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,17 @@ public class UserController : ControllerBase
     {
         _mediator = mediator;
         _validatorManager = validatorManager;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDto))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    public async Task<IActionResult> GetUserInfoAsync()
+    {
+        User user = await GetUserAsync();
+        UserDto dto = user.Adapt<UserDto>();
+
+        return Ok(dto);
     }
 
     [HttpGet]
