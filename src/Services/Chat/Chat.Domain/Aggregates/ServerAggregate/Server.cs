@@ -42,6 +42,7 @@ public class Server : Entity, IAggregateRoot
         newChannel.SetId(id);
         newChannel.SetDateCreated(dateCreated);
         newChannel.SetCreatedById(createdById);
+        newChannel.AddMember(createdById);
 
         if (lastModifiedById.HasValue)
             newChannel.SetLastModifiedById(lastModifiedById.Value);
