@@ -114,7 +114,7 @@ export default function ChatPage({ userServers }) {
                   setServerFilter(e.target.value);
                 }}
               />
-              <ExploreList servers={servers} showLoader={showLoader} />)
+              <ExploreList servers={servers} showLoader={showLoader} />
             </>
           )}
         </div>
