@@ -13,7 +13,7 @@ public class GetUserServersQueryHandler : IRequestHandler<GetUserServersQuery, I
 
     public async Task<IEnumerable<ServerDto>> Handle(GetUserServersQuery request, CancellationToken cancellationToken)
     {
-        var result = await _repositoryManager.UserRepository.GetUserServers(request.UserId);
+        var result = await _repositoryManager.UserRepository.GetUserServersAsync(request.UserId);
         if (!result.Any())
             return Enumerable.Empty<ServerDto>();
 

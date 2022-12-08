@@ -25,7 +25,7 @@ public class Channel : Entity
 
     public void AddMember(Guid userId)
     {
-        if (_members.Any(x => x == userId))
+        if (IsMember(userId))
             return;
 
         _members.Add(userId);
@@ -33,9 +33,12 @@ public class Channel : Entity
 
     public void RemoveMember(Guid userId)
     {
-        if (!_members.Any(x => x == userId))
+        if (!IsMember(userId))
             return;
 
         _members.Remove(userId);
     }
+
+    public bool IsMember(Guid userId) => _members.Any(x => x == userId);
+
 }

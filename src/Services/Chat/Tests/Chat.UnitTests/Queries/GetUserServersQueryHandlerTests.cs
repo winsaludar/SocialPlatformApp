@@ -25,7 +25,7 @@ public class GetUserServersQueryHandlerTests
     {
         // Arrange
         GetUserServersQuery query = new(Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.UserRepository.GetUserServers(It.IsAny<Guid>())).ReturnsAsync(Enumerable.Empty<Server>());
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetUserServersAsync(It.IsAny<Guid>())).ReturnsAsync(Enumerable.Empty<Server>());
 
         // Act
         var result = await _getUserServersQueryHandler.Handle(query, It.IsAny<CancellationToken>());
@@ -40,7 +40,7 @@ public class GetUserServersQueryHandlerTests
     {
         // Arrange
         GetUserServersQuery query = new(Guid.NewGuid());
-        _mockRepositoryManager.Setup(x => x.UserRepository.GetUserServers(It.IsAny<Guid>())).ReturnsAsync(
+        _mockRepositoryManager.Setup(x => x.UserRepository.GetUserServersAsync(It.IsAny<Guid>())).ReturnsAsync(
         new List<Server>()
             {
                 new Server("Server 1", "Short Description 1", "Short Description 1", "Thumbnail 1"),

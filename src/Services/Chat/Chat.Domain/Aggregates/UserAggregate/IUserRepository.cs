@@ -9,5 +9,5 @@ public interface IUserRepository : IRepository<User>
     Task<User?> GetByEmailAsync(string email);
     Task<User?> GetByIdAsync(Guid id);
     Task<Guid> AddAsync(User newUser);
-    Task<IEnumerable<Server>> GetUserServers(Guid id);
+    Task<IEnumerable<Server>> GetUserServersAsync(Guid id);
 }

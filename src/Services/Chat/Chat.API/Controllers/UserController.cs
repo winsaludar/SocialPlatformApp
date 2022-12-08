@@ -60,6 +60,28 @@ public class UserController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ChannelDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+    [Route("servers/{serverId}/channels")]
+    public async Task<IActionResult> GetAllUserServerChannelsAsync(Guid serverId)
+    {
+        User user = await GetUserAsync();
+        Server server = await GetServerAsync(serverId);
+        GetUserServerChannelsQuery query = new(user.Id, server);
+        ValidationResult validationResult = await _validatorManager.GetUserServerChannelsQueryValidator.ValidateAsync(query);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
+
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]

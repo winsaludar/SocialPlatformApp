@@ -64,7 +64,7 @@ public class UserRepository : IUserRepository
         return newId;
     }
 
-    public async Task<IEnumerable<Server>> GetUserServers(Guid id)
+    public async Task<IEnumerable<Server>> GetUserServersAsync(Guid id)
     {
         var result = await _serversCollection.Find(x => x.CreatedById.ToLower() == id.ToString().ToLower() ||
             x.Members.Any(y => y.UserId == id)).ToListAsync();
