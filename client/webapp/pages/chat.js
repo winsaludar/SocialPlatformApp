@@ -8,8 +8,6 @@ import ServerSidebar from "../src/components/chat/ServerSidebar";
 import styles from "../styles/ChatComponent.module.css";
 
 export async function getServerSideProps(context) {
-  let userServers = [];
-
   // Make sure user cookie (where our auth token reside) exist
   let token;
   try {
@@ -22,30 +20,40 @@ export async function getServerSideProps(context) {
     token = parsedCookie.value;
   } catch {}
 
+  const httpGetOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  // Fetch user info from remote api
+  let userInfo = {};
+  try {
+    const api = `${process.env.CHAT_BASE_URL}/${process.env.CHAT_GET_USER_INFO_ENDPOINT}`;
+    const response = await fetch(api, httpGetOptions);
+    userInfo = await response.json();
+  } catch {}
+
   // Fetch user servers from remote api
+  let userServers = [];
   try {
     const api = `${process.env.CHAT_BASE_URL}/${process.env.CHAT_GET_USER_SERVERS_ENDPOINT}`;
-    const options = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    const response = await fetch(api, options);
+    const response = await fetch(api, httpGetOptions);
     userServers = await response.json();
   } catch {}
 
   return {
     props: {
       title: "Chat",
+      userInfo: userInfo,
       userServers: userServers,
     },
   };
 }
 
-export default function ChatPage({ userServers }) {
+export default function ChatPage({ userInfo, userServers }) {
   const [servers, setServers] = useState([]);
   const [showLoader, setShowLoader] = useState(false);
   const [serverFilter, setServerFilter] = useState(null);
@@ -94,7 +102,7 @@ export default function ChatPage({ userServers }) {
 
     try {
       const response = await fetch(
-        `api/getServerChannels?serverId=${server.id}`,
+        `api/getServerChannels?serverId=${server.id}&userId=${userInfo.id}`,
         {
           method: "GET",
           headers: {
