@@ -51,6 +51,7 @@ export default function ChatPage({ userServers }) {
   const [serverFilter, setServerFilter] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState(null);
   const [selectedServer, setSelectedServer] = useState(null);
+  const [serverChannels, setServerChannels] = useState([]);
 
   useEffect(() => {
     let ignore = false;
@@ -63,18 +64,18 @@ export default function ChatPage({ userServers }) {
       if (serverFilter) endpoint += `${serverFilter}`;
       if (categoryFilter) endpoint += `&category=${categoryFilter}`;
 
-      const options = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-
       try {
-        const response = await fetch(endpoint, options);
+        const response = await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         const result = await response.json();
         if (!ignore) setServers(result.data);
-      } catch {}
+      } catch (err) {
+        console.log("Error fetching servers: ", err);
+      }
 
       setShowLoader(false);
     })();
@@ -84,19 +85,43 @@ export default function ChatPage({ userServers }) {
     };
   }, [serverFilter, categoryFilter]);
 
+  const handleServerClick = async function (server) {
+    try {
+      const response = await fetch(
+        `api/getServerChannels?serverId=${server.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      setServerChannels(result.data);
+      setSelectedServer(server);
+      setCategoryFilter(null);
+    } catch (err) {
+      console.log("Error fetching channels:", err);
+    }
+  };
+
   return (
     <>
       <div className={styles.container}>
         <MainNav
           userServers={userServers}
           onServerClick={(server) => {
-            setSelectedServer(server);
-            setCategoryFilter(null);
+            handleServerClick(server);
           }}
         />
 
         {selectedServer ? (
-          <ServerSidebar serverName={selectedServer.name} />
+          <ServerSidebar
+            serverName={selectedServer.name}
+            channels={serverChannels}
+          />
         ) : (
           <ExploreSidebar
             selectedCategory={categoryFilter}
