@@ -86,6 +86,12 @@ export default function ChatPage({ userServers }) {
   }, [serverFilter, categoryFilter]);
 
   const handleServerClick = async function (server) {
+    if (!server) {
+      setSelectedServer(null);
+      setServerChannels([]);
+      return;
+    }
+
     try {
       const response = await fetch(
         `api/getServerChannels?serverId=${server.id}`,

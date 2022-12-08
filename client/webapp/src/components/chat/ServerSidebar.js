@@ -4,7 +4,7 @@ export default function ServerSidebar({ serverName, channels, onButtonClick }) {
   console.log("Sidebar:", channels);
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${styles.smallHeader}`}>
       <h2>{serverName}</h2>
 
       <div>

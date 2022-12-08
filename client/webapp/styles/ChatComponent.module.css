@@ -297,6 +297,11 @@
     grid-template-columns: repeat(auto-fit, minmax(20em, 0.33fr));
     padding: 0;
   }
+
+  /* MISC */
+  .smallHeader h2 {
+    font-size: 1rem;
+  }
 }
 
 @keyframes LineFadeIn {
